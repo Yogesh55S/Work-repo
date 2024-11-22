@@ -37,10 +37,10 @@ const Navbar = () => {
   }, [isMenuOpen, isDesktop]);
 
   return (
-    <nav className="bg-[#e5cfc3] h-20 flex items-center">
+    <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg"> {/* Added z-50 for the navbar */}
       <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
         {/* Logo */}
-        <div className="text-2xl font-bold text-[#0d0d0d]">
+        <div className="text-2xl font-bold text-white">
           <Link to="/">Nidas Pure</Link>
         </div>
 
@@ -53,9 +53,10 @@ const Navbar = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col space-y-4 fixed top-20 left-0 bg-[#e5cfc3] w-full py-4 lg:hidden"
+              className="flex flex-col space-y-4 fixed top-20 left-0 bg-[#B09383] w-full py-4 lg:hidden z-50 shadow-lg" // Added z-50 and shadow for visibility
             >
-              {[{ name: 'Home', path: '/' },
+              {[
+                { name: 'Home', path: '/' },
                 { name: 'Winter Collection', path: '/winter-collection' },
                 { name: 'Shop', path: '/shop' },
                 { name: 'Contact Us', path: '/contact' },
@@ -63,8 +64,8 @@ const Navbar = () => {
                 <li key={navItem.path} className="list-none px-4">
                   <Link
                     to={navItem.path}
-                    className={`hover:text-[#c28565] text-[13px] font-medium uppercase ${
-                      isActive(navItem.path) ? 'text-[#c28565]' : ''
+                    className={`hover:text-[#D7C9C1] text-white text-[13px] font-medium uppercase ${
+                      isActive(navItem.path) ? 'text-[#D7C9C1]' : ''
                     }`}
                     onClick={() => setIsMenuOpen(false)} // Close menu on item click
                   >
@@ -77,8 +78,9 @@ const Navbar = () => {
 
           {/* For desktop */}
           {isDesktop && (
-            <ul className="hidden lg:flex lg:space-x-6 lg:items-center lg:static text-[#0d0d0d] text-[13px] font-medium uppercase lg:ml-16">
-              {[{ name: 'Home', path: '/' },
+            <ul className="hidden lg:flex lg:space-x-6 lg:items-center lg:static text-white text-[13px] font-medium uppercase lg:ml-16">
+              {[
+                { name: 'Home', path: '/' },
                 { name: 'Winter Collection', path: '/winter-collection' },
                 { name: 'Shop', path: '/shop' },
                 { name: 'Contact Us', path: '/contact' },
@@ -86,8 +88,8 @@ const Navbar = () => {
                 <li key={navItem.path} className="list-none px-4">
                   <Link
                     to={navItem.path}
-                    className={`hover:text-[#c28565] ${
-                      isActive(navItem.path) ? 'text-[#c28565]' : ''
+                    className={`hover:text-[#D7C9C1] ${
+                      isActive(navItem.path) ? 'text-[#D7C9C1]' : ''
                     }`}
                   >
                     {navItem.name}
@@ -99,12 +101,12 @@ const Navbar = () => {
         </AnimatePresence>
 
         {/* Icons */}
-        <div className="flex items-center space-x-6 text-[#0d0d0d] text-xl">
+        <div className="flex items-center space-x-6 text-white text-xl">
           {/* Cart Icon */}
           <Link
             to="/cart"
-            className={`hover:text-[#c28565] ${
-              isActive('/cart') ? 'text-[#c28565]' : ''
+            className={`hover:text-[#D7C9C1] ${
+              isActive('/cart') ? 'text-[#D7C9C1]' : ''
             }`}
           >
             <FiShoppingCart />
@@ -113,8 +115,8 @@ const Navbar = () => {
           {/* Profile Icon */}
           <Link
             to="/profile"
-            className={`hover:text-[#c28565] ${
-              isActive('/profile') ? 'text-[#c28565]' : ''
+            className={`hover:text-[#D7C9C1] ${
+              isActive('/profile') ? 'text-[#D7C9C1]' : ''
             }`}
           >
             <FiUser />
@@ -123,7 +125,7 @@ const Navbar = () => {
           {/* Hamburger Icon */}
           {!isDesktop && (
             <div
-              className="lg:hidden text-[#0d0d0d] text-2xl cursor-pointer"
+              className="lg:hidden text-white text-2xl cursor-pointer"
               onClick={toggleMenu}
             >
               {isMenuOpen ? <HiX /> : <HiMenu />}
