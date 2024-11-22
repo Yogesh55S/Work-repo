@@ -1,22 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom'; // Added useNavigate
 import { FiShoppingCart, FiUser } from 'react-icons/fi';
-import { HiMenu, HiX } from 'react-icons/hi'; // Hamburger and Cross icons
+import { HiMenu, HiX } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const location = useLocation();
+  const navigate = useNavigate(); // For navigation on user icon click
   const menuRef = useRef();
 
-  // Function to check if the current route matches the nav item
   const isActive = (path) => location.pathname === path;
 
-  // Toggle Menu
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
-  // Handle window resize to toggle desktop/mobile view dynamically
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
 
@@ -24,7 +22,6 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Close menu when clicking outside (mobile only)
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target) && !isDesktop) {
@@ -37,14 +34,12 @@ const Navbar = () => {
   }, [isMenuOpen, isDesktop]);
 
   return (
-    <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg"> {/* Added z-50 for the navbar */}
+    <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg">
       <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
-        {/* Logo */}
         <div className="text-2xl font-bold text-white">
           <Link to="/">Nidas Pure</Link>
         </div>
 
-        {/* Navigation Links */}
         <AnimatePresence>
           {isMenuOpen && !isDesktop && (
             <motion.ul
@@ -53,7 +48,7 @@ const Navbar = () => {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -50 }}
               transition={{ duration: 0.3 }}
-              className="flex flex-col space-y-4 fixed top-20 left-0 bg-[#B09383] w-full py-4 lg:hidden z-50 shadow-lg" // Added z-50 and shadow for visibility
+              className="flex flex-col space-y-4 fixed top-20 left-0 bg-[#B09383] w-full py-4 lg:hidden z-50 shadow-lg"
             >
               {[
                 { name: 'Home', path: '/' },
@@ -67,7 +62,7 @@ const Navbar = () => {
                     className={`hover:text-[#D7C9C1] text-white text-[13px] font-medium uppercase ${
                       isActive(navItem.path) ? 'text-[#D7C9C1]' : ''
                     }`}
-                    onClick={() => setIsMenuOpen(false)} // Close menu on item click
+                    onClick={() => setIsMenuOpen(false)}
                   >
                     {navItem.name}
                   </Link>
@@ -76,7 +71,6 @@ const Navbar = () => {
             </motion.ul>
           )}
 
-          {/* For desktop */}
           {isDesktop && (
             <ul className="hidden lg:flex lg:space-x-6 lg:items-center lg:static text-white text-[13px] font-medium uppercase lg:ml-16">
               {[
@@ -100,9 +94,7 @@ const Navbar = () => {
           )}
         </AnimatePresence>
 
-        {/* Icons */}
         <div className="flex items-center space-x-6 text-white text-xl">
-          {/* Cart Icon */}
           <Link
             to="/cart"
             className={`hover:text-[#D7C9C1] ${
@@ -112,17 +104,15 @@ const Navbar = () => {
             <FiShoppingCart />
           </Link>
 
-          {/* Profile Icon */}
-          <Link
-            to="/profile"
-            className={`hover:text-[#D7C9C1] ${
-              isActive('/profile') ? 'text-[#D7C9C1]' : ''
+          <div
+            className={`hover:text-[#D7C9C1] cursor-pointer ${
+              isActive('/login') ? 'text-[#D7C9C1]' : ''
             }`}
+            onClick={() => navigate('/login')} // Redirect to login page
           >
             <FiUser />
-          </Link>
+          </div>
 
-          {/* Hamburger Icon */}
           {!isDesktop && (
             <div
               className="lg:hidden text-white text-2xl cursor-pointer"
