@@ -4,26 +4,24 @@ import kittenImage from "../../assets/Image/banner2.png"; // Import the first im
 import yogaImage from "../../assets/Image/banner2.png"; // Import the second image
 import backgroundImage from "../../assets/Image/bannerbackground.png"; // Import the background image
 
-const banners = 
-  [
-    {
-      id: 1,
-      title: "Nature's Essence",
-      subtitleLine1: "Pure Ingredients",
-      subtitleLine2: "For True Beauty",
-      buttonText: "Explore Products",
-      image: yogaImage,
-    },
-    {
-      id: 2,
-      title: "Natural Radiance",
-      subtitleLine1: "Sustainably Sourced",
-      subtitleLine2: "Care You Deserve",
-      buttonText: "Learn More",
-      image: yogaImage,
-    },
-  ];
-  
+const banners = [
+  {
+    id: 1,
+    title: "Transforming",
+    subtitleLine1: "Surgical Artistry",
+    subtitleLine2: "Unveiling Beauty",
+    buttonText: "Our Services",
+    image: kittenImage,
+  },
+  {
+    id: 2,
+    title: "Transforming",
+    subtitleLine1: "Surgical Artistry",
+    subtitleLine2: "Unveiling Beauty",
+    buttonText: "Learn More",
+    image: yogaImage,
+  },
+];
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -38,7 +36,7 @@ const Banner = () => {
   }, []);
 
   return (
-    <div className="relative h-[100vh]">
+    <div className="relative h-[100vh] md:h-[100vh]  lg:h-[100vh]">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -86,16 +84,16 @@ const Banner = () => {
               <img
                 src={banner.image}
                 alt="Banner Image"
-                className="w-full  md:w-full h-full md:h-[90vh]"
+                className="w-full  md:w-full h-full"
               />
             </div>
             </div>
 
-            <div className=" hidden md:block w-full md:w-1/2  items-center justify-center mt-20">
+            <div className=" hidden md:block w-full md:w-1/2  items-center  justify-center mt-28">
               <img
                 src={banner.image}
                 alt="Banner Image"
-                className="  lg:w-[600px] llg:h-[600px]"
+                className="  lg:w-[600px] lg:h-[600px]"
               />
             </div>
           </div>

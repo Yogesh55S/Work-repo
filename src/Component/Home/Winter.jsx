@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -20,42 +20,45 @@ const jsonData = [
 
 const Winter = () => {
   const sliderRef = useRef(null); // Reference to the Slider instance
+  const [slidesToShow, setSlidesToShow] = useState(4); // Default number of cards to display
   const [currentSlide, setCurrentSlide] = useState(0); // Current slide index
+
+  const calculateSlidesToShow = () => {
+    const screenWidth = window.innerWidth; // Get the screen width
+    const cardWidth = 300; // Width of each card in pixels
+    const spaceBetweenCards = 20; // Space between cards in pixels
+    const totalCardWidth = cardWidth + spaceBetweenCards;
+
+    if (screenWidth >= 1440) {
+      setSlidesToShow(4); // Display exactly 4 cards for 1440px and above
+    } else {
+      const calculatedSlides = Math.floor(screenWidth / totalCardWidth);
+      setSlidesToShow(calculatedSlides);
+    }
+  };
+
+  useEffect(() => {
+    // Initial calculation
+    calculateSlidesToShow();
+
+    // Recalculate on window resize
+    window.addEventListener("resize", calculateSlidesToShow);
+    return () => {
+      window.removeEventListener("resize", calculateSlidesToShow);
+    };
+  }, []);
 
   const settings = {
     dots: false, // Disable dots
     infinite: false, // Disable infinite loop
     speed: 500,
-    slidesToShow: 4, // Default: 3 cards
+    slidesToShow: slidesToShow, // Dynamically calculated slides to show
     slidesToScroll: 1,
     beforeChange: (oldIndex, newIndex) => setCurrentSlide(newIndex), // Update current slide
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 768,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 1,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
   };
 
   const isPrevDisabled = currentSlide === 0;
-  const isNextDisabled = currentSlide + settings.slidesToShow >= jsonData.length;
+  const isNextDisabled = currentSlide + slidesToShow >= jsonData.length;
 
   return (
     <div id="winter-carousel" className="p-4 md:p-8 bg-gray-50 text-center relative overflow-hidden">
@@ -69,7 +72,12 @@ const Winter = () => {
         <div className="relative w-full">
           <Slider ref={sliderRef} {...settings}>
             {jsonData.map((item, index) => (
-              <div key={index} className="p-2">
+              <div
+                key={index}
+                style={{
+                  padding: "0 10px", // Adding space around each card
+                }}
+              >
                 <Card name={item.name} price={item.price} image={item.image} />
               </div>
             ))}
