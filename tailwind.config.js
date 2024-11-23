@@ -7,12 +7,12 @@ export default {
   theme: {
     extend: {
       screens: {
-        'xs': '320px',  // Extra small screens
-        'sm': '375px',  // Small screens
-        'md-sm': '425px', // Medium-small screens
-        'md': '768px', // Tablet size
-        'lg': '1024px',    // Large screens
-        'xl': '1440px',    // Extra large screens
+        'xs': '322px',  // Extra small screens
+        'sm': '378px',  // Small screens
+        'md-sm': '428px', // Medium-small screens
+        'md': '770px', // Tablet size
+        'lg': '1025px',    // Large screens
+        'xl': '1441px',    // Extra large screens
         '2xl': '2560px',   // 4K resolution
       },
       colors: {
