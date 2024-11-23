@@ -4,24 +4,26 @@ import kittenImage from "../../assets/Image/banner2.png"; // Import the first im
 import yogaImage from "../../assets/Image/banner2.png"; // Import the second image
 import backgroundImage from "../../assets/Image/bannerbackground.png"; // Import the background image
 
-const banners = [
-  {
-    id: 1,
-    title: "Transforming",
-    subtitleLine1: "Surgical Artistry",
-    subtitleLine2: "Unveiling Beauty",
-    buttonText: "Our Services",
-    image: kittenImage,
-  },
-  {
-    id: 2,
-    title: "Transforming",
-    subtitleLine1: "Surgical Artistry",
-    subtitleLine2: "Unveiling Beauty",
-    buttonText: "Learn More",
-    image: yogaImage,
-  },
-];
+const banners = 
+  [
+    {
+      id: 1,
+      title: "Nature's Essence",
+      subtitleLine1: "Pure Ingredients",
+      subtitleLine2: "For True Beauty",
+      buttonText: "Explore Products",
+      image: yogaImage,
+    },
+    {
+      id: 2,
+      title: "Natural Radiance",
+      subtitleLine1: "Sustainably Sourced",
+      subtitleLine2: "Care You Deserve",
+      buttonText: "Learn More",
+      image: yogaImage,
+    },
+  ];
+  
 
 const Banner = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
