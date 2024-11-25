@@ -33,6 +33,11 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isMenuOpen, isDesktop]);
 
+  // Scroll to top when the location changes
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to the top of the page
+  }, [location]);
+
   return (
     <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg">
       <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">

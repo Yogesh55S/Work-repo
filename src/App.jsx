@@ -12,6 +12,7 @@ import Profile from './Pages/Profile';
 import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx'; // Register Page
 import VerifyOTP from './Pages/VerifyOtp.jsx'; // Verify OTP Page
+import ProductDetail from "./Component/ProductDetail.jsx";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/login" element={<Login />} /> {/* Login Page */}
             <Route path="/register" element={<Register />} /> {/* Register Page */}
             <Route path="/verify-otp" element={<VerifyOTP />} /> {/* Verify OTP Page */}
+            <Route path="/product/:id" element={<ProductDetail />} />
           </Routes>
           <Footer />
         </div>
