@@ -8,10 +8,13 @@ const ProductDetail = () => {
   const product = location.state?.product;
 
   // List of images for carousel and thumbnails
-  const images = [product.image, goldOilImage, faceWashImage,goldOilImage];
+  const images = [product.image, goldOilImage, faceWashImage, goldOilImage];
 
   // State to track the currently displayed image
   const [currentImage, setCurrentImage] = useState(images[0]);
+
+  // State to handle tab selection
+  const [activeTab, setActiveTab] = useState("Description");
 
   if (!product) {
     return <div className="text-center text-gray-600">Product not found.</div>;
@@ -28,19 +31,19 @@ const ProductDetail = () => {
               <img
                 src={currentImage}
                 alt="Selected Product"
-                className="w-full h-auto object-cover shadow md:w-[100%] md:mx-auto" // Reduce size in 768px frame
+                className="w-full h-auto object-cover shadow md:w-[100%] md:mx-auto"
               />
             </div>
 
             {/* Thumbnails */}
-            <div className="flex mt-4  space-x-4 overflow-x-auto">
+            <div className="flex mt-4 space-x-4 overflow-x-auto">
               {images.map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Thumbnail ${index}`}
-                  onClick={() => setCurrentImage(img)} // Change main image on thumbnail click
-                  className={`w-16 h-16 md:w-20 md:h-20 object-cover  shadow cursor-pointer ${
+                  onClick={() => setCurrentImage(img)}
+                  className={`w-16 h-16 md:w-20 md:h-20 object-cover shadow cursor-pointer ${
                     currentImage === img ? "ring-2 ring-button-primary" : ""
                   }`}
                 />
@@ -53,7 +56,6 @@ const ProductDetail = () => {
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
             <div className="flex items-center mb-4">
               <p className="text-lg text-red-600 font-semibold mr-4">{product.price}</p>
-              {/* <p className="line-through text-gray-400 text-sm md:text-base">₹2500</p> */}
             </div>
             <div className="text-yellow-500 flex items-center space-x-1 mb-4 text-sm md:text-base">
               {"⭐".repeat(4)}
@@ -70,7 +72,7 @@ const ProductDetail = () => {
                 className="w-12 text-center border-y border-gray-300"
               />
               <button className="px-3 py-1 border text-gray-600">+</button>
-              <button className="ml-4 px-6 py-2 bg-button-primary text-white font-medium text-sm md:text-base shadow hover:bg-primary transition">
+              <button className="ml-4 px-6 py-2 bg-pink-400 text-white font-medium text-sm md:text-base shadow hover:bg-pink-500 transition">
                 Add to Cart
               </button>
             </div>
@@ -99,20 +101,56 @@ const ProductDetail = () => {
       </div>
 
       {/* Tabs Section */}
-      <div className="mt-12 border-t pt-8 mx-auto container  lg:w-[1240px]">
+      <div className="mt-12 border-t pt-8 mx-auto container lg:w-[1240px]">
         <div className="flex flex-wrap space-x-4 border-b pb-4 text-sm md:text-base">
-          <button className="text-gray-800 font-medium border-b-2 border-button-primary">
+          <button
+            className={`px-4 py-2 ${
+              activeTab === "Description"
+                ? "bg-pink-200 text-gray-800 border-b-2 border-button-primary"
+                : "bg-transparent text-gray-600"
+            } rounded`}
+            onClick={() => setActiveTab("Description")}
+          >
             Description
           </button>
-          <button className="text-gray-600">Additional Information</button>
-          <button className="text-gray-600">Reviews</button>
+          <button
+            className={`px-4 py-2 ${
+              activeTab === "Additional Information"
+                ? "bg-pink-200 text-gray-800 border-b-2 border-button-primary"
+                : "bg-transparent text-gray-600"
+            } rounded`}
+            onClick={() => setActiveTab("Additional Information")}
+          >
+            Additional Information
+          </button>
         </div>
-        <div className="mt-4">
-          <p className="text-gray-700 text-sm md:text-base">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-            euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
-          </p>
-        </div>
+
+        {/* Content based on selected tab */}
+        {activeTab === "Description" && (
+          <div className="mt-4">
+            <p className="text-gray-700 text-sm md:text-base">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
+            </p>
+          </div>
+        )}
+
+        {activeTab === "Additional Information" && (
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Replace these divs with dynamic related products */}
+            {[goldOilImage, faceWashImage, goldOilImage, faceWashImage].map((img, index) => (
+              <div key={index} className="relative shadow p-4 rounded">
+                <img
+                  src={img}
+                  alt={`Related product ${index}`}
+                  className="w-full h-auto object-cover"
+                />
+                <p className="text-gray-700 text-sm mt-2">Product Name</p>
+                <p className="text-red-500 text-sm font-medium">Price</p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
