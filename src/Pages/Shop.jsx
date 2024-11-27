@@ -1,8 +1,13 @@
 import React from 'react'
+import ShopBanner from '../Component/Shop/ShopBanner'
+import ShopProducts from '../Component/Shop/ShopProducts'
 
 const Shop = () => {
   return (
-    <div>Shop</div>
+    <div className='pt-20'>
+      <ShopBanner/>
+      <ShopProducts/>
+    </div>
   )
 }
 

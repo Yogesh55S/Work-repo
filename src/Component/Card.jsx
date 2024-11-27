@@ -1,6 +1,6 @@
 import React from "react";
 
-const Card = ({ name, price, image }) => {
+const Card = ({ name, price, image ,description }) => {
   return (
     <div className="flex flex-col items-center w-[300px] mx-auto my-auto">
       <img
