@@ -72,7 +72,7 @@ const ProductDetail = () => {
                 className="w-12 text-center border-y border-gray-300"
               />
               <button className="px-3 py-1 border text-gray-600">+</button>
-              <button className="ml-4 px-6 py-2 bg-pink-400 text-white font-medium text-sm md:text-base shadow hover:bg-pink-500 transition">
+              <button className="ml-4 px-6 py-2 bg-primary text-white font-medium text-sm md:text-base shadow hover:bg-pink-500 transition">
                 Add to Cart
               </button>
             </div>
@@ -106,7 +106,7 @@ const ProductDetail = () => {
           <button
             className={`px-4 py-2 ${
               activeTab === "Description"
-                ? "bg-pink-200 text-gray-800 border-b-2 border-button-primary"
+                ? "bg-primary text-gray-800 border-b-2 border-button-primary"
                 : "bg-transparent text-gray-600"
             } rounded`}
             onClick={() => setActiveTab("Description")}
@@ -116,7 +116,7 @@ const ProductDetail = () => {
           <button
             className={`px-4 py-2 ${
               activeTab === "Additional Information"
-                ? "bg-pink-200 text-gray-800 border-b-2 border-button-primary"
+                ? "bg-primary text-gray-800 border-b-2 border-button-primary"
                 : "bg-transparent text-gray-600"
             } rounded`}
             onClick={() => setActiveTab("Additional Information")}
@@ -130,6 +130,16 @@ const ProductDetail = () => {
           <div className="mt-4">
             <p className="text-gray-700 text-sm md:text-base">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
+            </p>
+            <p className="text-gray-700 text-sm md:text-base">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
+              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
               euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
             </p>
           </div>
