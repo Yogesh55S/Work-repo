@@ -16,7 +16,7 @@ import ProductDetail from "./Component/ProductDetail.jsx";
 
 function App() {
   return (
-    <GoogleAuthProvider>
+    <GoogleAuthProvider clientId = {import.meta.env.VITE_GOOGLE_CLIENT_ID} >
       <Router>
         <div>
           <Navbar />

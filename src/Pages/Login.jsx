@@ -1,20 +1,27 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { GoogleLogin } from '@react-oauth/google';
+import { useAuth } from '../Component/providers/AuthContext';
+import GoogleSignInButton from '../Component/GoogleSignInButton.jsx'; // Import the GoogleSignInButton component
 
-export default function Login({ login }) {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleEmailLogin = async () => {
     setErrorMessage('');
     setIsLoading(true);
+
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { email, password });
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
+        email,
+        password,
+      });
+
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -22,80 +29,91 @@ export default function Login({ login }) {
         navigate('/');
       }
     } catch (error) {
-      setErrorMessage('Invalid credentials. Please try again.');
+      if (error.response?.status === 400) {
+        setErrorMessage('Invalid email or password. Please try again.');
+      } else if (error.response?.status === 403) {
+        setErrorMessage('Please verify your email before logging in.');
+      } else {
+        setErrorMessage('Something went wrong. Please try again later.');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse) => {
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/google/callback`, {
-        token: credentialResponse.credential,
-      });
-      if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
-        login(response.data.user);
-        navigate('/');
-      }
-    } catch {
-      setErrorMessage('Google login failed. Please try again.');
-    }
-  };
-
-  const handleGoogleFailure = () => setErrorMessage('Google login failed. Please try again.');
-
   return (
-    <div className="flex flex-col items-center justify-center h-[90vh] bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-3xl font-bold mb-6 text-center text-[#004B65]">Login</h1>
+    <div className="flex items-center justify-center h-screen bg-primary">
+      <div className="w-full max-w-md bg-hover shadow-lg rounded-lg p-6 md:p-8">
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-center text-button-primary mb-6">
+          Welcome Back
+        </h1>
+        <p className="text-center text-text text-sm mb-8">
+          Login to your account to continue.
+        </p>
 
-        <div className="mb-6">
+        {/* Email Input */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-text mb-1">Email</label>
           <input
             type="email"
-            placeholder="Email"
+            placeholder="Enter your email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none"
+            className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary"
           />
         </div>
 
+        {/* Password Input */}
         <div className="mb-6">
+          <label className="block text-sm font-medium text-text mb-1">Password</label>
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 border rounded-lg focus:outline-none"
+            className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary"
           />
         </div>
 
+        {/* Error Message */}
+        {errorMessage && (
+          <p className="text-center text-red-600 text-sm mb-4">{errorMessage}</p>
+        )}
+
+        {/* Login Button */}
         <button
           onClick={handleEmailLogin}
-          className="w-full bg-[#004B65] text-white py-2 px-4 rounded-lg"
+          className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
+            isLoading ? 'bg-opacity-70 cursor-not-allowed' : 'bg-button-primary hover:bg-hover'
+          }`}
           disabled={isLoading}
         >
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
 
-        <div className="my-6">
-          <GoogleLogin onSuccess={handleGoogleSuccess} onError={handleGoogleFailure} />
+        {/* Divider */}
+        <div className="flex items-center my-6">
+          <hr className="flex-grow border-t border-gray-300" />
+          <span className="mx-2 text-sm text-text">OR</span>
+          <hr className="flex-grow border-t border-gray-300" />
         </div>
 
-        {errorMessage && <p className="text-red-500 text-center">{errorMessage}</p>}
-
-        <div className="text-center mt-4">
-          <p>
-            Don't have an account?{' '}
-            <span
-              onClick={() => navigate('/register')}
-              className="text-[#004B65] hover:underline cursor-pointer"
-            >
-              Register here
-            </span>
-          </p>
+        {/* Google Login Button */}
+        <div className="flex justify-center">
+          <GoogleSignInButton />
         </div>
+
+        {/* Register Link */}
+        <p className="text-center text-sm text-text mt-6">
+          Don&apos;t have an account?{' '}
+          <span
+            onClick={() => navigate('/register')}
+            className="text-button-primary hover:underline cursor-pointer"
+          >
+            Register here
+          </span>
+        </p>
       </div>
     </div>
   );

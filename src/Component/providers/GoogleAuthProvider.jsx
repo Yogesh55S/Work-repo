@@ -1,8 +1,8 @@
 import React from 'react';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-// Use Vite's environment variable syntax
 const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+console.log("Google Client ID:", clientId);
 
 const GoogleAuthProvider = ({ children }) => {
   if (!clientId) {
