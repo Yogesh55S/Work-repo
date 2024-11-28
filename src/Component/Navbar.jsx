@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useAuth } from './providers/AuthContext.jsx'; // Assume an Auth context is used
+import { useAuth } from './providers/AuthContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,29 +11,24 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef();
-  const { isLoggedIn, logout } = useAuth(); // Use authentication context
+  const { isLoggedIn, logout, userRole, user } = useAuth();  // Get userRole and user from AuthContext
+
+  console.log('Navbar rendered. isLoggedIn:', isLoggedIn);
+  console.log('User role:', userRole);
 
   const isActive = (path) => location.pathname === path;
 
-  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
-
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (isMenuOpen && menuRef.current && !menuRef.current.contains(event.target) && !isDesktop) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isMenuOpen, isDesktop]);
 
   const handleLogout = () => {
     logout(); // Call logout function from Auth context
@@ -42,15 +37,20 @@ const Navbar = () => {
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      navigate('/profile'); // Navigate to the profile page if logged in
+      // Check the user role and navigate accordingly
+      if (userRole.trim().toLowerCase() === 'admin') {
+        navigate('/admin-panel'); // Redirect to admin panel if user is an admin
+      } else {
+        navigate('/user-profile'); // Redirect to user profile if user is not an admin
+      }
     } else {
-      navigate('/login'); // Navigate to the login page if not logged in
+      navigate('/login'); // Navigate to login if not logged in
     }
   };
 
   return (
     <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg">
-      <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
+        <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
         {/* Logo */}
         <div className="text-2xl font-bold text-white">
           <Link to="/">Nidas Pure</Link>
@@ -101,27 +101,18 @@ const Navbar = () => {
         {/* User Controls */}
         <div className="flex items-center space-x-6 text-white text-xl">
           {/* Cart Icon */}
-          <Link
-            to="/cart"
-            className={`hover:text-[#D7C9C1] ${isActive('/cart') ? 'text-[#D7C9C1]' : ''}`}
-          >
+          <Link to="/cart" className={`hover:text-[#D7C9C1] ${isActive('/cart') ? 'text-[#D7C9C1]' : ''}`}>
             <FiShoppingCart />
           </Link>
 
           {/* User Icon */}
-          <div
-            className={`hover:text-[#D7C9C1] cursor-pointer`}
-            onClick={handleUserIconClick} // Navigate to profile or login based on login state
-          >
+          <div className="hover:text-[#D7C9C1] cursor-pointer" onClick={handleUserIconClick}>
             <FiUser />
           </div>
 
           {/* Logout Icon */}
           {isLoggedIn && (
-            <div
-              className="hover:text-[#D7C9C1] cursor-pointer flex items-center space-x-2"
-              onClick={handleLogout}
-            >
+            <div className="hover:text-[#D7C9C1] cursor-pointer flex items-center space-x-2" onClick={handleLogout}>
               <FiLogOut />
               <span className="text-[13px] uppercase">Logout</span>
             </div>

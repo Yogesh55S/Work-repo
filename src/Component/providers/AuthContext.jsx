@@ -1,44 +1,35 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Create the AuthContext
 const AuthContext = createContext();
 
-// Provide AuthContext to the application
+// This will hold the authentication state and the user role
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-
-  // Simulate checking for an existing session on app load
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-      setIsLoggedIn(true);
-    }
-  }, []);
+  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user')) || null);
 
   const login = (userData) => {
-    // Simulate an API call for logging in
-    localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-    setIsLoggedIn(true);
+    localStorage.setItem('user', JSON.stringify(userData)); // Store user with role
   };
 
   const logout = () => {
-    // Clear user data on logout
-    localStorage.removeItem('user');
     setUser(null);
-    setIsLoggedIn(false);
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
   };
 
+  useEffect(() => {
+    console.log('Auth state changed. Current user:', user);
+  }, [user]);
+
+  const isLoggedIn = !!user;
+
+  // Pass the user, role and loggedIn state to the context value
   return (
-    <AuthContext.Provider value={{ isLoggedIn, user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn, login, logout, userRole: user?.role || '' }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-// Custom hook for accessing the AuthContext
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+// Custom hook to access Auth context
+export const useAuth = () => useContext(AuthContext);

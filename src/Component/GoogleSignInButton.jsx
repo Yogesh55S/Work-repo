@@ -2,9 +2,11 @@ import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from './providers/AuthContext'; // Assuming useAuth is available
 
 const GoogleSignInButton = () => {
   const navigate = useNavigate();
+  const { login } = useAuth(); // Access the login method from AuthContext
 
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse || !credentialResponse.credential) {
@@ -22,8 +24,13 @@ const GoogleSignInButton = () => {
       if (res.data.needRegistration) {
         navigate(`/auth/register?email=${res.data.email}&name=${res.data.name}`);
       } else {
+        // Save token and user data locally
         localStorage.setItem('token', res.data.token);
         localStorage.setItem('user', JSON.stringify(res.data.user));
+
+        // Update the auth context to trigger a re-render of Navbar
+        login(res.data.user);
+
         navigate('/');
       }
     } catch (error) {
