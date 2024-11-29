@@ -1,44 +1,49 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types"; // Import PropTypes for validation
 import Card from "../Card";
-import goldOilImage from "../../assets/Image/goldoil.jpg";
-import faceWashImage from "../../assets/Image/facewash.png";
 
-
-// Temporary JSON Data
-const productData = [
-  { id: 1, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Skin Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 2, name: "Gentle Face Wash", price: "₹1500", category: "Skin Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 3, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Body Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 4, name: "Gentle Face Wash", price: "₹1500", category: "Hair Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 5, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Soap Bars", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 6, name: "Gentle Face Wash", price: "₹1500", category: "Body Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 7, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Skin Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 8, name: "Gentle Face Wash", price: "₹1500", category: "Soap Bars", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 9, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Skin Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 10, name: "Gentle Face Wash", price: "₹1500", category: "Skin Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 11, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Body Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 12, name: "Gentle Face Wash", price: "₹1500", category: "Hair Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 13, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Soap Bars", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 14, name: "Gentle Face Wash", price: "₹1500", category: "Body Care", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 15, name: "Saffron & Gold Face Oil", price: "₹2100", category: "Skin Care", image: goldOilImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-  { id: 16, name: "Gentle Face Wash", price: "₹1500", category: "Soap Bars", image: faceWashImage,description:"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." },
-];
+// For fetching products
+const API_URL = import.meta.env.VITE_API_URL; // Use environment variable for API URL
 
 const OurProducts = ({ showAll, hideViewAllButton }) => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [products, setProducts] = useState([]);
-  const navigate = useNavigate(); // For navigation
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
+  // Fetch products from the API
   useEffect(() => {
-    setProducts(productData);
-  }, []);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch(`${API_URL}/products`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch products: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("Fetched Products:", data); // Log to check the categories
+        setProducts(data); // Set fetched products in state
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, [API_URL]);
 
-  // Filtered products based on active category
+  // Log active category to check if it's updating correctly
+  console.log("Active Category:", activeCategory);
+
+  // Filter products based on active category
   const filteredProducts =
     activeCategory === "All"
       ? products
-      : products.filter((product) => product.category === activeCategory);
+      : products.filter((product) =>
+          product.type && product.type.trim().toLowerCase() === activeCategory.trim().toLowerCase()
+        );
 
   // Display limited products if `showAll` is false
   const displayedProducts = showAll ? filteredProducts : filteredProducts.slice(0, 8);
@@ -76,24 +81,43 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           ))}
         </div>
 
+        {/* Loading and Error Handling */}
+        {loading && <p className="text-gray-600">Loading products...</p>}
+        {error && <p className="text-red-600">Error: {error}</p>}
+
         {/* Products Grid */}
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {displayedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="cursor-pointer group"
-              onClick={() => handleProductClick(product)}
-            >
-              <Card name={product.name} price={product.price} image={product.image} description={product.description} />
-              <style jsx>{`
-                .group:hover img {
-                  transform: scale(1.05);
-                  transition: transform 0.3s ease;
-                }
-              `}</style>
-            </div>
-          ))}
-        </div>
+        {!loading && !error && (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {displayedProducts.length === 0 ? (
+              <p className="text-gray-600">No products found for this category.</p>
+            ) : (
+              displayedProducts.map((product) => {
+                const baseUrl = API_URL.replace('/api', '');
+                const imagePath = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
+                return (
+                  <div
+                    key={product._id}
+                    className="cursor-pointer group"
+                    onClick={() => handleProductClick(product)}
+                  >
+                    <Card
+                      name={product.productName}
+                      price={`₹${product.price}`}
+                      image={imagePath}
+                      description={product.description}
+                    />
+                    <style jsx>{`
+                      .group:hover img {
+                        transform: scale(1.05);
+                        transition: transform 0.3s ease;
+                      }
+                    `}</style>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        )}
 
         {/* View All Button */}
         {!hideViewAllButton && (
@@ -109,6 +133,12 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
       </div>
     </div>
   );
+};
+
+// Prop validation with PropTypes
+OurProducts.propTypes = {
+  showAll: PropTypes.bool,              // Expected type is boolean
+  hideViewAllButton: PropTypes.bool,    // Expected type is boolean
 };
 
 export default OurProducts;
