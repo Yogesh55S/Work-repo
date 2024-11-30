@@ -4,6 +4,10 @@
 
 
 
-h1,h2,h3,h4,h5,h6,p,a,div,span{
-    font-family: Cormorant Garamond;
+h1,h2,h3,h4,h5,h6,button{
+    font-family: Young Serif;
+  }
+
+  p,a,div,span {
+    font-family: Source Serif 4;
   }

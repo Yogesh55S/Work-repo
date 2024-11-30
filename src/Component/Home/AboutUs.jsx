@@ -29,9 +29,9 @@ const AboutUs = () => {
         </div>
 
         {/* Right Content Section */}
-        <div className="md:w-1/2 lg:space-y-5 md:space-y-3 sm:space-y-4 xs:space-y-4 lg:mr-8 sm:mt-10 md:text-left sm:text-center xs:text-center xs:mt-5">
-          <h2 className="text-[30px] font-bold text-text uppercase">About Us</h2>
-          <h1 className="lg:text-5xl md:text-4xl sm:text-3xl xs:text-3xl font-bold text-black sm:mt-5">
+        <div className="md:w-1/2 lg:space-y-5 md:space-y-3 sm:space-y-4 xs:space-y-4 lg:mr-8 sm:mt-10 md:text-left sm:text-center xs:text-center xs:mt-5 tracking-wider">
+          <h2 className="text-[30px]  text-text uppercase">About Us</h2>
+          <h1 className="lg:text-4xl md:text-3xl sm:text-2xl xs:text-2xl  text-black sm:mt-5">
             We are Put <span className="text-text">Beauty</span> Above Everything
           </h1>
           <p className="text-black lg:text-lg md:text-[16px] leading-relaxed">

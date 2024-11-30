@@ -9,7 +9,7 @@ const Card = ({ name, price, image ,description }) => {
         className="w-[300px] h-[350px] object-cover"
       />
       <div className="text-center mt-4">
-        <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
+        <h3 className="text-[16px]  text-gray-800">{name}</h3>
         <p className="text-gray-600">{price}</p>
       </div>
     </div>

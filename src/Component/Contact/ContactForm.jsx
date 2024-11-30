@@ -22,7 +22,7 @@ const ContactForm = () => {
     <div className="py-10 px-4 sm:px-6">
       <div className="max-w-[1200px] mx-auto bg-white p-8 shadow-md">
         {/* Heading */}
-        <h2 className="text-4xl font-bold text-center text-black mb-8">
+        <h2 className="text-4xl text-center text-black mb-8">
           Get In Touch
         </h2>
 
@@ -114,7 +114,7 @@ const ContactForm = () => {
           <div className="text-center">
             <button
               type="submit"
-              className="w-full bg-[#c28565] text-white font-medium py-3 px-12 shadow hover:bg-[#5C3822] transition duration-300"
+              className="w-full bg-[#c28565] text-white text-[16px] py-3 px-12 shadow hover:bg-[#5C3822] transition duration-300"
             >
               SEND MESSAGE →
             </button>

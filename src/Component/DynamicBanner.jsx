@@ -16,7 +16,7 @@ const DynamicBanner = ({ pageName }) => {
       <div className="absolute inset-0"></div>
 
       {/* Banner Title */}
-      <h1 className="relative text-5xl font-bold text-white px-4 py-2">
+      <h1 className="relative text-5xl  text-white px-4 py-2">
         {pageName}
       </h1>
     </div>

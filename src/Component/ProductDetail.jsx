@@ -1,166 +1,182 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import goldOilImage from "../assets/Image/goldoil.jpg";
-import faceWashImage from "../assets/Image/facewash.png";
 
 const ProductDetail = () => {
   const location = useLocation();
   const product = location.state?.product;
 
-  // List of images for carousel and thumbnails
-  const images = [product.image, goldOilImage, faceWashImage, goldOilImage];
-
-  // State to track the currently displayed image
-  const [currentImage, setCurrentImage] = useState(images[0]);
-
-  // State to handle tab selection
-  const [activeTab, setActiveTab] = useState("Description");
-
   if (!product) {
     return <div className="text-center text-gray-600">Product not found.</div>;
   }
 
+  const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+  const mainImage = `${baseUrl}/${product.image.replace(/\\/g, "/")}`;
+  const images = product.images || [mainImage];
+
+  const [activeTab, setActiveTab] = useState("Description to Use");
+  const [relatedProducts, setRelatedProducts] = useState([]);
+
+  // Fetch related products
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/products`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch related products");
+        }
+        const data = await response.json();
+
+        // Filter products based on type to show only related ones
+        const filtered = data.filter(
+          (item) =>
+            item.type &&
+            item.type.trim().toLowerCase() === product.type.trim().toLowerCase() &&
+            item._id !== product._id
+        );
+
+        setRelatedProducts(filtered);
+      } catch (error) {
+        console.error("Error fetching related products:", error);
+      }
+    };
+
+    fetchRelatedProducts();
+  }, [baseUrl, product.type, product._id]);
+
   return (
     <div className="max-w-full mx-auto p-4 pt-28">
       <div className="container mx-auto lg:w-[1240px]">
-        {/* Main Container */}
-        <div className="flex flex-col md:flex-row items-center md:items-start md:space-x-8 lg:space-x-12 space-y-8 md:space-y-0">
-          {/* Left Section: Product Image */}
-          <div className="flex-1 w-full md:w-[40%] lg:w-[50%]">
-            <div className="relative">
-              <img
-                src={currentImage}
-                alt="Selected Product"
-                className="w-full h-auto object-cover shadow md:w-[100%] md:mx-auto"
-              />
-            </div>
-
-            {/* Thumbnails */}
-            <div className="flex mt-4 space-x-4 overflow-x-auto">
+        <div className="flex flex-col md:flex-row items-center space-y-8 md:space-y-0 md:space-x-12">
+          {/* Product Image */}
+          <div className="w-full md:w-[40%]">
+            <img src={mainImage} alt="Product" className="w-full h-auto object-cover shadow" />
+            <div className="flex mt-4 space-x-4">
               {images.map((img, index) => (
                 <img
                   key={index}
                   src={img}
                   alt={`Thumbnail ${index}`}
-                  onClick={() => setCurrentImage(img)}
-                  className={`w-16 h-16 md:w-20 md:h-20 object-cover shadow cursor-pointer ${
-                    currentImage === img ? "ring-2 ring-button-primary" : ""
+                  className={`w-16 h-16 object-cover shadow cursor-pointer ${
+                    mainImage === img ? "ring-2 ring-button-primary" : ""
                   }`}
+                  onClick={() => setCurrentImage(img)}
                 />
               ))}
             </div>
           </div>
 
-          {/* Right Section: Product Details */}
-          <div className="flex-1 w-full md:w-[60%] lg:w-[50%]">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">{product.name}</h1>
-            <div className="flex items-center mb-4">
-              <p className="text-lg text-red-600 font-semibold mr-4">{product.price}</p>
-            </div>
-            <div className="text-yellow-500 flex items-center space-x-1 mb-4 text-sm md:text-base">
-              {"⭐".repeat(4)}
-              {"☆".repeat(1)} <span className="text-gray-600">(2 Customer Reviews)</span>
-            </div>
-            <p className="text-gray-700 text-sm md:text-base mb-6">{product.description}</p>
+          {/* Product Details */}
+          <div className="w-full md:w-[60%]">
+            <h1 className="text-2xl mb-4">{product.productName}</h1>
+            <p className="text-gray-700 mb-6">{product.description}</p>
+            <p className="text-red-600 mb-4 text-lg">₹{product.price}</p>
 
-            {/* Quantity and Add to Cart */}
-            <div className="flex items-center mb-6">
-              <button className="px-3 py-1 border text-gray-600">-</button>
-              <input
-                type="text"
-                defaultValue={1}
-                className="w-12 text-center border-y border-gray-300"
-              />
-              <button className="px-3 py-1 border text-gray-600">+</button>
-              <button className="ml-4 px-6 py-2 bg-primary text-white font-medium text-sm md:text-base shadow hover:bg-pink-500 transition">
-                Add to Cart
-              </button>
-            </div>
-
-            {/* Info Section */}
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Info</h3>
-              <ul className="text-gray-600 text-sm md:text-base space-y-1">
-                <li>SKU: {product.id}</li>
-                <li>Category: {product.category}</li>
-                <li>Tags: Skin, Health, Beauty</li>
+            <div className="mt-4">
+              <h3 className="text-[24px]  mb-2">Product Details</h3>
+              <ul className="text-gray-600 text-[16px]">
+                {product.netQuantity && (
+                  <li>
+                    <strong>Net Quantity:</strong> {product.netQuantity}
+                  </li>
+                )}
+                {product.allergenInformation && (
+                  <li>
+                    <strong>Allergen Information:</strong> {product.allergenInformation}
+                  </li>
+                )}
+                {product.useBefore && (
+                  <li>
+                    <strong>Use Before:</strong> {product.useBefore}
+                  </li>
+                )}
+                {product.type && (
+                  <li>
+                    <strong>Type:</strong> {product.type}
+                  </li>
+                )}
+                {product.subType && (
+                  <li>
+                    <strong>Sub-Type:</strong> {product.subType}
+                  </li>
+                )}
               </ul>
             </div>
 
-            {/* Share Links */}
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Share:</h3>
-              <div className="flex space-x-4 text-gray-500 text-xl">
-                <i className="fab fa-facebook cursor-pointer"></i>
-                <i className="fab fa-twitter cursor-pointer"></i>
-                <i className="fab fa-instagram cursor-pointer"></i>
-              </div>
-            </div>
+            {/* Add to Cart Button */}
+            <button
+              onClick={() => alert("Added to cart!")}
+              className="mt-6 px-6 py-2 bg-button-primary text-white font-medium text-sm md:text-base shadow hover:bg-primary transition"
+            >
+              Add to Cart
+            </button>
           </div>
         </div>
-      </div>
 
-      {/* Tabs Section */}
-      <div className="mt-12 border-t pt-8 mx-auto container lg:w-[1240px]">
-        <div className="flex flex-wrap space-x-4 border-b pb-4 text-sm md:text-base">
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "Description"
-                ? "bg-primary text-gray-800 border-b-2 border-button-primary"
-                : "bg-transparent text-gray-600"
-            } rounded`}
-            onClick={() => setActiveTab("Description")}
-          >
-            Description
-          </button>
-          <button
-            className={`px-4 py-2 ${
-              activeTab === "Additional Information"
-                ? "bg-primary text-gray-800 border-b-2 border-button-primary"
-                : "bg-transparent text-gray-600"
-            } rounded`}
-            onClick={() => setActiveTab("Additional Information")}
-          >
-            Additional Information
-          </button>
-        </div>
-
-        {/* Content based on selected tab */}
-        {activeTab === "Description" && (
-          <div className="mt-4">
-            <p className="text-gray-700 text-sm md:text-base">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
-            </p>
-            <p className="text-gray-700 text-sm md:text-base">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis eu turpis magna. Mauris
-              euismod sollicitudin mauris. Ut tempor, sapien a volutpat.
-            </p>
+        {/* Tabs Section */}
+        <div className="mt-12 border-t pt-8">
+          <div className="flex flex-wrap space-x-4 border-b pb-4 text-sm md:text-base">
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "Description to Use"
+                  ? "bg-primary text-gray-800 border-b-2 border-button-primary"
+                  : "bg-transparent text-gray-600"
+              } rounded`}
+              onClick={() => setActiveTab("Description to Use")}
+            >
+              Description to Use
+            </button>
+            <button
+              className={`px-4 py-2 ${
+                activeTab === "Additional Information"
+                  ? "bg-primary text-gray-800 border-b-2 border-button-primary"
+                  : "bg-transparent text-gray-600"
+              } rounded`}
+              onClick={() => setActiveTab("Additional Information")}
+            >
+              Additional Information
+            </button>
           </div>
-        )}
 
-        {activeTab === "Additional Information" && (
-          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Replace these divs with dynamic related products */}
-            {[goldOilImage, faceWashImage, goldOilImage, faceWashImage].map((img, index) => (
-              <div key={index} className="relative shadow p-4 rounded">
-                <img
-                  src={img}
-                  alt={`Related product ${index}`}
-                  className="w-full h-auto object-cover"
-                />
-                <p className="text-gray-700 text-sm mt-2">Product Name</p>
-                <p className="text-red-500 text-sm font-medium">Price</p>
+          {/* Tab Content */}
+          <div className="mt-8">
+            {activeTab === "Description to Use" && (
+              <div>
+                {/* <h3 className="text-lg  mb-4">Description to Use</h3> */}
+                <p className="text-gray-700 text-sm">
+                  {product.directionsToUse || "No information available for this product."}
+                </p>
               </div>
-            ))}
+            )}
+
+            {activeTab === "Additional Information" && (
+              <div>
+                <h3 className="text-lg  mb-4">Related Products</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  {relatedProducts.length > 0 ? (
+                    relatedProducts.map((item) => (
+                      <div
+                        key={item._id}
+                        className="shadow-lg p-4 rounded hover:shadow-xl transition cursor-pointer"
+                        onClick={() => window.location.href = `/product/${item._id}`}
+                      >
+                        <img
+                          src={`${baseUrl}/${item.image.replace(/\\/g, "/")}`}
+                          alt={item.productName}
+                          className="w-full h-40 object-cover mb-4"
+                        />
+                        <h4 className="text-gray-800 font-semibold">{item.productName}</h4>
+                        <p className="text-gray-500">{item.type}</p>
+                        <p className="text-red-600 font-bold">₹{item.price}</p>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-gray-600">No related products found.</p>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import PropTypes from "prop-types"; // Import PropTypes for validation
+import PropTypes from "prop-types";
 import Card from "../Card";
 
-// For fetching products
-const API_URL = import.meta.env.VITE_API_URL; // Use environment variable for API URL
+const API_URL = import.meta.env.VITE_API_URL;
 
 const OurProducts = ({ showAll, hideViewAllButton }) => {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -13,7 +12,6 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // Fetch products from the API
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -22,8 +20,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("Fetched Products:", data); // Log to check the categories
-        setProducts(data); // Set fetched products in state
+        setProducts(data);
       } catch (error) {
         console.error("Error fetching products:", error);
         setError(error.message);
@@ -32,12 +29,8 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
       }
     };
     fetchProducts();
-  }, [API_URL]);
+  }, []);
 
-  // Log active category to check if it's updating correctly
-  console.log("Active Category:", activeCategory);
-
-  // Filter products based on active category
   const filteredProducts =
     activeCategory === "All"
       ? products
@@ -45,23 +38,22 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           product.type && product.type.trim().toLowerCase() === activeCategory.trim().toLowerCase()
         );
 
-  // Display limited products if `showAll` is false
   const displayedProducts = showAll ? filteredProducts : filteredProducts.slice(0, 8);
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.id}`, { state: { product } });
+    navigate(`/product/${product._id}`, { state: { product } });
   };
 
   const handleViewAllClick = () => {
-    navigate("/shop"); // Redirect to shop page
+    navigate("/shop");
   };
 
   return (
     <div className="p-4 bg-gray-50">
       <div className="max-w-[1240px] mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Our Products</h2>
+        <h2 className="text-2xl sm:text-3xl  text-gray-800 mb-4">Our Products</h2>
         <p className="text-sm sm:text-base text-gray-600 mb-8">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pellentesque ac urna at malesuada.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>
 
         {/* Category Tabs */}
@@ -70,7 +62,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-3 sm:px-4 py-2 border font-medium mb-2 ${
+              className={`px-3 sm:px-4 py-2 border mb-2 ${
                 activeCategory === category
                   ? "bg-button-primary text-white"
                   : "bg-white text-gray-600 border-gray-300 hover:bg-primary hover:text-white"
@@ -87,13 +79,13 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
         {/* Products Grid */}
         {!loading && !error && (
-          <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {displayedProducts.length === 0 ? (
               <p className="text-gray-600">No products found for this category.</p>
             ) : (
               displayedProducts.map((product) => {
-                const baseUrl = API_URL.replace('/api', '');
-                const imagePath = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
+                const baseUrl = API_URL.replace("/api", "");
+                const imagePath = `${baseUrl}/${product.image.replace(/\\/g, "/")}`;
                 return (
                   <div
                     key={product._id}
@@ -106,12 +98,6 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
                       image={imagePath}
                       description={product.description}
                     />
-                    <style jsx>{`
-                      .group:hover img {
-                        transform: scale(1.05);
-                        transition: transform 0.3s ease;
-                      }
-                    `}</style>
                   </div>
                 );
               })
@@ -135,10 +121,9 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   );
 };
 
-// Prop validation with PropTypes
 OurProducts.propTypes = {
-  showAll: PropTypes.bool,              // Expected type is boolean
-  hideViewAllButton: PropTypes.bool,    // Expected type is boolean
+  showAll: PropTypes.bool,
+  hideViewAllButton: PropTypes.bool,
 };
 
 export default OurProducts;

@@ -66,13 +66,13 @@ const Banner = () => {
                 <span>Natural Beauty</span>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl xl:text-7xl lg:text-6xl md:text-5xl font-bold text-white tracking-wider">
+              <h1 className="text-4xl sm:text-5xl xl:text-7xl lg:text-6xl md:text-5xl  text-white tracking-wider">
                 {banner.title}
               </h1>
-              <h2 className="text-3xl sm:text-3xl lg:text-5xl xl:text-6xl md:text-4xl font-medium text-white tracking-wider">
+              <h2 className="text-3xl sm:text-3xl lg:text-5xl xl:text-5xl md:text-4xl  text-white tracking-wider">
                 {banner.subtitleLine1}
               </h2>
-              <h2 className="text-3xl sm:text-3xl lg:text-5xl xl:text-6xl md:text-4xl font-medium text-white tracking-wider">
+              <h2 className="text-3xl sm:text-3xl lg:text-5xl xl:text-5xl md:text-4xl  text-white tracking-wider">
                 {banner.subtitleLine2}
               </h2>
               <button className="px-6 py-2 bg-button-primary text-white text-lg shadow hover:bg-primary transition">

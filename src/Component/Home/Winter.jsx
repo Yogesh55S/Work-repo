@@ -77,7 +77,7 @@ const Winter = () => {
   return (
     <div id="winter-carousel" className="p-4 md:p-8 bg-gray-50 text-center relative overflow-hidden">
       <div className="max-w-[1240px] h-[600px] mx-auto relative w-full">
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Our Winter Collection</h2>
+        <h2 className="text-2xl md:text-3xl tracking-wider text-[#5C3822] font-medium mb-4">Our Winter Collection</h2>
         <p className="text-sm md:text-base text-gray-600 mb-8">
           Discover our exclusive winter collection, designed to keep your skin and body healthy and nourished during the cold months.
         </p>

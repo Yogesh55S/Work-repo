@@ -7,7 +7,7 @@ const ContactDetails = () => {
       <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Section - Contact Details */}
         <div className="bg-[#F9F4F2] p-6 shadow-md col-span-1">
-          <h2 className="text-2xl font-bold text-black mb-4">
+          <h2 className="text-2xl text-black mb-4">
             Our Contact Information
           </h2>
           <p className="text-[#909F8C] mb-6">
@@ -21,7 +21,7 @@ const ContactDetails = () => {
                 <FiMapPin className="text-white text-xl" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-black mb-1">
+                <h3 className="text-lg text-black mb-1">
                   Our Address
                 </h3>
                 <p className="text-[#909F8C] text-sm sm:text-base">
@@ -36,7 +36,7 @@ const ContactDetails = () => {
                 <FiPhone className="text-white text-xl" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-black mb-1">
+                <h3 className="text-lg text-black mb-1">
                   Phone Number
                 </h3>
                 <p className="text-[#909F8C] text-sm sm:text-base">
@@ -51,7 +51,7 @@ const ContactDetails = () => {
                 <FiMail className="text-white text-xl" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-black mb-1">
+                <h3 className="text-lg  text-black mb-1">
                   Email Address
                 </h3>
                 <p className="text-[#909F8C] text-sm sm:text-base">info@rasm.com</p>
