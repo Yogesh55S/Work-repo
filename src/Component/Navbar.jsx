@@ -30,6 +30,11 @@ const Navbar = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Scroll to top when location changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   const handleLogout = () => {
     logout(); // Call logout function from Auth context
     navigate('/login'); // Redirect to login page after logout
@@ -50,7 +55,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg">
-        <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
+      <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
         {/* Logo */}
         <div className="text-2xl font-bold text-white">
           <Link to="/">Nidas Pure</Link>
