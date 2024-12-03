@@ -4,7 +4,7 @@ import AboutUs from '../Component/Home/AboutUs'
 import Winter from '../Component/Home/Winter'
 import Care from '../Component/Home/Care'
 import OurProducts from '../Component/Home/OurProducts'
-// import Testimonial from '../Component/Home/Testimonial'
+import Testimonial from '../Component/Home/Testimonial'
 
 const Home = () => {
   return (
@@ -15,7 +15,7 @@ const Home = () => {
         <Care/>
           {/* Only show 8 products and display the "View All" button */}
       <OurProducts showAll={false} hideViewAllButton={false} />
-        {/* <Testimonial/> */}
+        <Testimonial/>
     </div>
   )
 }

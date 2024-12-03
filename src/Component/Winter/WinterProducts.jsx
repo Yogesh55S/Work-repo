@@ -1,29 +1,25 @@
-import React, { useState, useEffect } from "react";
-import Card from "../Card";
+import React, { useState, useEffect } from 'react';
+import Card from '../Card';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
 const WinterProducts = () => {
   const [winterProducts, setWinterProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const API_URL = import.meta.env.VITE_API_URL; // Backend URL from .env
+  const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const fetchWinterProducts = async () => {
       try {
         const response = await fetch(`${API_URL}/products`);
-
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
-
         const data = await response.json();
-
-        // Filter products with subType "Winter Collection"
-        const filteredProducts = data.filter(product => product.subType === "Winter Collection");
-
+        const filteredProducts = data.filter(product => product.subType === 'Winter Collection');
         setWinterProducts(filteredProducts);
       } catch (error) {
-        console.error("Error fetching winter products:", error);
+        console.error('Error fetching winter products:', error);
         setError(error.message);
       } finally {
         setLoading(false);
@@ -53,15 +49,21 @@ const WinterProducts = () => {
                 {winterProducts.map(product => {
                   const baseUrl = API_URL.replace('/api', '');
                   const imagePath = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
+
                   return (
-                    <div key={product._id} className="cursor-pointer group">
-                      <Card 
-                        name={product.productName} 
-                        price={`₹${product.price}`} 
+                    <Link
+                      key={product._id}
+                      to={`/product/${product._id}`}  // Navigate to ProductDetail page with product ID
+                      state={{ product }}             // Optionally pass product data to ProductDetail page
+                      className="cursor-pointer group"
+                    >
+                      <Card
+                        name={product.productName}
+                        price={`₹${product.price}`}
                         image={imagePath}
-                        description={product.description} 
+                        description={product.description}
                       />
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
