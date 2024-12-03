@@ -44,7 +44,7 @@ const AboutUs = () => {
           {/* Image + List Section */}
           <div className="flex items-start lg:gap-4 md:gap-2 sm:mt-5">
             {/* Small Image to the Left */}
-            <div className="w-[156px] h-[80px] ">
+            <div className="xs:w-[140px] xs:h-[70px] sm:w-[156px] sm:h-[80px] md:w-[156px] md:h-[80px] ">
               <img
                 src={bannerImage}
                 alt="U-Shape Small Image"
@@ -53,17 +53,17 @@ const AboutUs = () => {
             </div>
 
             {/* List */}
-            <ul className="space-y-1 text-[14px] sm:text-[14px] xs:text-[10px] md:mt-0 sm:mt-0 xs:mt-3">
+            <ul className="space-y-1 text-[13px] sm:text-[13px] xs:text-[10px] md:mt-0 sm:mt-0 xs:mt-2">
               <li className="flex sm:items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full "></span>
+                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full "></span>
                 Lorem ipsum dolor sit amet.
               </li>
               <li className="flex items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
+                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
                 Lorem ipsum dolor sit amet.
               </li>
               <li className="flex items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
+                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
                 Lorem ipsum dolor sit amet.
               </li>
             </ul>

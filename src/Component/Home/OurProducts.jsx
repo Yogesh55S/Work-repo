@@ -51,7 +51,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   return (
     <div className="p-4 bg-gray-50">
       <div className="max-w-[1240px] mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl  text-gray-800 mb-4">Our Products</h2>
+        <h2 className="text-2xl sm:text-3xl text-gray-800 mb-4">Our Products</h2>
         <p className="text-sm sm:text-base text-gray-600 mb-8">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>
@@ -62,10 +62,10 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
-              className={`px-3 sm:px-4 py-2 border mb-2 ${
+              className={`md:px-3 md:py-2 px-2 sm:px-2 py-1 border mb-2 ${
                 activeCategory === category
-                  ? "bg-button-primary text-white"
-                  : "bg-white text-gray-600 border-gray-300 hover:bg-primary hover:text-white"
+                  ? "bg-button-primary text-white md:text-[16px] text-[12px]"
+                  : "bg-white text-gray-600 md:text-[16px] text-[12px] border-gray-300 hover:bg-primary hover:text-white"
               }`}
             >
               {category}
@@ -89,7 +89,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
                 return (
                   <div
                     key={product._id}
-                    className="cursor-pointer group"
+                    className="cursor-pointer group transform transition duration-300 hover:scale-105"
                     onClick={() => handleProductClick(product)}
                   >
                     <Card

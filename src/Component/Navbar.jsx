@@ -27,6 +27,11 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Scroll to top when location changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   const handleLogout = () => {
     logout();
     navigate("/login");
