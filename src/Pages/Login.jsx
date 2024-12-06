@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from '../Component/providers/AuthContext';
-import GoogleSignInButton from '../Component/GoogleSignInButton.jsx'; // Import the GoogleSignInButton component
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useAuth } from "../Component/providers/AuthContext";
+import GoogleSignInButton from "../Component/GoogleSignInButton"; // Import the Google Sign-In button component
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleEmailLogin = async () => {
-    setErrorMessage('');
+    setErrorMessage("");
     setIsLoading(true);
 
     try {
@@ -23,18 +23,17 @@ export default function Login() {
       });
 
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        localStorage.setItem("token", response.data.token);
         login(response.data.user);
-        navigate('/');
+        navigate("/");
       }
     } catch (error) {
       if (error.response?.status === 400) {
-        setErrorMessage('Invalid email or password. Please try again.');
+        setErrorMessage("Invalid email or password. Please try again.");
       } else if (error.response?.status === 403) {
-        setErrorMessage('Please verify your email before logging in.');
+        setErrorMessage("Please verify your email before logging in.");
       } else {
-        setErrorMessage('Something went wrong. Please try again later.');
+        setErrorMessage("Something went wrong. Please try again later.");
       }
     } finally {
       setIsLoading(false);
@@ -85,11 +84,11 @@ export default function Login() {
         <button
           onClick={handleEmailLogin}
           className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
-            isLoading ? 'bg-opacity-70 cursor-not-allowed' : 'bg-button-primary hover:bg-hover'
+            isLoading ? "bg-opacity-70 cursor-not-allowed" : "bg-button-primary hover:bg-hover"
           }`}
           disabled={isLoading}
         >
-          {isLoading ? 'Logging in...' : 'Login'}
+          {isLoading ? "Logging in..." : "Login"}
         </button>
 
         {/* Divider */}
@@ -106,9 +105,9 @@ export default function Login() {
 
         {/* Register Link */}
         <p className="text-center text-sm text-text mt-6">
-          Don&apos;t have an account?{' '}
+          Don&apos;t have an account?{" "}
           <span
-            onClick={() => navigate('/register')}
+            onClick={() => navigate("/register")}
             className="text-button-primary hover:underline cursor-pointer"
           >
             Register here

@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../Component/providers/AuthContext"; // Import AuthContext
 
-const Cart = () => {
-  const { cartCount, fetchCartCount } = useAuth(); // Fetch cart-related actions from AuthContext
+const Cart = ({ userId }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [extractedUserId, setExtractedUserId] = useState(userId);
 
-  // Fetch cart items from backend
+  const decodeJWT = (token) => {
+    try {
+      const payloadBase64 = token.split(".")[1];
+      const payload = atob(payloadBase64);
+      return JSON.parse(payload);
+    } catch (error) {
+      console.error("Failed to decode token:", error.message);
+      return null;
+    }
+  };
+
   const fetchCartItems = async () => {
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${extractedUserId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -18,44 +27,19 @@ const Cart = () => {
         const items = await response.json();
         setCartItems(items);
       } else {
-        throw new Error("Failed to fetch cart items");
+        console.error("Failed to fetch cart items. Status:", response.status);
       }
     } catch (error) {
-      console.error("Error fetching cart items:", error);
+      console.error("Error fetching cart items:", error.message);
     }
   };
 
-  // Remove item from cart
-  const handleRemoveItem = async (productId) => {
-    try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/remove`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ productId }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to remove item from cart");
-      }
-
-      // Update cart items after removal
-      setCartItems((prev) => prev.filter((item) => item.productId !== productId));
-      fetchCartCount(); // Update cart count in context
-    } catch (error) {
-      console.error("Error removing item:", error);
-    }
-  };
-
-  // Adjust item quantity
   const handleQuantityChange = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/update`, {
-        method: "POST",
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${extractedUserId}/update`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -63,26 +47,64 @@ const Cart = () => {
         body: JSON.stringify({ productId, quantity: newQuantity }),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update quantity");
+      if (response.ok) {
+        setCartItems((prev) =>
+          prev.map((item) =>
+            item.productId._id === productId ? { ...item, quantity: newQuantity } : item
+          )
+        );
+      } else {
+        console.error("Failed to update quantity. Status:", response.status);
       }
-
-      // Update quantity locally
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.productId === productId ? { ...item, quantity: newQuantity } : item
-        )
-      );
-      fetchCartCount(); // Update cart count in context
     } catch (error) {
-      console.error("Error updating quantity:", error);
+      console.error("Error updating quantity:", error.message);
     }
   };
 
-  // Fetch cart items on component mount
+  const handleRemoveItem = async (productId) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${extractedUserId}/remove`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({ productId }),
+      });
+
+      if (response.ok) {
+        setCartItems((prev) => prev.filter((item) => item.productId._id !== productId));
+      } else {
+        console.error("Failed to remove item. Status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error removing item:", error.message);
+    }
+  };
+
   useEffect(() => {
-    fetchCartItems();
-  }, [cartCount]);
+    if (!userId) {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const decoded = decodeJWT(token);
+        if (decoded?.userId) {
+          setExtractedUserId(decoded.userId);
+        }
+      }
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (extractedUserId) fetchCartItems();
+  }, [extractedUserId]);
+
+  if (!extractedUserId) {
+    return (
+      <div className="container mx-auto p-4 pt-28 text-center">
+        <h1 className="text-2xl font-bold">Please log in to view your cart.</h1>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
@@ -107,53 +129,60 @@ const Cart = () => {
           </tr>
         </thead>
         <tbody>
-          {cartItems.map((item) => (
-            <tr key={item.productId} className="border-t">
-              <td className="py-4">
-                <div className="flex items-center space-x-4">
-                  <img
-                    src={`${import.meta.env.VITE_API_URL}/${item.image}`}
-                    alt={item.productName}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <span>{item.productName}</span>
-                </div>
-              </td>
-              <td className="py-4">₹{item.price}</td>
-              <td className="py-4">
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleQuantityChange(item.productId, item.quantity - 1)}
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                  >
-                    -
-                  </button>
-                  <span>{item.quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(item.productId, item.quantity + 1)}
-                    className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-                  >
-                    +
-                  </button>
-                </div>
-              </td>
-              <td className="py-4">₹{item.price * item.quantity}</td>
-              <td className="py-4">
-                <button
-                  onClick={() => handleRemoveItem(item.productId)}
-                  className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-                >
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
+  {cartItems.map((item) => {
+    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+    const imageUrl = `${baseUrl}/${item.productId.image?.replace(/\\/g, "/")}`;
+
+    return (
+      <tr key={item.productId._id} className="border-t">
+        <td className="py-4">
+          <div className="flex items-center space-x-4">
+            <img
+              src={imageUrl}
+              alt={item.productId.productName || "Product Image"}
+              className="w-16 h-16 object-cover rounded"
+              onError={(e) => (e.target.src = "/path/to/placeholder-image.png")} // Fallback image
+            />
+            <span>{item.productId.productName}</span>
+          </div>
+        </td>
+        <td className="py-4">₹{item.productId.price}</td>
+        <td className="py-4">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => handleQuantityChange(item.productId._id, item.quantity - 1)}
+              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              -
+            </button>
+            <span>{item.quantity}</span>
+            <button
+              onClick={() => handleQuantityChange(item.productId._id, item.quantity + 1)}
+              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            >
+              +
+            </button>
+          </div>
+        </td>
+        <td className="py-4">₹{item.productId.price * item.quantity}</td>
+        <td className="py-4">
+          <button
+            onClick={() => handleRemoveItem(item.productId._id)}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+          >
+            Remove
+          </button>
+        </td>
+      </tr>
+    );
+  })}
+</tbody>
+
       </table>
       <div className="mt-6 flex justify-end">
         <p className="text-lg font-bold">
           Total: ₹
-          {cartItems.reduce((total, item) => total + item.price * item.quantity, 0)}
+          {cartItems.reduce((total, item) => total + item.productId.price * item.quantity, 0)}
         </p>
       </div>
     </div>

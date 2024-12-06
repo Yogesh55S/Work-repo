@@ -70,81 +70,92 @@ export default function RegisterPage() {
     }
   };
 
-  // console.log(`${import.meta.env.VITE_API_URL}/auth/register`);
-
-
   return (
-    <div className="flex flex-col items-center justify-center h-[90vh] bg-gray-100">
-      <div className="bg-white p-10 rounded-xl shadow-lg max-w-md w-full">
-        <h1 className="text-3xl font-semibold mb-8 text-center text-[#004B65]">Complete Your Registration</h1>
+    <div className="flex flex-col items-center justify-center h-screen bg-primary">
+      <div className="w-full max-w-md bg-hover shadow-lg rounded-lg p-6 md:p-8">
+        {/* Title */}
+        <h1 className="text-3xl font-bold text-center text-button-primary mb-6">
+          Create an Account
+        </h1>
+        <p className="text-center text-text text-sm mb-8">
+          Register to start your journey with us.
+        </p>
 
+        {/* Full Name */}
         <input
           type="text"
           placeholder="Full Name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none"
+          className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary mb-4"
         />
         {errorMessage.fullName && <p className="text-red-500 text-sm">{errorMessage.fullName}</p>}
 
+        {/* Email */}
         <input
           type="email"
           placeholder="Email"
           value={email}
           readOnly={!!emailFromGoogle}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none"
+          className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary mb-4"
         />
         {errorMessage.email && <p className="text-red-500 text-sm">{errorMessage.email}</p>}
 
+        {/* Phone */}
         <input
           type="tel"
           placeholder="Phone Number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none"
+          className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary mb-4"
         />
         {errorMessage.phone && <p className="text-red-500 text-sm">{errorMessage.phone}</p>}
 
-        <div className="relative">
+        {/* Password */}
+        <div className="relative mb-4">
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none"
+            className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-3 text-sm text-[#004B65]"
+            className="absolute right-4 top-2 text-sm text-button-primary"
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
         {errorMessage.password && <p className="text-red-500 text-sm">{errorMessage.password}</p>}
 
-        <div className="relative">
+        {/* Confirm Password */}
+        <div className="relative mb-6">
           <input
             type={showPassword ? 'text' : 'password'}
             placeholder="Confirm Password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full px-4 py-3 border rounded-lg mb-4 focus:outline-none"
+            className="w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-3 text-sm text-[#004B65]"
+            className="absolute right-4 top-2 text-sm text-button-primary"
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
         {errorMessage.confirmPassword && <p className="text-red-500 text-sm">{errorMessage.confirmPassword}</p>}
 
+        {/* Register Button */}
         <button
           onClick={handleRegister}
-          className="w-full bg-[#004B65] text-white py-2 px-4 rounded-lg"
+          className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
+            isLoading ? 'bg-opacity-70 cursor-not-allowed' : 'bg-button-primary hover:bg-hover'
+          }`}
           disabled={isLoading}
         >
           {isLoading ? 'Registering...' : 'Register'}
@@ -152,6 +163,17 @@ export default function RegisterPage() {
 
         {errorMessage.general && <p className="text-red-500 text-center mt-4">{errorMessage.general}</p>}
         {successMessage && <p className="text-green-500 text-center mt-4">{successMessage}</p>}
+
+        {/* Login Link */}
+        <p className="text-center text-sm text-text mt-6">
+          Already have an account?{' '}
+          <span
+            onClick={() => navigate('/login')}
+            className="text-button-primary hover:underline cursor-pointer"
+          >
+            Login here
+          </span>
+        </p>
       </div>
     </div>
   );

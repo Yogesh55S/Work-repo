@@ -1,12 +1,10 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
 import RelatedProducts from "./RelatedProducts";
-import { useAuth } from "./providers/AuthContext"; // Import AuthContext
 
 const ProductDetail = () => {
   const location = useLocation();
   const product = location.state?.product;
-  const { addToCart } = useAuth(); // Use addToCart from AuthContext
 
   if (!product) {
     return <div className="text-center text-gray-600">Product not found.</div>;
@@ -16,9 +14,40 @@ const ProductDetail = () => {
   const mainImage = `${baseUrl}/${product.image.replace(/\\/g, "/")}`;
   const images = product.images || [mainImage];
 
-  const handleAddToCart = () => {
-    addToCart(product._id, 1); // Add product to the cart with quantity 1
+  const handleAddToCart = async () => {
+    const token = localStorage.getItem("token");
+    const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
+    const userId = user?._id;
+  
+    if (!token || !userId) {
+      alert("You need to log in to add items to the cart.");
+      return;
+    }
+  
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/${userId}/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId: product._id, quantity: 1 }),
+      });
+  
+      if (response.ok) {
+        const updatedCart = await response.json();
+        console.log("Item added to cart:", updatedCart);
+        alert("Product added to cart successfully!");
+      } else {
+        console.error("Failed to add item to cart. Status:", response.status);
+        alert("Failed to add product to cart.");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error.message);
+      alert("An error occurred while adding the product to the cart.");
+    }
   };
+  
 
   return (
     <div className="max-w-full mx-auto p-4 pt-28">

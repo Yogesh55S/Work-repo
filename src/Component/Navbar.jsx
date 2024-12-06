@@ -1,23 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FiShoppingCart, FiUser, FiLogOut } from "react-icons/fi";
 import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth } from "./providers/AuthContext"; // Import AuthContext
+import { useAuth } from "./providers/AuthContext";
+import axios from "axios";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  const [cartCount, setCartCount] = useState(0); // Local state for cart count
   const location = useLocation();
   const navigate = useNavigate();
-  const menuRef = useRef();
-  const { isLoggedIn, logout, userRole, cartCount } = useAuth(); // Access cartCount from AuthContext
-
-  const isActive = (path) => location.pathname === path;
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const { isLoggedIn, logout, user } = useAuth(); // Assume `user` contains logged-in user data
 
   useEffect(() => {
     const handleResize = () => {
@@ -27,10 +22,27 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Scroll to top when location changes
+  // Fetch cart data for the logged-in user
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location]);
+    if (isLoggedIn && user) {
+      fetchUserCart();
+    }
+  }, [isLoggedIn, user, location]); // Trigger when user or location changes
+
+  const fetchUserCart = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_URL}/users/${user._id}/cart`
+      ); // Replace `user._id` with the appropriate user identifier
+      const totalItems = response.data.cart.reduce(
+        (total, item) => total + item.quantity,
+        0
+      ); // Assuming `cart` is an array of items with a `quantity` property
+      setCartCount(totalItems);
+    } catch (error) {
+      console.error("Failed to fetch user cart", error);
+    }
+  };
 
   const handleLogout = () => {
     logout();
@@ -39,107 +51,108 @@ const Navbar = () => {
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      if (userRole.trim().toLowerCase() === "admin") {
-        navigate("/admin-panel");
-      } else {
-        navigate("/user-profile");
-      }
+      navigate(user.role === "admin" ? "/admin-panel" : "/user-profile");
     } else {
       navigate("/login");
     }
   };
 
   return (
-    <nav className="bg-primary h-20 flex items-center fixed w-full z-50 shadow-lg">
-      <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center">
-        {/* Logo */}
-        <div className="text-2xl font-bold text-white">
-          <Link to="/">Nidas Pure</Link>
+    <nav className="bg-primary text-white h-20 fixed w-full z-50 shadow-md">
+      <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center h-full">
+        {/* Brand */}
+        <div className="text-2xl font-bold">
+          <Link to="/" className="hover:text-secondary transition-colors">
+            Nidas Pure
+          </Link>
         </div>
 
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMenuOpen && !isDesktop && (
-            <motion.ul
-              ref={menuRef}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-              className="flex flex-col space-y-4 fixed top-20 left-0 bg-[#B09383] w-full py-4 lg:hidden z-50 shadow-lg"
-            >
-              {[
-                { name: "Home", path: "/" },
-                { name: "Winter Collection", path: "/winter-collection" },
-                { name: "Shop", path: "/shop" },
-                { name: "Contact Us", path: "/contact" },
-              ].map((navItem) => (
-                <li key={navItem.path} className="list-none px-4">
+        {/* Desktop Navigation */}
+        {isDesktop ? (
+          <ul className="hidden lg:flex space-x-8 text-base font-medium">
+            {[{ name: "Home", path: "/" }, { name: "Winter Collection", path: "/winter-collection" }, { name: "Shop", path: "/shop" }, { name: "Contact Us", path: "/contact" }].map(
+              (navItem) => (
+                <li key={navItem.path}>
                   <Link
                     to={navItem.path}
-                    className={`hover:text-[#D7C9C1] text-white text-[13px] font-medium uppercase ${
-                      isActive(navItem.path) ? "text-[#D7C9C1]" : ""
+                    className={`hover:text-secondary transition-colors ${
+                      location.pathname === navItem.path ? "text-secondary" : ""
                     }`}
-                    onClick={() => setIsMenuOpen(false)}
                   >
                     {navItem.name}
                   </Link>
                 </li>
-              ))}
+              )
+            )}
+          </ul>
+        ) : (
+          <div
+            className="lg:hidden cursor-pointer text-2xl"
+            onClick={() => setIsMenuOpen((prev) => !prev)}
+          >
+            {isMenuOpen ? <HiX /> : <HiMenu />}
+          </div>
+        )}
+
+        {/* Mobile Navigation */}
+        <AnimatePresence>
+          {isMenuOpen && !isDesktop && (
+            <motion.ul
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.3 }}
+              className="absolute top-20 left-0 w-full bg-primary shadow-lg z-40 flex flex-col text-base font-medium space-y-4 px-6 py-4"
+            >
+              {[{ name: "Home", path: "/" }, { name: "Winter Collection", path: "/winter-collection" }, { name: "Shop", path: "/shop" }, { name: "Contact Us", path: "/contact" }].map(
+                (navItem) => (
+                  <li key={navItem.path}>
+                    <Link
+                      to={navItem.path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`hover:text-secondary transition-colors ${
+                        location.pathname === navItem.path ? "text-secondary" : ""
+                      }`}
+                    >
+                      {navItem.name}
+                    </Link>
+                  </li>
+                )
+              )}
             </motion.ul>
           )}
         </AnimatePresence>
 
-        {/* Desktop Menu */}
-        {isDesktop && (
-          <ul className="hidden lg:flex lg:space-x-6 lg:items-center lg:static text-white text-[13px] font-medium uppercase lg:ml-16">
-            {[
-              { name: "Home", path: "/" },
-              { name: "Winter Collection", path: "/winter-collection" },
-              { name: "Shop", path: "/shop" },
-              { name: "Contact Us", path: "/contact" },
-            ].map((navItem) => (
-              <li key={navItem.path} className="list-none px-4">
-                <Link
-                  to={navItem.path}
-                  className={`hover:text-[#D7C9C1] ${
-                    isActive(navItem.path) ? "text-[#D7C9C1]" : ""
-                  }`}
-                >
-                  {navItem.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {/* User Controls */}
-        <div className="flex items-center space-x-6 text-white text-xl">
-          {/* Cart Icon */}
-          <div className="relative">
-            <Link to="/cart" className={`hover:text-[#D7C9C1] ${isActive("/cart") ? "text-[#D7C9C1]" : ""}`}>
-              <FiShoppingCart />
-            </Link>
+        {/* Icons */}
+        <div className="flex items-center space-x-6 text-xl">
+          {/* Cart Icon with Badge */}
+          <Link
+            to="/cart"
+            className="relative hover:text-secondary transition-colors"
+          >
+            <FiShoppingCart />
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full text-xs px-2 py-0.5">
+              <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                 {cartCount}
               </span>
             )}
-          </div>
+          </Link>
 
           {/* User Icon */}
-          <div className="hover:text-[#D7C9C1] cursor-pointer" onClick={handleUserIconClick}>
+          <div
+            onClick={handleUserIconClick}
+            className="cursor-pointer hover:text-secondary transition-colors"
+          >
             <FiUser />
           </div>
 
-          {/* Logout */}
+          {/* Logout Icon */}
           {isLoggedIn && (
             <div
-              className="hover:text-[#D7C9C1] cursor-pointer flex items-center space-x-2"
               onClick={handleLogout}
+              className="cursor-pointer hover:text-secondary transition-colors"
             >
               <FiLogOut />
-              <span className="text-[13px] uppercase">Logout</span>
             </div>
           )}
         </div>

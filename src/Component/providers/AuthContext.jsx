@@ -1,106 +1,48 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useState, useContext } from "react";
 
 const AuthContext = createContext();
 
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
 export const AuthProvider = ({ children }) => {
-  // Authentication state
-  const [user, setUser] = useState(() => JSON.parse(localStorage.getItem("user")) || null);
-  
-  // Cart state
-  const [cartCount, setCartCount] = useState(0);
+  const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
+  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("token") !== null);
+  const [userRole, setUserRole] = useState(localStorage.getItem("userRole") || "");
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
 
-  // Login function
   const login = (userData) => {
+    setIsLoggedIn(true);
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData)); // Store user with role
-    localStorage.setItem("token", userData.token); // Save token for API calls
-    fetchCartCount(); // Fetch cart count after login
+    setUserRole(userData.role || "");
+    localStorage.setItem("user", JSON.stringify(userData));
+    localStorage.setItem("userRole", userData.role || "");
   };
 
-  // Logout function
   const logout = () => {
+    setIsLoggedIn(false);
     setUser(null);
-    setCartCount(0);
-    localStorage.removeItem("user");
+    setUserRole("");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("cart");
+    localStorage.removeItem("userRole");
   };
 
-  // Fetch cart count from backend
-  const fetchCartCount = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const cart = await response.json();
-        setCartCount(cart.length || 0);
-      }
-    } catch (error) {
-      console.error("Failed to fetch cart count:", error);
-    }
+  const addToCart = (productId, quantity) => {
+    const updatedCart = [...cart, { productId, quantity }];
+    setCart(updatedCart);
+    localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
-  // Add to cart function
-  const addToCart = async (productId, quantity = 1) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        alert("Please log in to add items to your cart.");
-        return;
-      }
-
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/cart/add`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, quantity }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add item to cart.");
-      }
-
-      setCartCount((prev) => prev + quantity); // Update cart count locally
-      alert("Item added to cart!");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      alert("Failed to add item to cart.");
-    }
-  };
-
-  // Fetch cart count on component mount if user is logged in
-  useEffect(() => {
-    if (user) {
-      fetchCartCount();
-    }
-  }, [user]);
-
-  const isLoggedIn = !!user;
+  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <AuthContext.Provider
-      value={{
-        user,
-        isLoggedIn,
-        login,
-        logout,
-        userRole: user?.role || "",
-        cartCount,
-        addToCart,
-      }}
+      value={{ isLoggedIn, user, userRole, cart, addToCart, logout, login, cartCount }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-
-// Custom hook to access AuthContext
-export const useAuth = () => useContext(AuthContext);
