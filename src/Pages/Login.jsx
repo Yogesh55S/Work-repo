@@ -15,15 +15,19 @@ export default function Login() {
   const handleEmailLogin = async () => {
     setErrorMessage("");
     setIsLoading(true);
-
+  
     try {
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
         email,
         password,
       });
-
+  
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
+        
+        // Log the token to verify it's stored in localStorage
+        console.log("Token stored in localStorage:", localStorage.getItem("token"));
+  
         login(response.data.user);
         navigate("/");
       }
@@ -39,6 +43,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+  
 
   return (
     <div className="flex items-center justify-center h-screen bg-primary">

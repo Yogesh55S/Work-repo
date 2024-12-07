@@ -82,6 +82,39 @@ const Cart = ({ userId }) => {
     }
   };
 
+  const handleCheckout = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/order/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          userId: extractedUserId,
+          cart: cartItems.map((item) => ({
+            productId: item.productId._id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.paymentUrl) {
+          // Redirect to payment gateway
+          window.location.href = data.paymentUrl;
+        } else {
+          console.error("Payment URL not received.");
+        }
+      } else {
+        console.error("Failed to initiate checkout. Status:", response.status);
+      }
+    } catch (error) {
+      console.error("Error during checkout:", error.message);
+    }
+  };
+
   useEffect(() => {
     if (!userId) {
       const token = localStorage.getItem("token");
@@ -129,61 +162,66 @@ const Cart = ({ userId }) => {
           </tr>
         </thead>
         <tbody>
-  {cartItems.map((item) => {
-    const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
-    const imageUrl = `${baseUrl}/${item.productId.image?.replace(/\\/g, "/")}`;
+          {cartItems.map((item) => {
+            const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+            const imageUrl = `${baseUrl}/${item.productId.image?.replace(/\\/g, "/")}`;
 
-    return (
-      <tr key={item.productId._id} className="border-t">
-        <td className="py-4">
-          <div className="flex items-center space-x-4">
-            <img
-              src={imageUrl}
-              alt={item.productId.productName || "Product Image"}
-              className="w-16 h-16 object-cover rounded"
-              onError={(e) => (e.target.src = "/path/to/placeholder-image.png")} // Fallback image
-            />
-            <span>{item.productId.productName}</span>
-          </div>
-        </td>
-        <td className="py-4">₹{item.productId.price}</td>
-        <td className="py-4">
-          <div className="flex items-center space-x-2">
-            <button
-              onClick={() => handleQuantityChange(item.productId._id, item.quantity - 1)}
-              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-            >
-              -
-            </button>
-            <span>{item.quantity}</span>
-            <button
-              onClick={() => handleQuantityChange(item.productId._id, item.quantity + 1)}
-              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
-            >
-              +
-            </button>
-          </div>
-        </td>
-        <td className="py-4">₹{item.productId.price * item.quantity}</td>
-        <td className="py-4">
-          <button
-            onClick={() => handleRemoveItem(item.productId._id)}
-            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Remove
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
-
+            return (
+              <tr key={item.productId._id} className="border-t">
+                <td className="py-4">
+                  <div className="flex items-center space-x-4">
+                    <img
+                      src={imageUrl}
+                      alt={item.productId.productName || "Product Image"}
+                      className="w-16 h-16 object-cover rounded"
+                      onError={(e) => (e.target.src = "/path/to/placeholder-image.png")} // Fallback image
+                    />
+                    <span>{item.productId.productName}</span>
+                  </div>
+                </td>
+                <td className="py-4">₹{item.productId.price}</td>
+                <td className="py-4">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handleQuantityChange(item.productId._id, item.quantity - 1)}
+                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      -
+                    </button>
+                    <span>{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(item.productId._id, item.quantity + 1)}
+                      className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300"
+                    >
+                      +
+                    </button>
+                  </div>
+                </td>
+                <td className="py-4">₹{item.productId.price * item.quantity}</td>
+                <td className="py-4">
+                  <button
+                    onClick={() => handleRemoveItem(item.productId._id)}
+                    className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
       </table>
-      <div className="mt-6 flex justify-end">
+      <div className="mt-6 flex justify-between items-center">
         <p className="text-lg font-bold">
           Total: ₹
           {cartItems.reduce((total, item) => total + item.productId.price * item.quantity, 0)}
         </p>
+        <button
+          onClick={handleCheckout}
+          className="px-6 py-3 bg-blue-600 text-white font-bold rounded hover:bg-blue-700"
+        >
+          Proceed to Checkout
+        </button>
       </div>
     </div>
   );

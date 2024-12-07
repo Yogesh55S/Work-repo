@@ -32,7 +32,7 @@ const Navbar = () => {
   const fetchUserCart = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/users/${user._id}/cart`
+        `${import.meta.env.VITE_API_URL}/users/${user._id}`
       ); // Replace `user._id` with the appropriate user identifier
       const totalItems = response.data.cart.reduce(
         (total, item) => total + item.quantity,

@@ -8,7 +8,7 @@ import WinterCollection from './Pages/WinterCollection';
 import Shop from './Pages/Shop';
 import Contact from './Pages/Contact';
 import Cart from './Pages/Cart';
-import Profile from './Pages/Profile';
+// import Profile from './Pages/Profile';
 import Login from './Pages/Login.jsx';
 import Register from './Pages/Register.jsx';
 import VerifyOTP from './Pages/VerifyOtp.jsx';
@@ -36,7 +36,7 @@ const AppWrapper = () => {
         <Route path="/shop" element={<Shop />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/profile" element={<Profile />} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
