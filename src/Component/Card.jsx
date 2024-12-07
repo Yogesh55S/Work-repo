@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import { FaShoppingCart } from "react-icons/fa";
 
 const Card = ({ name, price, image, productId }) => {
-  const handleAddToCartClick = async () => {
+  const handleAddToCart = async () => {
     const token = localStorage.getItem("token");
     const user = JSON.parse(localStorage.getItem("user")); // Retrieve user from localStorage
     const userId = user?._id;
@@ -20,7 +20,7 @@ const Card = ({ name, price, image, productId }) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ productId, quantity: 1 }),
+        body: JSON.stringify({ productId, quantity: 1 }), // Corrected to use productId
       });
 
       if (response.ok) {
@@ -41,8 +41,8 @@ const Card = ({ name, price, image, productId }) => {
     <div className="relative flex flex-col items-center gap-2 group">
       {/* Cart Icon (Visible on Hover) */}
       <button
-        onClick={handleAddToCartClick}
-        className="absolute top-2 right-2 bg-gray-800 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out z-50"
+        onClick={handleAddToCart}
+        className="absolute top-8 right-8 bg-gray-800 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out z-50"
         aria-label="Add to Cart"
       >
         <FaShoppingCart />
@@ -73,7 +73,7 @@ const Card = ({ name, price, image, productId }) => {
 
 // Prop types validation
 Card.propTypes = {
-  name: PropTypes.string.isRequired,  // Ensures 'name' is a required string
+  name: PropTypes.string.isRequired, // Ensures 'name' is a required string
   price: PropTypes.string.isRequired, // Ensures 'price' is a required string
   image: PropTypes.string.isRequired, // Ensures 'image' is a required string
   productId: PropTypes.string.isRequired, // Product ID for the cart action

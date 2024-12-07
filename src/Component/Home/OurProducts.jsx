@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import Card from "../Card";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OurProducts = ({ showAll, hideViewAllButton }) => {
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeCategory, setActiveCategory] = useState("All"); // Keep active category state
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation(); // To access the passed state (category)
 
+  // Extract the category from location state (if any)
+  const categoryFromState = location.state?.category || "All"; // Default to "All" if category is not passed
+
+  // Set the active category when coming from Care (via navigate)
+  useEffect(() => {
+    if (categoryFromState !== "All") {
+      setActiveCategory(categoryFromState); // Update active category if passed
+    }
+  }, [categoryFromState]);
+
+  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
@@ -21,9 +35,9 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
         }
         const data = await response.json();
         setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-        setError(error.message);
+      } catch (err) {
+        console.error("Error fetching products:", err);
+        setError(err.message);
       } finally {
         setLoading(false);
       }
@@ -31,11 +45,13 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     fetchProducts();
   }, []);
 
+  // Filter products based on the active category
   const filteredProducts =
     activeCategory === "All"
       ? products
-      : products.filter((product) =>
-          product.type && product.type.trim().toLowerCase() === activeCategory.trim().toLowerCase()
+      : products.filter(
+          (product) =>
+            product.type?.trim().toLowerCase() === activeCategory.trim().toLowerCase()
         );
 
   const displayedProducts = showAll ? filteredProducts : filteredProducts.slice(0, 8);
@@ -48,6 +64,12 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     navigate("/shop");
   };
 
+  // Handle category button clicks
+  const handleCategoryClick = (category) => {
+    setActiveCategory(category); // Set active category to the clicked one
+    navigate(`/shop`, { state: { category } }); // Pass category to the next page via state
+  };
+
   return (
     <div className="p-4 bg-gray-50">
       <div className="max-w-[1240px] mx-auto text-center">
@@ -56,12 +78,12 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           Lorem ipsum dolor sit amet, consectetur adipiscing elit.
         </p>
 
-        {/* Category Tabs */}
+        {/* Category Buttons */}
         <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-8">
           {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
             <button
               key={category}
-              onClick={() => setActiveCategory(category)}
+              onClick={() => handleCategoryClick(category)}
               className={`md:px-3 md:py-2 px-2 sm:px-2 py-1 border mb-2 ${
                 activeCategory === category
                   ? "bg-button-primary text-white md:text-[16px] text-[12px]"
@@ -97,6 +119,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
                       price={`₹${product.price}`}
                       image={imagePath}
                       description={product.description}
+                      productId={product._id}
                     />
                   </div>
                 );

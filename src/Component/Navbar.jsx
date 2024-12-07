@@ -22,6 +22,11 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Scroll to top whenever the route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
   // Fetch cart data for the logged-in user
   useEffect(() => {
     if (isLoggedIn && user) {
@@ -57,6 +62,9 @@ const Navbar = () => {
     }
   };
 
+  // Helper function to determine if the nav item is active
+  const isActive = (path) => location.pathname === path;
+
   return (
     <nav className="bg-primary text-white h-20 fixed w-full z-50 shadow-md">
       <div className="container mx-auto px-4 lg:px-8 flex justify-between items-center h-full">
@@ -69,14 +77,14 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         {isDesktop ? (
-          <ul className="hidden lg:flex space-x-8 text-base font-medium">
+          <ul className="hidden lg:flex space-x-8 text-base font-medium ">
             {[{ name: "Home", path: "/" }, { name: "Winter Collection", path: "/winter-collection" }, { name: "Shop", path: "/shop" }, { name: "Contact Us", path: "/contact" }].map(
               (navItem) => (
                 <li key={navItem.path}>
                   <Link
                     to={navItem.path}
-                    className={`hover:text-secondary transition-colors ${
-                      location.pathname === navItem.path ? "text-secondary" : ""
+                    className={`hover:text-[#D7C9C1] transition-colors ${
+                      isActive(navItem.path) ? "text-[#D7C9C1]" : ""
                     }`}
                   >
                     {navItem.name}
@@ -111,7 +119,7 @@ const Navbar = () => {
                       to={navItem.path}
                       onClick={() => setIsMenuOpen(false)}
                       className={`hover:text-secondary transition-colors ${
-                        location.pathname === navItem.path ? "text-secondary" : ""
+                        isActive(navItem.path) ? "text-secondary font-bold" : ""
                       }`}
                     >
                       {navItem.name}

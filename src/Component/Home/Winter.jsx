@@ -106,6 +106,7 @@ const Winter = () => {
                     price={`₹${product.price}`}
                     image={`${API_URL.replace('/api', '')}/${product.image.replace(/\\/g, "/")}`}
                     product={product} // Pass the full product data to the Card component
+                    productId={product._id}
                   />
                 </div>
               ))}

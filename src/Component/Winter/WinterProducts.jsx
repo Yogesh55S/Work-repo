@@ -58,10 +58,11 @@ const WinterProducts = () => {
                       className="cursor-pointer group"
                     >
                       <Card
-                        name={product.productName}
-                        price={`₹${product.price}`}
-                        image={imagePath}
-                        description={product.description}
+                       name={product.productName}
+                       price={`₹${product.price}`}
+                       image={imagePath}
+                       description={product.description}
+                       productId={product._id}
                       />
                     </Link>
                   );
