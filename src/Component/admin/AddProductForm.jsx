@@ -10,7 +10,7 @@ const AddProductForm = () => {
   const [formData, setFormData] = useState({});
   const [image, setImage] = useState(null);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     // Fetch fields dynamically from the backend
@@ -66,7 +66,7 @@ const AddProductForm = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      setSuccess(`Product ${product ? "updated" : "added"} successfully.`);
+      setSuccess(true);
     } catch (err) {
       console.error(err.response?.data || "Error adding/updating product.");
       setError(err.response?.data?.message || "Failed to save product.");
@@ -74,24 +74,44 @@ const AddProductForm = () => {
   };
 
   const handleCancel = () => {
-    // Navigate back to the product list or reset the form
     navigate("/admin-panel/products");
+  };
+
+  const handleSuccessOkay = () => {
+    setSuccess(false);
+    setFormData(fields.reduce((acc, field) => {
+      acc[field.name] = field.type === "number" ? 0 : "";
+      return acc;
+    }, {}));
+    setImage(null);
   };
 
   return (
     <div className="py-5">
-      <div className="max-w-5xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg">
+      {success && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+            <h2 className="text-2xl font-bold mb-4 text-green-600">Success</h2>
+            <p className="mb-6">Product {product ? "updated" : "added"} successfully.</p>
+            <button
+              onClick={handleSuccessOkay}
+              className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition"
+            >
+              Okay
+            </button>
+          </div>
+        </div>
+      )}
+      <div className={`max-w-5xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg ${success ? "opacity-25" : "opacity-100"}`}>
         <h1 className="text-3xl font-bold text-center mb-6">
           {product ? "Edit Product" : "Add New Product"}
         </h1>
         {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        {success && <p className="text-green-500 text-center mb-4">{success}</p>}
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {fields.map((field) => (
             <div key={field.name} className="col-span-1">
               <label htmlFor={field.name} className="block text-sm font-medium text-gray-700 mb-1">
-                {field.label}{" "}
-                {field.name === "netQuantity" && (
+                {field.label} {field.name === "netQuantity" && (
                   <span className="text-sm text-gray-500">(e.g., g, pcs, ml)</span>
                 )}
               </label>
@@ -144,9 +164,8 @@ const AddProductForm = () => {
               type="submit"
               className={`${
                 product ? "bg-green-500" : "bg-blue-500"
-              } text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:${
-                product ? "bg-green-600" : "bg-blue-600"
-              }`}
+              } text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:$
+                {product ? "bg-green-600" : "bg-blue-600"}`}
             >
               {product ? "Update Product" : "Add Product"}
             </button>
