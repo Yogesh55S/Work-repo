@@ -1,36 +1,46 @@
-
-
 .personal-info-container {
   background: #fff;
   padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  /* border-radius: 8px; */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
 }
 
-.title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: #6b4226;
-  font-family: "Georgia", serif;
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #909F8C;
+  font-weight: 600;
+  /* margin-bottom: 10px; */
+}
+
+.personal {
+  padding-top: 40px;
+}
+
+.contact {
+  padding-top: 40px;
+}
+
+.left-arrow {
+  width: 77px;
+  height: 20px;
+  align-items: right;
+ margin-top: 40px;
 }
 
 .description {
   font-size: 0.9rem;
-  color: #8c6046;
+  color: black;
   margin-bottom: 20px;
-  font-family: "Georgia", serif;
-}
-
-.personal-info-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  position: relative;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 .form-group label {
@@ -38,6 +48,14 @@
   color: #6b4226;
   margin-bottom: 5px;
   font-family: "Georgia", serif;
+}
+
+.full-name input {
+  width: 433px; /* Fixed width for Full Name */
+}
+
+.full-name {
+  width: 400px;
 }
 
 .field-wrapper {
@@ -51,6 +69,7 @@
   font-size: 0.95rem;
   background-color: #f9f5f2;
   color: #333;
+  width: 100%;
 }
 
 .field-wrapper input.disabled {
@@ -77,6 +96,12 @@
 
 .edit-button:hover {
   color: #6b4226;
+}
+
+.form-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .save-button {

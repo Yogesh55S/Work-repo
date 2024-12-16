@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { useAuth } from "../Component/providers/AuthContext"; // Assuming useAuth is available
-import "../Component/css/UserPanel.css"; // Import CSS for UserPanel
+import { useAuth } from "../Component/providers/AuthContext";
+import "../Component/css/UserPanel.css";
 
 const UserPanel = () => {
-  const { token, user, logout } = useAuth(); // Fetch user data and token from AuthContext
+  const { token, user, logout } = useAuth();
   const [userData, setUserData] = useState(user || null);
+  const [activeLink, setActiveLink] = useState("profile"); // Track active sidebar link
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -15,45 +16,39 @@ const UserPanel = () => {
     }
 
     if (!userData) {
-      // Fetch user data only if it's not already available in AuthContext
       fetch(`${API_URL}/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       })
         .then((response) => {
           if (!response.ok) {
             if (response.status === 401) {
-              console.error("Token validation failed or token expired.");
               logout();
             }
             throw new Error("Failed to fetch user profile");
           }
           return response.json();
         })
-        .then((data) => {
-          console.log("Fetched User Data in UserPanel:", data);
-          setUserData(data);
-        })
+        .then((data) => setUserData(data))
         .catch((error) => console.error("Error fetching user profile:", error));
     }
   }, [API_URL, token, userData, logout]);
 
   return (
-    <div className="user-panel-container">
+    <div className="user-panel-container py-28">
       <div className="user-panel">
-        {/* Sidebar */}
         <div className="user-sidebar">
           <div className="user-profile">
+            <div className="account space-y-4"><p>My Account</p>
             <div className="profile-image">
               <img
-                src={userData?.profilePicture || "https://via.placeholder.com/150"} // Display user profile picture or placeholder
+                src={userData?.profilePicture || "https://via.placeholder.com/150"}
                 alt="User Avatar"
                 className="profile-img"
               />
             </div>
-            <h2 className="sidebar-title">{userData?.fullName || "My Account"}</h2>
-            <p className="sidebar-email">{userData?.email || "user@example.com"}</p>
+            </div>
+            {/* <h2 className="sidebar-title">{userData?.fullName || "My Account"}</h2> */}
+            {/* <p className="sidebar-email">{userData?.email || "user@example.com"}</p> */}
           </div>
           <ul className="sidebar-links">
             {[
@@ -65,17 +60,19 @@ const UserPanel = () => {
               { label: "Help & Support", path: "help-support" },
             ].map((item) => (
               <li key={item.path}>
-                <Link to={item.path} className="sidebar-link">
+                <Link
+                  to={item.path}
+                  className={`sidebar-link ${activeLink === item.path ? "active" : ""}`}
+                  onClick={() => setActiveLink(item.path)} // Set active link on click
+                >
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
         </div>
-
-        {/* Main Content */}
         <div className="user-content">
-          <Outlet context={{ userData }} /> {/* Pass user data to nested routes */}
+          <Outlet context={{ userData }} />
         </div>
       </div>
     </div>

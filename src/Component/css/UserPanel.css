@@ -1,41 +1,98 @@
 /* Container for the entire user panel */
 .user-panel-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f8f4f2; /* Light beige background */
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  min-height: 100vh; /* Full viewport height */
+ 
+  margin: 0 auto; /* Keep container centered horizontally */
+  padding: 20px; /* Add padding to prevent edge overflow */
+  box-sizing: border-box; 
 }
 
 /* Main wrapper */
 .user-panel {
-  display: flex;
-  width: 90%;
-  max-width: 1200px;
+  display: flex; /* Enables side-by-side alignment */
+  flex-direction: row; /* Align elements horizontally */
+  width: 100%; /* Full width */
+  max-width: 1200px; /* Limit the maximum width */
+  margin: 0 auto; /* Center it horizontally */
   background: #fff;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
+  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+ 
   overflow: hidden;
+}
+
+.account {
+  text-align: left;
+  font-size: 20px;
+  color: #6b4226;
+  font-weight: 700;
 }
 
 /* Sidebar styling */
 .user-sidebar {
-  width: 280px; /* Adjusted for exact proportions */
-  background: #fdf8f5; /* Light cream background */
-  padding: 20px;
+  width: 280px; /* Fixed width for sidebar */
+  /* background: #fdf8f5; */
   text-align: center;
-  border-right: 1px solid #d6cfc9; /* Subtle border */
+  box-sizing: border-box;
+  /* border-right: 1px solid #d6cfc9; */
 }
 
-/* Profile image wrapper */
+/* Sidebar links container */
+.sidebar-links {
+  list-style: none; /* Remove bullets */
+  padding: 0;
+  margin: 0;
+}
+
+/* Individual sidebar link - as boxes */
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%; /* Full width of sidebar */
+  height: 50px; /* Fixed height for each box */
+  background-color: #E8DFDA; /* Light cream background */
+  color: #6b4226; /* Dark brown text */
+  font-family: "Georgia", serif; /* Serif font */
+  font-size: 1rem;
+  text-decoration: none; /* Remove underline */
+  border-bottom: 1px solid #6b422667;
+  transition: background-color 0.3s ease;
+  /* box-sizing: border-box; */
+}
+
+
+/* Active sidebar link */
+.sidebar-link.active {
+  background-color: #F1EBE8; /* Dark brown active background */
+ 
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+
+/* Hover effect for sidebar links */
+.sidebar-link:hover {
+  background-color: #F1EBE8; /* Slightly darker cream on hover */
+  color: #6b4226; /* Text remains dark brown */
+  cursor: pointer;
+}
+
+/* Profile section styling */
+.user-profile {
+  padding: 20px 0;
+  
+}
+
 .profile-image {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto;
+  width: 150px;
+  height: 150px;
+  margin: 0 auto 10px;
   border-radius: 50%;
   overflow: hidden;
-  border: 3px solid #d6cfc9; /* Light brownish border */
-  margin-bottom: 15px;
+  border: 3px solid #6b4226; /* Circular border */
 }
 
 .profile-img {
@@ -44,39 +101,23 @@
   object-fit: cover;
 }
 
-/* Title below the profile image */
 .sidebar-title {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #6b4226; /* Dark brown */
-  font-family: 'Georgia', serif;
-  margin-bottom: 20px;
+  color: #6b4226;
+  font-family: "Georgia", serif;
 }
 
-/* Sidebar links list */
-.sidebar-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Each sidebar link */
-.sidebar-link {
-  display: block;
-  padding: 12px 15px;
-  color: #6b4226; /* Dark brown text */
-  text-decoration: none;
-  border: 1px solid #d6cfc9; /* Subtle light brown border */
-  border-radius: 4px;
+.sidebar-email {
+  font-size: 0.9rem;
+  color: #6b4226;
   margin-bottom: 10px;
-  font-family: 'Georgia', serif;
-  font-size: 1rem;
-  transition: all 0.3s ease;
 }
 
-/* Hover effect for links */
-.sidebar-link:hover {
-  background: #f2ebe5; /* Light cream hover */
-  color: #6b4226; /* Ensure text remains brown */
-  cursor: pointer;
+/* Content Section */
+.user-content {
+  flex-grow: 1; /* Takes remaining space */
+  padding: 20px; /* Space around content */
+  box-sizing: border-box;
+  background-color: #fff; /* Consistent background */
 }
