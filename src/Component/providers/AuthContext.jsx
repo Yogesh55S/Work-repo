@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
 const AuthContext = createContext();
 
@@ -7,40 +7,75 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+  // State Management
   const [cart, setCart] = useState(JSON.parse(localStorage.getItem("cart")) || []);
-  const [isLoggedIn, setIsLoggedIn] = useState(localStorage.getItem("token") !== null);
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("authToken"));
+  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
   const [userRole, setUserRole] = useState(localStorage.getItem("userRole") || "");
   const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")) || null);
 
-  const login = (userData) => {
+  // Function to log in the user
+  const login = (userData, authToken) => {
     setIsLoggedIn(true);
-    setUser(userData);
-    setUserRole(userData.role || "");
+    setToken(authToken); // Set the token in state
+    setUser(userData); // Set the user data
+    setUserRole(userData?.role || ""); // Set user role
+
+    // Store data in localStorage for persistence
+    localStorage.setItem("authToken", authToken);
     localStorage.setItem("user", JSON.stringify(userData));
-    localStorage.setItem("userRole", userData.role || "");
+    localStorage.setItem("userRole", userData?.role || "");
   };
 
+  // Function to log out the user
   const logout = () => {
     setIsLoggedIn(false);
+    setToken(null);
     setUser(null);
     setUserRole("");
-    localStorage.removeItem("token");
+    setCart([]);
+
+    // Clear localStorage data
+    localStorage.removeItem("authToken");
     localStorage.removeItem("user");
-    localStorage.removeItem("cart");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("cart");
   };
 
+  // Function to manage cart
   const addToCart = (productId, quantity) => {
     const updatedCart = [...cart, { productId, quantity }];
     setCart(updatedCart);
     localStorage.setItem("cart", JSON.stringify(updatedCart));
   };
 
+  // Ensure token and user data persist after a page refresh
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    const storedUser = localStorage.getItem("user");
+
+    if (storedToken && storedUser) {
+      setToken(storedToken);
+      setUser(JSON.parse(storedUser));
+      setIsLoggedIn(true);
+    }
+  }, []);
+
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, user, userRole, cart, addToCart, logout, login, cartCount }}
+      value={{
+        isLoggedIn,
+        token,
+        user,
+        userRole,
+        cart,
+        addToCart,
+        logout,
+        login,
+        cartCount,
+      }}
     >
       {children}
     </AuthContext.Provider>

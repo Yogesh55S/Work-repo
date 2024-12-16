@@ -1,48 +1,41 @@
-import React from 'react';
-import { GoogleLogin } from '@react-oauth/google';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { useAuth } from './providers/AuthContext'; // Assuming useAuth is available
+import React from "react";
+import { GoogleLogin } from "@react-oauth/google";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const GoogleSignInButton = () => {
+const GoogleSignInButton = ({ onGoogleSuccess }) => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access the login method from AuthContext
 
   const handleGoogleSuccess = async (credentialResponse) => {
     if (!credentialResponse || !credentialResponse.credential) {
-      console.error('Google Sign-In failed: No credentials received.');
+      console.error("Google Sign-In failed: No credentials received.");
       return;
     }
 
     const { credential } = credentialResponse;
 
-    // Log the Google token here
-    console.log('Google Token received:', credential);
+    console.log("Google Token received:", credential); // Debug Google token
 
     try {
       const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/google/callback`, {
         token: credential,
       });
 
+      console.log("Google Login API Response:", res.data); // Debug the backend response
+
       if (res.data.needRegistration) {
         navigate(`/auth/register?email=${res.data.email}&name=${res.data.name}`);
-      } else {
-        // Save token and user data locally
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('user', JSON.stringify(res.data.user));
-
-        // Update the auth context to trigger a re-render of Navbar
-        login(res.data.user);
-
-        navigate('/');
+      } else if (onGoogleSuccess) {
+        // Pass token and user data to the parent component for handling
+        onGoogleSuccess(res.data.token, res.data.user);
       }
     } catch (error) {
-      console.error('Google Sign-In failed:', error?.response?.data || error.message);
+      console.error("Google Sign-In failed:", error?.response?.data || error.message);
     }
   };
 
   const handleGoogleFailure = () => {
-    console.error('Google Sign-In failed');
+    console.error("Google Sign-In failed");
   };
 
   return (

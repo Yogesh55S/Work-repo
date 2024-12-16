@@ -1,0 +1,95 @@
+
+
+.personal-info-container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #6b4226;
+  font-family: "Georgia", serif;
+}
+
+.description {
+  font-size: 0.9rem;
+  color: #8c6046;
+  margin-bottom: 20px;
+  font-family: "Georgia", serif;
+}
+
+.personal-info-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.form-group label {
+  font-size: 0.9rem;
+  color: #6b4226;
+  margin-bottom: 5px;
+  font-family: "Georgia", serif;
+}
+
+.field-wrapper {
+  position: relative;
+}
+
+.field-wrapper input {
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #d6cfc9;
+  border-radius: 5px;
+  font-size: 0.95rem;
+  background-color: #f9f5f2;
+  color: #333;
+}
+
+.field-wrapper input.disabled {
+  background-color: #f9f5f2;
+  cursor: not-allowed;
+}
+
+.field-wrapper input.editable {
+  background-color: #fff;
+  border-color: #6b4226;
+}
+
+.edit-button {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #8c6046;
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+.edit-button:hover {
+  color: #6b4226;
+}
+
+.save-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #6b4226;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.save-button:hover {
+  background-color: #8c6046;
+}

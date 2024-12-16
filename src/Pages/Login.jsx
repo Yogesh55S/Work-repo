@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAuth } from "../Component/providers/AuthContext";
-import GoogleSignInButton from "../Component/GoogleSignInButton"; // Import the Google Sign-In button component
+import GoogleSignInButton from "../Component/GoogleSignInButton";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -10,28 +10,36 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login } = useAuth(); // Access login from AuthContext
 
+  // Handle Email Login
   const handleEmailLogin = async () => {
     setErrorMessage("");
     setIsLoading(true);
-  
+
     try {
+      console.log("Attempting login with:", { email, password }); // Debug payload
+
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
         email,
         password,
       });
-  
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        
-        // Log the token to verify it's stored in localStorage
-        console.log("Token stored in localStorage:", localStorage.getItem("token"));
-  
-        login(response.data.user);
+
+      console.log("Login API Response:", response.data); // Debug API response
+
+      if (response.data.token && response.data.user) {
+        login(response.data.user, response.data.token);
+
+        console.log("Regular Login Token:", response.data.token);
+        console.log("User Data from Regular Login:", response.data.user);
+
         navigate("/");
+      } else {
+        console.error("Token or user data missing in the response:", response.data);
+        setErrorMessage("Login failed. Please try again.");
       }
     } catch (error) {
+      console.error("Login request failed:", error); // Debug error
       if (error.response?.status === 400) {
         setErrorMessage("Invalid email or password. Please try again.");
       } else if (error.response?.status === 403) {
@@ -43,7 +51,24 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-  
+
+  // Handle Google Login Success
+  const handleGoogleSuccess = (googleToken, googleUserData) => {
+    try {
+      console.log("Google Token received:", googleToken);
+      console.log("Google User Data received:", googleUserData);
+
+      login(googleUserData, googleToken);
+
+      console.log("Google Login Token stored:", googleToken);
+      console.log("Google User Data stored:", googleUserData);
+
+      navigate("/");
+    } catch (error) {
+      console.error("Google Login handling failed:", error);
+      setErrorMessage("Google Login failed. Please try again.");
+    }
+  };
 
   return (
     <div className="flex items-center justify-center h-screen bg-primary">
@@ -105,7 +130,7 @@ export default function Login() {
 
         {/* Google Login Button */}
         <div className="flex justify-center">
-          <GoogleSignInButton />
+          <GoogleSignInButton onGoogleSuccess={handleGoogleSuccess} />
         </div>
 
         {/* Register Link */}

@@ -9,10 +9,10 @@ import axios from "axios";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
-  const [cartCount, setCartCount] = useState(0); // Local state for cart count
+  const [cartCount, setCartCount] = useState(0);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isLoggedIn, logout, user } = useAuth(); // Assume `user` contains logged-in user data
+  const { isLoggedIn, logout, user } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,22 +22,27 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Fetch cart data for the logged-in user
   useEffect(() => {
     if (isLoggedIn && user) {
       fetchUserCart();
     }
-  }, [isLoggedIn, user, location]); // Trigger when user or location changes
+  }, [isLoggedIn, user, location]);
+
+  useEffect(() => {
+    // Scroll to top on location change
+    window.scrollTo(0, 0);
+  }, [location]);
 
   const fetchUserCart = async () => {
     try {
+      if (!user?._id) return;
       const response = await axios.get(
         `${import.meta.env.VITE_API_URL}/users/${user._id}`
-      ); // Replace `user._id` with the appropriate user identifier
+      );
       const totalItems = response.data.cart.reduce(
         (total, item) => total + item.quantity,
         0
-      ); // Assuming `cart` is an array of items with a `quantity` property
+      );
       setCartCount(totalItems);
     } catch (error) {
       console.error("Failed to fetch user cart", error);
@@ -51,8 +56,10 @@ const Navbar = () => {
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      navigate(user.role === "admin" ? "/admin-panel" : "/user-profile");
+      // Navigate to user panel or admin panel based on user role
+      navigate(user.role === "admin" ? "/admin-panel" : "/user-panel");
     } else {
+      // Redirect to login page if user is not logged in
       navigate("/login");
     }
   };
@@ -70,20 +77,23 @@ const Navbar = () => {
         {/* Desktop Navigation */}
         {isDesktop ? (
           <ul className="hidden lg:flex space-x-8 text-base font-medium">
-            {[{ name: "Home", path: "/" }, { name: "Winter Collection", path: "/winter-collection" }, { name: "Shop", path: "/shop" }, { name: "Contact Us", path: "/contact" }].map(
-              (navItem) => (
-                <li key={navItem.path}>
-                  <Link
-                    to={navItem.path}
-                    className={`hover:text-secondary transition-colors ${
-                      location.pathname === navItem.path ? "text-secondary" : ""
-                    }`}
-                  >
-                    {navItem.name}
-                  </Link>
-                </li>
-              )
-            )}
+            {[
+              { name: "Home", path: "/" },
+              { name: "Winter Collection", path: "/winter-collection" },
+              { name: "Shop", path: "/shop" },
+              { name: "Contact Us", path: "/contact" },
+            ].map((navItem) => (
+              <li key={navItem.path}>
+                <Link
+                  to={navItem.path}
+                  className={`hover:text-secondary transition-colors ${
+                    location.pathname === navItem.path ? "text-secondary" : ""
+                  }`}
+                >
+                  {navItem.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         ) : (
           <div
@@ -104,20 +114,51 @@ const Navbar = () => {
               transition={{ duration: 0.3 }}
               className="absolute top-20 left-0 w-full bg-primary shadow-lg z-40 flex flex-col text-base font-medium space-y-4 px-6 py-4"
             >
-              {[{ name: "Home", path: "/" }, { name: "Winter Collection", path: "/winter-collection" }, { name: "Shop", path: "/shop" }, { name: "Contact Us", path: "/contact" }].map(
-                (navItem) => (
-                  <li key={navItem.path}>
-                    <Link
-                      to={navItem.path}
-                      onClick={() => setIsMenuOpen(false)}
-                      className={`hover:text-secondary transition-colors ${
-                        location.pathname === navItem.path ? "text-secondary" : ""
-                      }`}
-                    >
-                      {navItem.name}
-                    </Link>
-                  </li>
-                )
+              {[
+                { name: "Home", path: "/" },
+                { name: "Winter Collection", path: "/winter-collection" },
+                { name: "Shop", path: "/shop" },
+                { name: "Contact Us", path: "/contact" },
+              ].map((navItem) => (
+                <li key={navItem.path}>
+                  <Link
+                    to={navItem.path}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`hover:text-secondary transition-colors ${
+                      location.pathname === navItem.path ? "text-secondary" : ""
+                    }`}
+                  >
+                    {navItem.name}
+                  </Link>
+                </li>
+              ))}
+              {/* Profile Icon */}
+              <li>
+                <div
+                  onClick={() => {
+                    handleUserIconClick();
+                    setIsMenuOpen(false);
+                  }}
+                  className="cursor-pointer hover:text-secondary transition-colors flex items-center space-x-2"
+                >
+                  <FiUser />
+                  <span>{isLoggedIn ? "My Account" : "Login"}</span>
+                </div>
+              </li>
+              {/* Logout Icon */}
+              {isLoggedIn && (
+                <li>
+                  <div
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="cursor-pointer hover:text-secondary transition-colors flex items-center space-x-2"
+                  >
+                    <FiLogOut />
+                    <span>Logout</span>
+                  </div>
+                </li>
               )}
             </motion.ul>
           )}
@@ -138,21 +179,24 @@ const Navbar = () => {
             )}
           </Link>
 
-          {/* User Icon */}
-          <div
-            onClick={handleUserIconClick}
-            className="cursor-pointer hover:text-secondary transition-colors"
-          >
-            <FiUser />
-          </div>
+          {/* User Icon (Desktop only) */}
+          {isDesktop && (
+            <div
+              onClick={handleUserIconClick}
+              className="cursor-pointer hover:text-secondary transition-colors"
+            >
+              <FiUser />
+            </div>
+          )}
 
-          {/* Logout Icon */}
+          {/* Logout Button (Always visible when logged in) */}
           {isLoggedIn && (
             <div
               onClick={handleLogout}
-              className="cursor-pointer hover:text-secondary transition-colors"
+              className="cursor-pointer hover:text-secondary transition-colors flex items-center"
             >
               <FiLogOut />
+              <span className="ml-2 hidden lg:inline">Logout</span>
             </div>
           )}
         </div>
