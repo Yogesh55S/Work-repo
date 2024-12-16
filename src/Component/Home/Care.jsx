@@ -3,44 +3,43 @@ import { useNavigate } from "react-router-dom";
 import goldOilImage from "../../assets/Image/goldoil.jpg"; // Update the path based on your structure
 import faceWashImage from "../../assets/Image/facewash.png"; // Update the path based on your structure
 
-// Temporary JSON data
 const careData = [
   {
     id: 1,
     title: "Body Care",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pellentesque ac urna at malesuada.",
+    description: "Pamper yourself with our body care collection.",
     image: goldOilImage,
     type: "Body Care",
   },
   {
     id: 2,
     title: "Skin Care",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pellentesque ac urna at malesuada.",
+    description: "Rejuvenate your skin with our premium skin care products.",
     image: faceWashImage,
     type: "Skin Care",
   },
   {
     id: 3,
     title: "Hair Care",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pellentesque ac urna at malesuada.",
+    description: "Get nourished and healthy hair with our hair care range.",
     image: goldOilImage,
     type: "Hair Care",
   },
   {
     id: 4,
     title: "Soap Bars",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec pellentesque ac urna at malesuada.",
+    description: "Experience the freshness of our handmade soap bars.",
     image: faceWashImage,
     type: "Soap Bars",
   },
 ];
 
 const Care = () => {
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
 
-  // Handle category click to navigate to products page
+  // Handle category click to pass the category type to the next page
   const handleCategoryClick = (category) => {
-    navigate(`/shop/${category}`); // Navigate to /shop/:category
+    navigate(`/shop`, { state: { category } }); // Pass the category as state to the next page
   };
 
   return (
@@ -54,15 +53,13 @@ const Care = () => {
             <div
               key={item.id}
               className="relative bg-white shadow-md rounded-lg overflow-hidden group cursor-pointer"
-              onClick={() => handleCategoryClick(item.type)} // Pass category on click
+              onClick={() => handleCategoryClick(item.type)} // Pass category type on click
             >
-              {/* Background Image */}
               <img
                 src={item.image}
                 alt={item.title}
                 className="w-full h-[220px] md:w-[615px] md:h-[290px] object-cover group-hover:opacity-70 transition-opacity duration-300"
               />
-              {/* Text Overlay */}
               <div className="absolute inset-0 flex items-center bg-black bg-opacity-30">
                 <div className="text-left px-6 md:px-10">
                   <h3 className="text-xl md:text-5xl text-white mb-2 md:mb-4">{item.title}</h3>

@@ -1,15 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for navigation
-import PropTypes from "prop-types"; // Import PropTypes
-import Card from "./Card"; // Ensure the Card component is imported correctly
+import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import Card from "./Card";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 const RelatedProducts = ({ productType }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [loading, setLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-  const navigate = useNavigate(); // Initialize navigation
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const fetchRelatedProducts = useCallback(async () => {
     setLoading(true);
@@ -21,12 +21,10 @@ const RelatedProducts = ({ productType }) => {
       }
       const data = await response.json();
 
-      // Ensure the data is an array and filter products by type
       if (Array.isArray(data)) {
         const filtered = data.filter(
           (item) => item.type?.trim().toLowerCase() === productType.trim().toLowerCase()
         );
-
         setRelatedProducts(filtered);
       } else {
         throw new Error("Invalid data format received from the API.");
@@ -46,10 +44,7 @@ const RelatedProducts = ({ productType }) => {
   }, [productType, fetchRelatedProducts]);
 
   const handleProductClick = (product) => {
-    // Scroll to the top of the page before navigating
-    window.scrollTo(0, 0);  // This will scroll to the top of the page
-    
-    // Navigate to the product details page with the product's ID
+    window.scrollTo(0, 0); // Scroll to top before navigating
     navigate(`/product/${product._id}`, { state: { product } });
   };
 
@@ -63,12 +58,11 @@ const RelatedProducts = ({ productType }) => {
       )}
 
       <div className="relative">
-        {/* Inline styles for hiding scrollbars */}
         <div
           className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6"
           style={{
-            scrollbarWidth: "none", // Firefox
-            msOverflowStyle: "none", // IE and Edge
+            scrollbarWidth: "none",
+            msOverflowStyle: "none",
           }}
         >
           {relatedProducts.map((item) => {
@@ -76,21 +70,20 @@ const RelatedProducts = ({ productType }) => {
             const imagePath = `${baseUrl}/${item.image.replace(/\\/g, "/")}`;
             return (
               <div
-                className="min-w-[240px] max-w-[240px] flex-shrink-0 snap-start transform transition duration-300 hover:scale-105 cursor-pointer"
+                className="min-w-[300px] max-w-[300px] flex-shrink-0 snap-start transform transition duration-300 hover:scale-105 cursor-pointer"
                 key={item._id}
-                onClick={() => handleProductClick(item)} // Navigate on click
+                onClick={() => handleProductClick(item)}
               >
                 <Card
                   name={item.productName}
                   price={`₹${item.price}`}
                   image={imagePath}
-                  description={item.description}
+                  productId={item._id} // Use item._id here instead of product._id
                 />
               </div>
             );
           })}
         </div>
-        {/* Additional style for hiding scrollbar in WebKit-based browsers */}
         <style>
           {`
             .flex::-webkit-scrollbar {
@@ -103,9 +96,8 @@ const RelatedProducts = ({ productType }) => {
   );
 };
 
-// Add prop types for validation
 RelatedProducts.propTypes = {
-  productType: PropTypes.string.isRequired, // productType should be a string and is required
+  productType: PropTypes.string.isRequired,
 };
 
 export default RelatedProducts;

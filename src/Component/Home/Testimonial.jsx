@@ -1,187 +1,124 @@
-import React, { useState } from 'react';
-import bigrose from '../../assets/svg/bigrose.svg'; // Update with your actual path
-import drop from '../../assets/Image/drop.png'; // Update with your actual path
-import arrow from '../../assets/svg/arrow.svg'; // Update with your actual path
-import smallrose from '../../assets/svg/smallrose.svg'; // Update with your actual path
-import user1 from '../../assets/Image/user6.jpg'; // Update with your actual path
+import React, { useState, useEffect } from 'react';
+import bigrose from '../../assets/svg/rosevector.svg';
+import quotes from '../../assets/svg/quotes.svg';
 
 const testimonials = [
   {
-    title: "Great Service",
-    text: "This company provided outstanding service, and the quality of work was exceptional!",
-    image: user1,
-    name: "John Doe",
+    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
+    name: 'Itadori Yuji',
+    age: 19,
+    country: 'Japan',
   },
   {
-    title: "Very Professional",
-    text: "The team was very professional, and the communication was excellent. Highly recommend!",
-    image: user1,
-    name: "Jane Smith",
+    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
+    name: 'Jane Doe',
+    age: 25,
+    country: 'USA',
   },
   {
-    title: "Highly Recommend",
-    text: "I am extremely satisfied with the work done. I would definitely recommend them to anyone.",
-    image: user1,
-    name: "Alice Johnson",
-  }
+    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
+    name: 'John Smith',
+    age: 30,
+    country: 'UK',
+  },
+  {
+    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
+    name: 'Anna Kim',
+    age: 22,
+    country: 'South Korea',
+  },
 ];
 
 const Testimonial = () => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  const handleArrowClick = (direction) => {
-    if (direction === 'up') {
-      setActiveIndex((prevIndex) => (prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1));
-    } else {
-      setActiveIndex((prevIndex) => (prevIndex === testimonials.length - 1 ? 0 : prevIndex + 1));
-    }
-  };
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
+    }, 5000); // Auto-slide every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <section className="testimonial-section" style={styles.section}>
-      <div className="testimonial-left" style={styles.left}>
-        <img src={bigrose} alt="Big Rose" style={styles.bigrose} />
-        <img src={drop} alt="Drop" style={styles.drop} />
-      </div>
-
-      <div className="testimonial-center" style={styles.center}>
-        <img
-          src={arrow}
-          alt="Up Arrow"
-          onClick={() => handleArrowClick('up')}
-          style={styles.arrow}
-        />
-        <div style={styles.dots}>
-          {testimonials.map((_, index) => (
-            <span
+    <div className="flex flex-col items-center p-4">
+      <div className="relative bg-white shadow-lg rounded-lg overflow-hidden max-w-full lg:max-w-[1240px] lg:h-[490px] md:h-[530px] xs:h-[460px] md-sm:h-[540px] sm:h-[580px]">
+        <div
+          className="flex transition-transform duration-[2000ms] ease-in-out"
+          style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+        >
+          {testimonials.map((testimonial, index) => (
+            <div
               key={index}
-              style={{
-                ...styles.dot,
-                backgroundColor: activeIndex === index ? '#000' : '#ccc',
-              }}
-              onClick={() => setActiveIndex(index)}
-            />
+              className="flex-shrink-0 w-full max-w-full sm:max-w-[1240px] h-[420px] text-center p-8 relative"
+            >
+              <div className="absolute top-0  left-0 right-0 flex justify-center items-center">
+                <img
+                  src={bigrose}
+                  alt="Horizontal Decoration"
+                  className="w-[250px] sm:w-[300px] md:w-[400px] opacity-50"
+                />
+              </div>
+              <div className="flex justify-center mt-12 sm:mt-16">
+                <img
+                  src={quotes}
+                  alt="Quotes Decoration"
+                  className="w-[52px] h-[38px] sm:w-[76px] sm:h-[56px] md:w-[104px] md:h-[76px] lg:mt-3 md-sm:mt-0 sm:mt-[-10px] xs:mt-[-10px]  z-50"
+                />
+              </div>
+              <p className="text-gray-800 lg:mt-3 xl:mt-7 md:mt-1 text-sm sm:text-base md:text-lg md:px-2 ">
+                {testimonial.text}
+              </p>
+              <h4 className="text-base sm:text-lg md:text-xl font-semibold mt-2">
+                {testimonial.name}, {testimonial.age}
+              </h4>
+              <p className="text-gray-800 mt-1 text-sm sm:text-base md:text-lg z-50  ">
+                {testimonial.country}
+              </p>
+              <div className="absolute lg:bottom-[-70px] md:bottom-[-110px] xs:bottom-[-40px] md-sm:bottom-[-120px] sm:bottom-[-160px] left-0 right-0 flex justify-center items-center">
+                <img
+                  src={bigrose}
+                  alt="Horizontal Decoration"
+                  className="w-[250px] sm:w-[300px] md:w-[400px] rotate-180 opacity-50"
+                />
+              </div>
+            </div>
           ))}
         </div>
-        <img
-          src={arrow}
-          alt="Down Arrow"
-          onClick={() => handleArrowClick('down')}
-          style={styles.arrow}
-        />
       </div>
 
-      <div className="testimonial-right" style={styles.right}>
-        <div style={styles.heading}>
-          <img src={arrow} alt="Left Arrow" style={styles.arrowLeft} />
-          <h3>Testimonials</h3>
-        </div>
-        <h4>{testimonials[activeIndex].title}</h4>
-        <div style={styles.textBox}>
-          <p style={styles.text}>{`"${testimonials[activeIndex].text}"`}</p>
-        </div>
-        <div style={styles.userContainer}>
-          <img src={testimonials[activeIndex].image} alt="User" style={styles.userImage} />
-          <img src={smallrose} alt="Small Rose" style={styles.smallrose} />
-        </div>
-        <p>{testimonials[activeIndex].name}</p>
-      </div>
-    </section>
+      {/* circle */}
+      <div className="flex justify-center items-center mt-4 space-x-4">
+  {testimonials.map((_, index) => (
+    <div
+      key={index}
+      className={`relative flex items-center justify-center transition-all ${
+        index === activeIndex ? 'w-6 h-6' : 'w-4 h-4'
+      }`}
+    >
+      {/* Outer Circle */}
+      <div
+        className={`absolute w-full h-full rounded-full border-2 transition-all ${
+          index === activeIndex ? 'border-gray-600' : 'border-gray-300'
+        }`}
+      ></div>
+
+      {/* Inner Circle */}
+      <div
+        className={`absolute ${
+          index === activeIndex ? 'w-3 h-3' : 'w-2 h-2'
+        } rounded-full transition-all ${
+          index === activeIndex ? 'bg-gray-600' : 'bg-gray-300'
+        }`}
+      ></div>
+    </div>
+  ))}
+</div>
+
+
+
+
+    </div>
   );
-};
-
-const styles = {
-  section: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '20px',
-    backgroundColor: '#f8f8f8',
-    width: '1240px', // Set width to 1240px
-    margin: '0 auto', // Center align the section horizontally
-    position: 'relative', // Needed to position images relative to the section
-  },
-  left: {
-    position: 'relative',
-    maxWidth: '300px', // Control the max width of the left side images
-  },
-  bigrose: {
-    position: 'absolute',
-    top: '-40px', // Adjust for better positioning
-    left: '-200px', // Adjust for better visibility
-    maxWidth: '150%', // Ensure the image is visible
-    zIndex: 10, // Ensure it is visible over other content
-  },
-  drop: {
-    position: 'absolute',
-    top: '20px', // Adjust the position for better alignment
-    left: '-80px', // Adjust for better visibility
-    maxWidth: '100%',
-    zIndex: 5, // Ensure it's visible under the bigrose
-  },
-  center: {
-    textAlign: 'center',
-    position: 'relative',
-  },
-  arrow: {
-    cursor: 'pointer',
-    margin: '10px',
-    width: '30px',
-  },
-  dots: {
-    display: 'flex',
-    justifyContent: 'center',
-    marginBottom: '20px',
-  },
-  dot: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-    margin: '0 5px',
-    transition: 'background-color 0.3s',
-    cursor: 'pointer',
-  },
-  right: {
-    textAlign: 'left',
-    maxWidth: '500px',
-  },
-  heading: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-  arrowLeft: {
-    width: '20px',
-    transform: 'rotate(180deg)',
-  },
-  textBox: {
-    backgroundColor: '#fff',
-    padding: '15px',
-    borderRadius: '10px',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-    position: 'relative',
-    margin: '20px 0',
-  },
-  text: {
-    fontStyle: 'italic',
-  },
-  userContainer: {
-    display: 'flex',
-    alignItems: 'center',
-    marginTop: '10px',
-  },
-  userImage: {
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    marginRight: '10px',
-  },
-  smallrose: {
-    position: 'absolute',
-    top: '15px', // Adjust for better alignment
-    left: '35px', // Adjust to position it relative to the user image
-    width: '20px',
-    zIndex: 20, // Ensure the smallrose is visible over the text box
-  },
 };
 
 export default Testimonial;

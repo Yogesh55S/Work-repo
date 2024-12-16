@@ -22,6 +22,15 @@ const Navbar = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+<<<<<<< HEAD
+=======
+  // Scroll to top whenever the route changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+
+  // Fetch cart data for the logged-in user
+>>>>>>> 6f2aa5506a1cc277324b55056f27a22d5f4e14a8
   useEffect(() => {
     if (isLoggedIn && user) {
       fetchUserCart();
@@ -63,6 +72,9 @@ const Navbar = () => {
       navigate("/login");
     }
   };
+
+  // Helper function to determine if the nav item is active
+  const isActive = (path) => location.pathname === path;
 
   return (
     <nav className="bg-primary text-white h-20 fixed w-full z-50 shadow-md">
