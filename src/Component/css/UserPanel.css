@@ -25,7 +25,7 @@
 
 .account {
   text-align: left;
-  font-size: 20px;
+  font-size: 32px;
   color: #6b4226;
   font-weight: 700;
 }
@@ -50,7 +50,9 @@
 .sidebar-link {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: left;
+  padding-left: 10px;
+  text-align: left;
   width: 100%; /* Full width of sidebar */
   height: 50px; /* Fixed height for each box */
   background-color: #E8DFDA; /* Light cream background */
