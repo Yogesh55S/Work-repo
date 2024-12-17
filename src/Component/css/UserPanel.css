@@ -3,11 +3,10 @@
   display: flex;
   justify-content: center; /* Center horizontally */
   align-items: center; /* Center vertically */
-  min-height: 100vh; /* Full viewport height */
- 
+  min-height: 90vh; /* Full viewport height */
   margin: 0 auto; /* Keep container centered horizontally */
-  padding: 20px; /* Add padding to prevent edge overflow */
   box-sizing: border-box; 
+  /* margin-top: 30px; */
 }
 
 /* Main wrapper */
@@ -28,6 +27,7 @@
   font-size: 32px;
   color: #6b4226;
   font-weight: 700;
+  /* padding-top: 40px; */
 }
 
 /* Sidebar styling */
@@ -123,3 +123,7 @@
   box-sizing: border-box;
   background-color: #fff; /* Consistent background */
 }
+
+/* Save Changes Button */
+
+

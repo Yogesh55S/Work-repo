@@ -70,13 +70,16 @@ const AddressBook = () => {
   return (
     <div className="address-book-container">
       <h2 className="title">Saved Addresses</h2>
+      <div className="button-para">
+      <p>Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed faucibus morbi curae maecenas dignissim volutpat hac quam.</p>
       <button className="add-address-btn" onClick={() => handleEdit(null)}>
         + Add New Address
       </button>
+      </div>
 
       <div className="address-section">
         {defaultAddress && (
-          <div className="address-card default-address">
+          <div className="address-card-box default-address">
             <h3 className="address-section-title">Default Address</h3>
             <AddressDetails address={defaultAddress} onEdit={handleEdit} onDelete={handleDelete} />
           </div>
