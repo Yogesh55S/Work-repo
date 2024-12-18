@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 
+
+// fixed cart workin 
 const Cart = ({ userId }) => {
   const [cartItems, setCartItems] = useState([]);
   const [extractedUserId, setExtractedUserId] = useState(userId);
