@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../Component/providers/AuthContext";
 import "../Component/css/UserPanel.css";
 
 const UserPanel = () => {
   const { token, user, logout } = useAuth();
   const [userData, setUserData] = useState(user || null);
-  const [activeLink, setActiveLink] = useState("profile"); // Track active sidebar link
+  const location = useLocation(); // Get current URL path
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -33,24 +33,24 @@ const UserPanel = () => {
     }
   }, [API_URL, token, userData, logout]);
 
-
-  
   return (
     <div className="user-panel-container py-28">
       <div className="user-panel">
         <div className="user-sidebar">
           <div className="user-profile">
-            <div className="account space-y-4"><p>My Account</p>
-            <div className="profile-image">
-              <img
-                src={userData?.profilePicture || "https://via.placeholder.com/150"}
-                alt="User Avatar"
-                className="profile-img"
-              />
+            <div className="account space-y-4">
+              <p>My Account</p>
+              <div className="profile-image">
+                <img
+                  src={
+                    userData?.profilePicture ||
+                    "https://via.placeholder.com/150"
+                  }
+                  alt="User Avatar"
+                  className="profile-img"
+                />
+              </div>
             </div>
-            </div>
-            {/* <h2 className="sidebar-title">{userData?.fullName || "My Account"}</h2> */}
-            {/* <p className="sidebar-email">{userData?.email || "user@example.com"}</p> */}
           </div>
           <ul className="sidebar-links">
             {[
@@ -64,8 +64,9 @@ const UserPanel = () => {
               <li key={item.path}>
                 <Link
                   to={item.path}
-                  className={`sidebar-link ${activeLink === item.path ? "active" : ""}`}
-                  onClick={() => setActiveLink(item.path)} // Set active link on click
+                  className={`sidebar-link ${
+                    location.pathname.includes(item.path) ? "active" : ""
+                  }`}
                 >
                   {item.label}
                 </Link>

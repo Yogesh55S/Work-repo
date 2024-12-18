@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthContext";
 import "../css/AddressBook.css";
+import leftArrow from "../../assets/svg/leftarrow.svg";
 
 const AddressBook = () => {
   const { token, user } = useAuth(); // Extract user and token dynamically
@@ -33,7 +34,7 @@ const AddressBook = () => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(() => setAddresses((prev) => prev.filter((addr) => addr._id !== id)))
+      .then(() => fetchAddresses()) // Re-fetch addresses after deletion
       .catch((error) => console.error("Error deleting address:", error));
   };
 
@@ -52,12 +53,8 @@ const AddressBook = () => {
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
-      .then((data) => {
-        setAddresses((prev) =>
-          formData._id
-            ? prev.map((addr) => (addr._id === formData._id ? data : addr))
-            : [...prev, data]
-        );
+      .then(() => {
+        fetchAddresses(); // Re-fetch addresses after saving
         setShowModal(false);
         setSelectedAddress(null);
       })
@@ -69,7 +66,8 @@ const AddressBook = () => {
 
   return (
     <div className="address-book-container">
-      <h2 className="title">Saved Addresses</h2>
+      <h2 className="title">Saved Addresses</h2> 
+      
       <div className="button-para">
         <p>
           Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed
