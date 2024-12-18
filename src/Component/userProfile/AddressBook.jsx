@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthContext";
 import "../css/AddressBook.css";
+import leftArrow from "../../assets/svg/leftarrow.svg";
 
 const AddressBook = () => {
   const { token, user } = useAuth(); // Extract user and token dynamically
@@ -33,7 +34,7 @@ const AddressBook = () => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(() => setAddresses((prev) => prev.filter((addr) => addr._id !== id)))
+      .then(() => fetchAddresses()) // Re-fetch addresses after deletion
       .catch((error) => console.error("Error deleting address:", error));
   };
 
@@ -52,12 +53,8 @@ const AddressBook = () => {
       body: JSON.stringify(formData),
     })
       .then((response) => response.json())
-      .then((data) => {
-        setAddresses((prev) =>
-          formData._id
-            ? prev.map((addr) => (addr._id === formData._id ? data : addr))
-            : [...prev, data]
-        );
+      .then(() => {
+        fetchAddresses(); // Re-fetch addresses after saving
         setShowModal(false);
         setSelectedAddress(null);
       })
@@ -69,19 +66,27 @@ const AddressBook = () => {
 
   return (
     <div className="address-book-container">
-      <h2 className="title">Saved Addresses</h2>
+      <h2 className="title">Saved Addresses</h2> 
+      
       <div className="button-para">
-      <p>Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed faucibus morbi curae maecenas dignissim volutpat hac quam.</p>
-      <button className="add-address-btn" onClick={() => handleEdit(null)}>
-        + Add New Address
-      </button>
+        <p>
+          Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed
+          faucibus morbi curae maecenas dignissim volutpat hac quam.
+        </p>
+        <button className="add-address-btn" onClick={() => handleEdit(null)}>
+          + Add New Address
+        </button>
       </div>
 
       <div className="address-section">
         {defaultAddress && (
           <div className="address-card-box default-address">
             <h3 className="address-section-title">Default Address</h3>
-            <AddressDetails address={defaultAddress} onEdit={handleEdit} onDelete={handleDelete} />
+            <AddressDetails
+              address={defaultAddress}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           </div>
         )}
 
@@ -117,7 +122,8 @@ const AddressDetails = ({ address, onEdit, onDelete }) => (
     <div className="address-details">
       <p className="address-title">{address.deliveryName}</p>
       <p>
-        {address.street}, {address.city}, {address.state} - {address.zip}, {address.country}
+        {address.street}, {address.city}, {address.state} - {address.zip},{" "}
+        {address.country}
       </p>
       <p>
         <strong>Mobile:</strong> {address.deliveryNumber}
@@ -159,7 +165,9 @@ const AddressModal = ({ address, onClose, onSave }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3 className="modal-title">{address ? "Edit Address" : "Add New Address"}</h3>
+        <h3 className="modal-title">
+          {address ? "Edit Address" : "Add New Address"}
+        </h3>
 
         <div className="modal-grid">
           <div className="form-group">

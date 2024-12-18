@@ -10,9 +10,10 @@
 }
 
 .title {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #6b4226;
+  color: #6a6c69;
+  font-weight: bold;
 }
 
 .subtitle {
@@ -47,7 +48,7 @@
 .address-section-title {
   font-size: 1.2rem;
   margin-bottom: 10px;
-  color: #6b4226;
+  color: #6a6c69;
   font-weight: bold;
 }
 
