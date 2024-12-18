@@ -97,7 +97,7 @@ const PersonalInformation = () => {
 
       <form className="personal-info-form">
         <div className="form-group full-name">
-          <label>Full Name</label>
+          <label className=" font-semibold " >Full Name</label>
           <div className="field-wrapper">
             <input
               type="text"
@@ -123,7 +123,7 @@ const PersonalInformation = () => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label>Phone Number</label>
+            <label className=" font-semibold">Phone Number</label>
             <div className="field-wrapper">
               <input
                 type="text"
@@ -144,7 +144,7 @@ const PersonalInformation = () => {
           </div>
 
           <div className="form-group">
-            <label>Email ID</label>
+            <label className=" font-semibold" >Email ID</label>
             <div className="field-wrapper">
               <input
                 type="text"

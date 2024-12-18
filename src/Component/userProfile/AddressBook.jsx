@@ -71,17 +71,24 @@ const AddressBook = () => {
     <div className="address-book-container">
       <h2 className="title">Saved Addresses</h2>
       <div className="button-para">
-      <p>Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed faucibus morbi curae maecenas dignissim volutpat hac quam.</p>
-      <button className="add-address-btn" onClick={() => handleEdit(null)}>
-        + Add New Address
-      </button>
+        <p>
+          Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed
+          faucibus morbi curae maecenas dignissim volutpat hac quam.
+        </p>
+        <button className="add-address-btn" onClick={() => handleEdit(null)}>
+          + Add New Address
+        </button>
       </div>
 
       <div className="address-section">
         {defaultAddress && (
           <div className="address-card-box default-address">
             <h3 className="address-section-title">Default Address</h3>
-            <AddressDetails address={defaultAddress} onEdit={handleEdit} onDelete={handleDelete} />
+            <AddressDetails
+              address={defaultAddress}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           </div>
         )}
 
@@ -115,9 +122,11 @@ const AddressBook = () => {
 const AddressDetails = ({ address, onEdit, onDelete }) => (
   <div className="address-card">
     <div className="address-details">
-      <p className="address-title">{address.deliveryName}</p>
+      <p className="address-title">
+        {address.deliveryName} - <span className="address-tag">{address.tag}</span>
+      </p>
       <p>
-        {address.street}, {address.city}, {address.state} - {address.zip}, {address.country}
+        {address.houseNumber}, {address.city}, {address.state} - {address.zip}
       </p>
       <p>
         <strong>Mobile:</strong> {address.deliveryNumber}
@@ -139,11 +148,10 @@ const AddressModal = ({ address, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     deliveryName: address?.deliveryName || "",
     deliveryNumber: address?.deliveryNumber || "",
-    street: address?.street || "",
+    houseNumber: address?.houseNumber || "",
     city: address?.city || "",
     state: address?.state || "",
     zip: address?.zip || "",
-    country: address?.country || "",
     tag: address?.tag || "home",
   });
 
@@ -159,7 +167,9 @@ const AddressModal = ({ address, onClose, onSave }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h3 className="modal-title">{address ? "Edit Address" : "Add New Address"}</h3>
+        <h3 className="modal-title">
+          {address ? "Edit Address" : "Add New Address"}
+        </h3>
 
         <div className="modal-grid">
           <div className="form-group">
@@ -181,11 +191,11 @@ const AddressModal = ({ address, onClose, onSave }) => {
             />
           </div>
           <div className="form-group full-width">
-            <label>Street *</label>
+            <label>House Number *</label>
             <input
               type="text"
-              name="street"
-              value={formData.street}
+              name="houseNumber"
+              value={formData.houseNumber}
               onChange={handleChange}
             />
           </div>
@@ -217,13 +227,17 @@ const AddressModal = ({ address, onClose, onSave }) => {
             />
           </div>
           <div className="form-group">
-            <label>Country *</label>
-            <input
-              type="text"
-              name="country"
-              value={formData.country}
+            <label>Tag *</label>
+            <select
+              name="tag"
+              value={formData.tag}
               onChange={handleChange}
-            />
+              className="form-control"
+            >
+              <option value="home">Home</option>
+              <option value="work">Work</option>
+              <option value="other">Other</option>
+            </select>
           </div>
         </div>
 
