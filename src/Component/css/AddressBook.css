@@ -125,75 +125,88 @@
   z-index: 999;
 }
 
+/* Modal Content Specific Styles */
 .modal-content {
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 500px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  position: relative;
+  background: white;
+  padding: 25px;
+  width: 600px; /* Adjust for the layout */
+  max-width: 90%;
 }
 
 .modal-title {
-  font-size: 1.3rem;
-  margin-bottom: 15px;
-  color: #6b4226;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #6b4226; /* Adjust the color */
 }
 
+/* Updated Form Grid Layout */
 .modal-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 20px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-}
-
-.form-group.full-width {
+.modal-grid .full-width {
   grid-column: span 2;
 }
 
+/* Updated Form Group */
 .form-group label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  color: #6a6c69;
   margin-bottom: 5px;
-  color: #555;
 }
 
 .form-group input,
 .form-group select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 0.95rem;
+  border: none;
+  border-bottom: 1px solid #ddd; /* Light bottom border */
+  outline: none;
+  padding: 5px;
+  font-size: 1rem;
   color: #333;
+  background: transparent;
+  transition: border-bottom-color 0.3s;
 }
 
+.form-group input:focus,
+.form-group select:focus {
+  border-bottom: 1px solid #6b4226; /* Active state */
+}
+
+.form-group input::placeholder {
+  color: #aaa; /* Light placeholder color */
+}
+
+/* Modal Actions (Buttons) */
 .modal-actions {
-  margin-top: 20px;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: space-between; /* Buttons touch the edges */
+  margin-top: 20px;
 }
 
 .cancel-btn,
 .save-btn {
-  padding: 8px 15px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  border: none;
-  border-radius: 4px;
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
   font-weight: bold;
+  border: none;
+  padding: 15px 0;
+  cursor: pointer;
+  text-transform: uppercase;
 }
 
 .cancel-btn {
-  background: #ccc;
+  background: #ddd;
   color: #333;
+  margin-right: 10px; /* Space between buttons */
 }
 
 .cancel-btn:hover {
-  background: #b3b3b3;
+  background: #bbb;
 }
 
 .save-btn {
@@ -204,3 +217,4 @@
 .save-btn:hover {
   background: #55341a;
 }
+

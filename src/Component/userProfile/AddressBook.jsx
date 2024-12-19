@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthContext";
 import "../css/AddressBook.css";
-import leftArrow from "../../assets/svg/leftarrow.svg";
+
 
 const AddressBook = () => {
   const { token, user } = useAuth(); // Extract user and token dynamically
@@ -170,7 +170,7 @@ const AddressModal = ({ address, onClose, onSave }) => {
         </h3>
 
         <div className="modal-grid">
-          <div className="form-group">
+          <div className="form-group full-width">
             <label>Name *</label>
             <input
               type="text"
@@ -179,7 +179,8 @@ const AddressModal = ({ address, onClose, onSave }) => {
               onChange={handleChange}
             />
           </div>
-          <div className="form-group">
+          {/* <br /> */}
+          <div className="form-group full-width">
             <label>Mobile Number *</label>
             <input
               type="text"
