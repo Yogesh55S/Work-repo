@@ -2,35 +2,35 @@ import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../Component/providers/AuthContext";
 import "../Component/css/UserPanel.css";
+import { fetchWithAuth } from "../utils/api"; // Import the utility function
 
 const UserPanel = () => {
   const { token, user, logout } = useAuth();
   const [userData, setUserData] = useState(user || null);
-  const location = useLocation(); // Get current URL path
+  const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    if (!token) {
-      console.error("No token found in AuthContext.");
-      return;
-    }
+    const fetchUserData = async () => {
+      if (!token) {
+        console.error("No token found in AuthContext.");
+        return;
+      }
 
-    if (!userData) {
-      fetch(`${API_URL}/profile`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-        .then((response) => {
-          if (!response.ok) {
-            if (response.status === 401) {
-              logout();
-            }
-            throw new Error("Failed to fetch user profile");
+      if (!userData) {
+        try {
+          const data = await fetchWithAuth(`${API_URL}/profile`, token);
+          setUserData(data);
+        } catch (error) {
+          console.error("Error fetching user profile:", error.message);
+          if (error.message.includes("Unauthorized")) {
+            logout();
           }
-          return response.json();
-        })
-        .then((data) => setUserData(data))
-        .catch((error) => console.error("Error fetching user profile:", error));
-    }
+        }
+      }
+    };
+
+    fetchUserData();
   }, [API_URL, token, userData, logout]);
 
   return (
