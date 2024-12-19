@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthContext";
 import "../css/AddressBook.css";
 
+
 const AddressBook = () => {
-  const { token, user } = useAuth();
+  const { token, user } = useAuth(); // Extract user and token dynamically
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -33,7 +34,7 @@ const AddressBook = () => {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     })
-      .then(() => fetchAddresses())
+      .then(() => fetchAddresses()) // Re-fetch addresses after deletion
       .catch((error) => console.error("Error deleting address:", error));
   };
 
@@ -53,20 +54,20 @@ const AddressBook = () => {
     })
       .then((response) => response.json())
       .then(() => {
-        fetchAddresses();
+        fetchAddresses(); // Re-fetch addresses after saving
         setShowModal(false);
         setSelectedAddress(null);
       })
       .catch((error) => console.error("Error saving address:", error));
   };
 
-  const defaultAddress = addresses[0];
+  const defaultAddress = addresses[0]; // Assume the first address as default
   const otherAddresses = addresses.slice(1);
 
   return (
     <div className="address-book-container">
-      <h2 className="title">Saved Addresses</h2>
-
+      <h2 className="title">Saved Addresses</h2> 
+      
       <div className="button-para">
         <p>
           Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed
@@ -115,6 +116,7 @@ const AddressBook = () => {
   );
 };
 
+// Component for displaying a single address card
 const AddressDetails = ({ address, onEdit, onDelete }) => (
   <div className="address-card">
     <div className="address-details">
@@ -139,6 +141,7 @@ const AddressDetails = ({ address, onEdit, onDelete }) => (
   </div>
 );
 
+// Modal Component
 const AddressModal = ({ address, onClose, onSave }) => {
   const [formData, setFormData] = useState({
     deliveryName: address?.deliveryName || "",
@@ -162,11 +165,11 @@ const AddressModal = ({ address, onClose, onSave }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <div className="modal-title-container">
-          <h3>Add New Address</h3>
-        </div>
+        <h3 className="modal-title">
+          {address ? "Edit Address" : "Add New Address"}
+        </h3>
 
-        <div className="form-section-shadow">
+        <div className="modal-grid">
           <div className="form-group full-width">
             <label>Name *</label>
             <input
@@ -176,6 +179,7 @@ const AddressModal = ({ address, onClose, onSave }) => {
               onChange={handleChange}
             />
           </div>
+          {/* <br /> */}
           <div className="form-group full-width">
             <label>Mobile Number *</label>
             <input
@@ -185,9 +189,6 @@ const AddressModal = ({ address, onClose, onSave }) => {
               onChange={handleChange}
             />
           </div>
-        </div>
-
-        <div className="form-section-top-shadow">
           <div className="form-group full-width">
             <label>House Number *</label>
             <input
