@@ -1,6 +1,6 @@
 .personal-info-container {
   background: #fff;
-  padding: 30px;
+  padding: 10px;
   /* border-radius: 8px; */
   /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
 }
@@ -15,19 +15,15 @@
   /* margin-bottom: 10px; */
 }
 
-.personal {
-  padding-top: 40px;
-}
 
-.contact {
-  padding-top: 40px;
-}
+
+
 
 .left-arrow {
   width: 77px;
   height: 20px;
   align-items: right;
- margin-top: 40px;
+ /* margin-top: 40px; */
 }
 
 .description {
@@ -118,3 +114,76 @@
 .save-button:hover {
   background-color: #8c6046;
 }
+
+
+@media (max-width: 1024px) {
+  
+
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .save-button {
+    width: auto;
+  }
+}
+
+
+
+@media (max-width: 768px) {
+  /* Adjust spacing for personal-info-container */
+  
+
+  /* Section header with left arrow adjustment */
+  .section-header {
+    display: flex;
+    justify-content: space-between; /* Push left arrow to the right side */
+    align-items: center;
+    font-size: 1rem;
+    color: #909F8C;
+    font-weight: 600;
+    margin-bottom: 8px; /* Reduce bottom margin */
+  }
+
+  /* Adjusting Personal and Contact titles */
+ 
+
+  /* Adjust the left arrow */
+  .left-arrow {
+    width: 77px;
+    height: 20px;
+    /* margin-top: 10px; */
+  }
+}
+
+@media (max-width: 480px) {
+  /* Adjust spacing for personal-info-container */
+ 
+
+  /* Section header with left arrow adjustment */
+  .section-header {
+    display: flex;
+    justify-content: space-between; /* Push left arrow to the right side */
+    align-items: center;
+    font-size: 0.9rem;
+    color: #909F8C;
+    font-weight: 600;
+    margin-bottom: 5px; /* Reduce bottom margin */
+  }
+
+  /* Adjusting Personal and Contact titles */
+  .personal,
+  .contact {
+    padding-top: 0; /* Remove unnecessary top padding */
+    margin: 0; /* Remove any margin */
+  }
+
+  /* Adjust the left arrow */
+  .left-arrow {
+    width: 77px;
+    height: 20px;
+}
+}
+
+

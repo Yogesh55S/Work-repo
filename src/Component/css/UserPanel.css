@@ -6,7 +6,8 @@
   min-height: 90vh; /* Full viewport height */
   margin: 0 auto; /* Keep container centered horizontally */
   box-sizing: border-box; 
-  /* margin-top: 30px; */
+  padding: 10% 2%; /* Add padding for smaller screens */
+  /* padding-top: 70px; */
 }
 
 /* Main wrapper */
@@ -14,12 +15,11 @@
   display: flex; /* Enables side-by-side alignment */
   flex-direction: row; /* Align elements horizontally */
   width: 100%; /* Full width */
-  max-width: 1200px; /* Limit the maximum width */
+  max-width: 1240px; /* Limit the maximum width */
   margin: 0 auto; /* Center it horizontally */
   background: #fff;
-  /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
- 
   overflow: hidden;
+  gap: 20px; /* Add spacing between sidebar and content */
 }
 
 .account {
@@ -27,16 +27,28 @@
   font-size: 32px;
   color: #6b4226;
   font-weight: 700;
-  /* padding-top: 40px; */
+}
+
+.my-account {
+  font-weight: bold;
 }
 
 /* Sidebar styling */
 .user-sidebar {
   width: 280px; /* Fixed width for sidebar */
-  /* background: #fdf8f5; */
   text-align: center;
   box-sizing: border-box;
-  /* border-right: 1px solid #d6cfc9; */
+}
+
+.user-email {
+  padding-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+  .user-sidebar {
+    width: 100%; /* Full width for smaller screens */
+    /* margin-bottom: 20px; */
+  }
 }
 
 /* Sidebar links container */
@@ -62,18 +74,14 @@
   text-decoration: none; /* Remove underline */
   border-bottom: 1px solid #6b422667;
   transition: background-color 0.3s ease;
-  /* box-sizing: border-box; */
 }
-
 
 /* Active sidebar link */
 .sidebar-link.active {
   background-color: #F1EBE8; /* Dark brown active background */
- 
   font-weight: bold;
   transition: background-color 0.3s ease;
 }
-
 
 /* Hover effect for sidebar links */
 .sidebar-link:hover {
@@ -83,11 +91,9 @@
 }
 
 /* Profile section styling */
-.user-profile {
-  padding: 20px 0;
-  
-}
 
+
+/* Profile image */
 .profile-image {
   width: 150px;
   height: 150px;
@@ -119,11 +125,183 @@
 /* Content Section */
 .user-content {
   flex-grow: 1; /* Takes remaining space */
-  padding: 20px; /* Space around content */
+ 
   box-sizing: border-box;
   background-color: #fff; /* Consistent background */
 }
 
-/* Save Changes Button */
+.user-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #5D5C5C;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.user-email {
+  font-size: 0.9rem;
+  color: #5D5C5C;
+  /* margin-bottom: 20px; */
+  /* margin-top: 5px; */
+  text-align: center;
+  /* margin-bottom: 10px; */
+}
 
 
+/* Responsive Design */
+@media (max-width: 768px) {
+  .user-panel {
+    flex-direction: column; /* Stack sidebar and content */
+    gap: 20px;
+  }
+
+ 
+
+  .user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .profile-image {
+    width: 120px;
+    height: 120px;
+  }
+
+  .user-name {
+    font-size: 1rem;
+  }
+
+  .user-email {
+    font-size: 0.85rem;
+  }
+
+  .my-account {
+    margin-top: 5px; /* Add top margin for better visibility */
+    /* padding-top: 15px; */
+    text-align: center;
+  }
+
+  .user-sidebar {
+    width: 100%; /* Full width for smaller screens */
+    /* margin-bottom: 20px; */
+    text-align: center; /* Center the navigation */
+  }
+
+  .sidebar-links {
+    display: flex; /* Horizontal layout */
+    justify-content: center; /* Center the links */
+    gap: 20px; /* Add spacing between links */
+    padding-top:  10px; /* Add some padding for better appearance */
+    background-color: transparent; /* Remove box background */
+    border-bottom: none; /* Remove border */
+    /* margin-top: 20px; */
+  }
+
+  .sidebar-link {
+    display: inline-block; /* Make links inline */
+    width: auto; /* Remove width constraint */
+    height: auto; /* Remove height constraint */
+    padding: 5px 10px; /* Adjust padding */
+    font-size: 1rem; /* Slightly smaller text for smaller screens */
+    text-align: center;
+    text-decoration: none; /* Keep links without underline */
+    background-color: transparent; /* Remove background */
+    border: none; /* Remove borders */
+    color: #6b4226; /* Retain the link color */
+  }
+
+  .sidebar-link.active {
+    border-bottom: 2px solid #B09383; /* Highlight the active link */
+    font-weight: bold; /* Emphasize active link */
+    background: transparent;
+    color: #AD8C78;
+  }
+
+  .sidebar-link:hover {
+    background-color: transparent; /* Remove hover background */
+    color: #AD8C78; /* Slightly darker color on hover */
+    cursor: pointer;
+  }
+
+  .account {
+    padding-top: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-panel-container {
+    padding: 10px; /* Reduce padding for very small screens */
+  }
+
+  .profile-image {
+    width: 100px;
+    height: 100px;
+  }
+
+  .user-name {
+    font-size: 0.9rem;
+  }
+
+  .user-email {
+    font-size: 0.8rem;
+  }
+
+  .sidebar-links {
+    display: flex; /* Horizontal layout for links */
+    gap: 5px; /* Add space between links */
+    overflow-x: auto; /* Enable horizontal scrolling */
+    white-space: nowrap; /* Prevent links from wrapping to the next line */
+    padding:  10px; /* Add padding for better appearance */
+    scrollbar-width: thin; /* For Firefox, make scrollbar thinner */
+    scrollbar-color: rgb(214, 212, 212) transparent; /* Light scrollbar thumb color */
+  }
+
+  
+  .sidebar-links::-webkit-scrollbar-thumb {
+    background-color: rgb(226, 220, 220); /* Light color for the scrollbar thumb */
+    border-radius: 10px; /* Rounded scrollbar thumb */
+  }
+
+  .sidebar-links::-webkit-scrollbar-track {
+    background: transparent; /* Transparent scrollbar track */
+  }
+
+  .sidebar-link {
+    flex-shrink: 0; /* Prevent links from shrinking to fit in the container */
+    padding: 5px 10px; /* Adjust padding for better fit */
+    font-size: 0.9rem; /* Slightly smaller font size */
+    background-color: transparent; /* Remove background */
+    border: none; /* Remove borders */
+    color: #6b4226; /* Retain the link color */
+  }
+
+  .sidebar-link.active {
+    background-color: transparent; /* Ensure active links also have no background */
+    border-bottom: 2px solid #B09383; /* Highlight active links with a bottom border */
+  }
+
+  .sidebar-link:hover {
+    background-color: transparent; /* Remove hover background color */
+    color: #AD8C78; /* Change text color on hover */
+  }
+
+  .my-account {
+    margin-top: 40px;
+    padding-top: 20px;
+    font-size: 30px; /* Adjust heading size for small screens */
+    text-align: center;
+  }
+
+  .account {
+    padding-top: 20px;
+  }
+
+  
+
+  .sidebar-links {
+    scroll-behavior: smooth; /* Enable smooth scrolling */
+    justify-content: flex-start; /* Ensure links align properly */
+  }
+}

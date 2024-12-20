@@ -1,8 +1,9 @@
+// UserPanel.js
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../Component/providers/AuthContext";
 import "../Component/css/UserPanel.css";
-import { fetchWithAuth } from "../utils/api"; // Import the utility function
+import { fetchWithAuth } from "../utils/api";
 
 const UserPanel = () => {
   const { token, user, logout } = useAuth();
@@ -39,7 +40,7 @@ const UserPanel = () => {
         <div className="user-sidebar">
           <div className="user-profile">
             <div className="account space-y-4">
-              <p>My Account</p>
+              <p className="my-account">My Account</p>
               <div className="profile-image">
                 <img
                   src={
@@ -50,6 +51,9 @@ const UserPanel = () => {
                   className="profile-img"
                 />
               </div>
+              {/* Name and Email */}
+              <p className="user-name">{userData?.fullName || "User Name"}</p>
+              <p className="user-email">{userData?.email || "user@example.com"}</p>
             </div>
           </div>
           <ul className="sidebar-links">
