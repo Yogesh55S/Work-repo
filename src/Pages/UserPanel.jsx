@@ -1,4 +1,3 @@
-// UserPanel.js
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../Component/providers/AuthContext";
@@ -10,6 +9,15 @@ const UserPanel = () => {
   const [userData, setUserData] = useState(user || null);
   const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
+
+  const breadcrumbs = {
+    profile: "Profile",
+    "address-book": "Address Book",
+    orders: "Orders",
+    payment: "Payment",
+    security: "Security",
+    "help-support": "Help & Support",
+  };
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -35,11 +43,11 @@ const UserPanel = () => {
   }, [API_URL, token, userData, logout]);
 
   return (
-    <div className="user-panel-container py-28">
+    <div className="user-panel-container">
       <div className="user-panel">
         <div className="user-sidebar">
           <div className="user-profile">
-            <div className="account space-y-4">
+            <div className="account space-y-2">
               <p className="my-account">My Account</p>
               <div className="profile-image">
                 <img
@@ -51,7 +59,6 @@ const UserPanel = () => {
                   className="profile-img"
                 />
               </div>
-              {/* Name and Email */}
               <p className="user-name">{userData?.fullName || "User Name"}</p>
               <p className="user-email">{userData?.email || "user@example.com"}</p>
             </div>
@@ -79,6 +86,13 @@ const UserPanel = () => {
           </ul>
         </div>
         <div className="user-content">
+          {/* Breadcrumb Navigation */}
+          <div className="breadcrumb-container">
+            <p className="breadcrumb">
+              My Account &gt;&gt;{" "}
+              {breadcrumbs[location.pathname.split("/").pop()] || "Profile"}
+            </p>
+          </div>
           <Outlet context={{ userData }} />
         </div>
       </div>

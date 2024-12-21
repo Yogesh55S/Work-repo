@@ -97,7 +97,7 @@ const PersonalInformation = () => {
 
       <form className="personal-info-form">
         <div className="form-group full-name">
-          <label className=" font-semibold " >Full Name</label>
+          <label className=" font-semibold" >Full Name</label>
           <div className="field-wrapper">
             <input
               type="text"

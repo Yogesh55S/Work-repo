@@ -70,7 +70,7 @@ const AddressBook = () => {
       
       <div className="button-para">
         <p>
-          Lorem ipsum odor amet, consectetuer adipiscing elit. <br /> Sed
+          Lorem ipsum odor amet, consectetuer adipiscing elit.Sed
           faucibus morbi curae maecenas dignissim volutpat hac quam.
         </p>
         <button className="add-address-btn" onClick={() => handleEdit(null)}>

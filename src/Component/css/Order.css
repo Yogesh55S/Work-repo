@@ -1,0 +1,67 @@
+/* Container for orders with scrolling */
+.user-orders-scroll-container {
+    max-height: 500px; /* Matches sidebar height */
+    overflow-y: auto;
+    padding-right: 10px; /* Adds padding for scrollbar */
+    margin-top: 8px;
+  }
+  
+  /* Custom scrollbar for desktop */
+  .user-orders-scroll-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .user-orders-scroll-container::-webkit-scrollbar-thumb {
+    background-color: #b09383;
+    border-radius: 4px;
+  }
+
+  
+  
+  /* Ensure scroll effect is only applied for larger screens */
+  @media (min-width: 1024px) {
+    .user-orders-scroll-container {
+      max-height: 500px; /* Adjust to sidebar height */
+      overflow-y: auto;
+    }
+  }
+  
+  /* Disable scrollable effect for smaller screens */
+  @media (max-width: 768px) {
+    .user-orders-scroll-container {
+      max-height: unset;
+      overflow-y: unset;
+    }
+  }
+
+
+  /* Default Order Styles - No changes here */
+
+/* Responsive Styles ONLY for 480px */
+/* Responsive Styles ONLY for 480px */
+@media (max-width: 480px) {
+  .bg-[#5C3822] {
+    display: flex;
+    flex-direction: col; /* Stack elements vertically */
+    gap: 4px; /* Add spacing between each line */
+    padding: 12px; /* Adjust padding for spacing */
+  }
+
+  .order-label {
+    font-weight: bold;
+    font-size: 0.9rem; /* Smaller font for mobile */
+    color: white; /* Ensure text is readable */
+  }
+
+  .order-value {
+    font-size: 0.9rem; /* Adjust size for mobile readability */
+    margin-left: 0; /* Align values properly under labels */
+  }
+
+  .bg-[#5C3822] p {
+    margin: 0; /* Remove extra margin for cleaner stacking */
+  }
+}
+
+  
+  
