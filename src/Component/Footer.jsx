@@ -17,7 +17,7 @@ const Footer = () => {
               backgroundSize: 'contain',
             }}
           >
-            <div className="relative z-10 text-center xl:mb-24 lg:mb-[45px] md:mb-[43px]">
+            <div className="relative  text-center xl:mb-24 lg:mb-[45px] md:mb-[43px]">
               <h3 className="text-lg font-bold text-gray-800">About Us</h3>
               <p className="text-gray-600 mt-4 ">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor

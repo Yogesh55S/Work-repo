@@ -20,6 +20,8 @@ button {
     font-family: "Inter";
 }
 
+
+/* winter section text css genera  */
 .text-gradient {
     position: relative;
     font-size: 4.5rem;
@@ -48,7 +50,7 @@ button {
   
 
   
-
+/* winter collection cerousal button  */
 .winter-carousel-button-2 {
     background: rgb(139, 69, 19); /* SaddleBrown */
     background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
@@ -84,7 +86,12 @@ button {
 }
 
 
-.shop-now-button {
+
+
+
+/* general brown 3d deep button  */
+
+.brown-deep-button {
     background: rgb(139, 69, 19); /* SaddleBrown */
     background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
     border: none;
@@ -103,28 +110,26 @@ button {
     transition: all 0.3s ease;
 }
 
-.shop-now-button:hover {
-    background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
+.brown-deep-button:hover {
+    background: linear-gradient(0deg, rgb(216, 108, 31) 0%, rgb(204, 104, 58) 100%);
     box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, 0.5),
                 -4px -4px 6px 0 rgba(116, 125, 136, 0.5),
                 inset -4px -4px 6px 0 rgba(255, 255, 255, 0.2),
                 inset 4px 4px 6px 0 rgba(0, 0, 0, 0.4);
 }
 
-.shop-now-button:disabled {
+.brown-deep-button:disabled {
     background: #e0e0e0;
     color: #a8a8a8;
     cursor: not-allowed;
     box-shadow: none;
 }
 
-
-
+/* Category selector button for our products section */
 .product-button {
     position: relative;
     display: inline-block;
     padding: 10px 20px;
-    /* font-family: 'Lato', sans-serif; */
     font-weight: 500;
     background: transparent;
     border: 2px solid #8B4513; /* Brown Border */
@@ -133,65 +138,72 @@ button {
     transition: all 0.3s ease;
     overflow: hidden;
     margin-bottom: 10px;
-  }
-  
-  .product-button:hover {
+}
+
+/* Hover state */
+.product-button:hover {
     color: #8B4513; /* Retain the same color on hover */
-  }
-  
-  .product-button:before,
-  .product-button:after,
-  .product-button span:before,
-  .product-button span:after {
+}
+
+/* Active button styling */
+.product-button.active {
+    background: rgba(139, 69, 19, 0.2); /* Light brown background with reduced opacity */
+    color: #8B4513; /* Retain text color */
+}
+
+/* Top-Left Animation */
+.product-button:before,
+.product-button:after,
+.product-button span:before,
+.product-button span:after {
     content: "";
     position: absolute;
     background: #8B4513; /* Brown Border Color */
     transition: all 0.3s ease;
-  }
-  
-  /* Top-Left Animation */
-  .product-button:before {
+}
+
+/* Top-Left Animation */
+.product-button:before {
     height: 0%;
     width: 2px;
     top: 0;
     left: 0;
-  }
-  
-  .product-button:hover:before {
+}
+
+.product-button:hover:before {
     height: 100%;
-  }
-  
-  .product-button:after {
+}
+
+.product-button:after {
     width: 0%;
     height: 2px;
     top: 0;
     left: 0;
-  }
-  
-  .product-button:hover:after {
+}
+
+.product-button:hover:after {
     width: 100%;
-  }
-  
-  /* Bottom-Right Animation */
-  .product-button span:before {
+}
+
+/* Bottom-Right Animation */
+.product-button span:before {
     height: 0%;
     width: 2px;
     bottom: 0;
     right: 0;
-  }
-  
-  .product-button:hover span:before {
+}
+
+.product-button:hover span:before {
     height: 100%;
-  }
-  
-  .product-button span:after {
+}
+
+.product-button span:after {
     width: 0%;
     height: 2px;
     bottom: 0;
     right: 0;
-  }
-  
-  .product-button:hover span:after {
+}
+
+.product-button:hover span:after {
     width: 100%;
-  }
-  
+}

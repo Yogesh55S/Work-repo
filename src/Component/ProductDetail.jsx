@@ -116,7 +116,7 @@ const ProductDetail = () => {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              className="mt-6 px-6 py-2 bg-button-primary text-white font-medium text-sm md:text-base shadow hover:bg-primary transition"
+              className="mt-6 brown-deep-button"
             >
               Add to Cart
             </button>

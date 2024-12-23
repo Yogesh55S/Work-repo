@@ -222,7 +222,7 @@ const Cart = ({ userId }) => {
       {/* Address Modal */}
       {showAddressModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          className="fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center"
         >
           <div className="bg-white p-6 rounded-lg max-w-lg w-full relative">
             <button
@@ -263,14 +263,14 @@ const Cart = ({ userId }) => {
             <div className="flex gap-4 mt-4">
               <button
                 onClick={() => setShowAddAddressForm(true)}
-                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                className="brown-deep-button "
               >
                 Add Address
               </button>
               <button
                 onClick={handleCheckout}
                 disabled={!selectedAddress}
-                className={`px-4 py-2 rounded-md font-bold text-white ${
+                className={`brown-deep-button ${
                   selectedAddress ? "bg-blue-500 hover:bg-blue-600" : "bg-gray-300 cursor-not-allowed"
                 }`}
               >
@@ -284,7 +284,7 @@ const Cart = ({ userId }) => {
       {/* Add Address Form */}
       {showAddAddressForm && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+          className="fixed z-20 inset-0 bg-black bg-opacity-50 flex items-center justify-center"
         >
           <div className="bg-white p-6 rounded-lg max-w-lg w-full">
             <h2 className="text-xl font-bold mb-4">Add New Address</h2>

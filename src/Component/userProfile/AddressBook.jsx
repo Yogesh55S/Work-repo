@@ -73,7 +73,7 @@ const AddressBook = () => {
           Lorem ipsum odor amet, consectetuer adipiscing elit.Sed
           faucibus morbi curae maecenas dignissim volutpat hac quam.
         </p>
-        <button className="add-address-btn" onClick={() => handleEdit(null)}>
+        <button className="brown-deep-button mt-5  " onClick={() => handleEdit(null)}>
           + Add New Address
         </button>
       </div>

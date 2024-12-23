@@ -63,11 +63,7 @@
 }
 
 
-@media (min-width: 2560px) {
-  .user-panel-container {
-    padding: 0;
-  }
-}
+
 
 @media (max-width: 768px) {
   .user-sidebar {

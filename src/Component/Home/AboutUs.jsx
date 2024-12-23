@@ -69,7 +69,7 @@ const AboutUs = () => {
             </ul>
           </div>
 
-          <button className="shop-now-button">
+          <button className="brown-deep-button">
     Shop Now
 </button>
 

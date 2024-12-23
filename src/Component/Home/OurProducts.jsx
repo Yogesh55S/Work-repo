@@ -80,17 +80,17 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
         {/* Category Buttons */}
         <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-8">
-          {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className='product-button'
-            >
-              <span>
-              {category}</span>
-            </button>
-          ))}
-        </div>
+    {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
+        <button
+            key={category}
+            onClick={() => handleCategoryClick(category)}
+            className={`product-button ${activeCategory === category ? "active" : ""}`}
+        >
+            <span>{category}</span>
+        </button>
+    ))}
+</div>
+
 
         {/* Loading and Error Handling */}
         {loading && <p className="text-gray-600">Loading products...</p>}
@@ -130,7 +130,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           <div className="mt-8">
             <button
               onClick={handleViewAllClick}
-              className="shop-now-button"
+              className="brown-deep-button"
             >
               View All
             </button>
