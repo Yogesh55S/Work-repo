@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi'; // Import the email icon FiMail
+import { FiMapPin, FiPhone, FiMail, FiInstagram } from 'react-icons/fi'; // Import the email icon FiMail
 import { FiFacebook, FiTwitter, FiGithub, FiDribbble } from 'react-icons/fi';
 import smallrose from '../assets/svg/smallrose.svg';  // Import your SVG
 
@@ -7,11 +7,17 @@ const Footer = () => {
   return (
     <footer className="bg-white">
       <div className="container mx-auto px-6 lg:py-10 md:py-5 py-5 xl:px-40 lg:px-32">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 text-center lg:text-left">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 text-center lg:text-left md:grid-cols-3 md:gap-10 md:items-center">
           {/* About Us Section with background image */}
-          <div className="mt-10 lg:mt-10 relative lg:p-6 bg-cover bg-center" 
-               style={{ backgroundImage: `url(${smallrose})` }}>
-            <div className="relative z-10 text-center mb-20">
+          <div 
+            className="mt-10 lg:mt-10 relative lg:pt-6 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${smallrose})`,
+              backgroundRepeat: 'no-repeat',
+              backgroundSize: 'contain',
+            }}
+          >
+            <div className="relative z-10 text-center xl:mb-24 lg:mb-[45px] md:mb-[43px]">
               <h3 className="text-lg font-bold text-gray-800">About Us</h3>
               <p className="text-gray-600 mt-4 ">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
@@ -21,9 +27,9 @@ const Footer = () => {
           </div>
 
           {/* Shop by Category Section */}
-          <div className="lg:mt-[58px]">
-            <h3 className="text-lg font-bold text-gray-800 xl:px-16 lg:px-0 px-16 text-center">Shop by category</h3>
-            <ul className='text-gray-600 mt-3 space-y-1 text-center text-[16px]'>
+          <div className="">
+            <h3 className="text-lg font-bold text-gray-800 xl:px-16 lg:px-0 text-center">Shop by category</h3>
+            <ul className='text-gray-600 mt-3 space-y-1 text-[16px] text-center'>
               <li><a href="#" className="hover:text-black">Skin Care</a></li>
               <li><a href="#" className="hover:text-black">Body care</a></li>
               <li><a href="#" className="hover:text-black">Hair Care</a></li>
@@ -32,32 +38,32 @@ const Footer = () => {
           </div>
 
           {/* Contact Us Section */}
-          <div className="text-center lg:text-left lg:mb-0 mb-10 lg:mt-[58px]">
-            <h3 className="text-lg font-bold text-gray-800">Contact Us</h3>
-            <ul className="mt-6 space-y-3">
-              <li className="flex flex-col lg:flex-row items-center lg:items-start lg:space-x-4">
+          <div className="text-center xl:text-left lg:text-left md:text-left xl:mt-20 lg:mt-[75px] ">
+            <h3 className="text-lg font-bold text-gray-800 xl:mt-0 lg:mt-0 md:mt-16">Contact Us</h3>
+            <ul className="list lg:mt-6 md:mt-8 mt-4 space-y-4">
+              <li className="md:flex flex-none  md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
                   <FiMapPin size={20} />
                 </div>
-                <p className="text-gray-600 mt-2 lg:mt-0">
+                <p className="text-gray-600">
                   72 Main Drive, <br />
                   Calibry, Florida 20304
                 </p>
               </li>
-              <li className="flex flex-col lg:flex-row items-center lg:items-start lg:space-x-4">
+              <li className="md:flex flex-none md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
                   <FiPhone size={20} />
                 </div>
-                <p className="text-gray-600 mt-2 lg:mt-0">
+                <p className="text-gray-600">
                   Helpline 24/7: <br /> +1 (700) 111 00 222
                 </p>
               </li>
-              <li className="flex flex-col lg:flex-row items-center lg:items-start lg:space-x-4">
+              <li className="md:flex flex-none md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
-                  <FiMail size={20} /> {/* Replaced FiClock with FiMail */}
+                  <FiMail size={20} />
                 </div>
-                <p className="text-gray-600 mt-2 lg:mt-0">
-                  Email Us: <br /> contact@yourcompany.com {/* Updated text for email */}
+                <p className="text-gray-600">
+                  Email Us: <br /> contact@yourcompany.com
                 </p>
               </li>
             </ul>
@@ -76,16 +82,41 @@ const Footer = () => {
             <FiFacebook size={20} />
           </a>
           <a href="#" className="text-white hover:text-[#f8bdb9]">
-            <FiTwitter size={20} />
+            <FiInstagram size={20} />
           </a>
-          <a href="#" className="text-white hover:text-[#f8bdb9]">
+          {/* <a href="#" className="text-white hover:text-[#f8bdb9]">
             <FiGithub size={20} />
           </a>
           <a href="#" className="text-white hover:text-[#f8bdb9]">
             <FiDribbble size={20} />
-          </a>
+          </a> */}
         </div>
       </div>
+
+      {/* Custom Styles for 768px */}
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .md\:grid-cols-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            align-items: flex-start;
+          }
+          .lg\:mt-[58px] {
+            margin-top: 0;
+          }
+          ul.mt-6 {
+            margin-top: 0;
+          }
+        }
+
+         @media (max-width: 480px) {
+          .list {
+          align-items: center;}
+        }
+
+        
+      `}</style>
     </footer>
   );
 };
