@@ -5,7 +5,8 @@ import smallrose from '../assets/svg/smallrose.svg';  // Import your SVG
 
 const Footer = () => {
   return (
-    <footer className="bg-white">
+    <footer className="bg-white border-t border-[#5C3822] font-bold">
+
       <div className="container mx-auto px-6 lg:py-10 md:py-5 py-5 xl:px-40 lg:px-32">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 text-center lg:text-left md:grid-cols-3 md:gap-10 md:items-center">
           {/* About Us Section with background image */}
@@ -17,18 +18,17 @@ const Footer = () => {
               backgroundSize: 'contain',
             }}
           >
-            <div className="relative z-10 text-center xl:mb-24 lg:mb-[45px] md:mb-[43px]">
+            <div className="relative z-10 text-center xl:mb-28 md:mb-[35px] xl:mt-0 lg:pt-[16px]">
               <h3 className="text-lg font-bold text-gray-800">About Us</h3>
               <p className="text-gray-600 mt-4 ">
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-                incididunt ut labore et dolore magna aliqua.
+              Rooted in ancient Indian herbal wisdom, Nida’s Pure prepares 100% natural, handmade products designed to nourish your natural beauty with a promise of purity and ayurveda.
               </p>
             </div>
           </div>
 
           {/* Shop by Category Section */}
-          <div className="">
-            <h3 className="text-lg font-bold text-gray-800 xl:px-16 lg:px-0 text-center">Shop by category</h3>
+          <div className="lg:mb-0 md:mb-5">
+            <h3 className="text-lg font-bold text-gray-800 xl:px-16 lg:px-0 text-center ">Shop by category</h3>
             <ul className='text-gray-600 mt-3 space-y-1 text-[16px] text-center'>
               <li><a href="#" className="hover:text-black">Skin Care</a></li>
               <li><a href="#" className="hover:text-black">Body care</a></li>
@@ -40,8 +40,8 @@ const Footer = () => {
           {/* Contact Us Section */}
           <div className="text-center xl:text-left lg:text-left md:text-left xl:mt-20 lg:mt-[75px] ">
             <h3 className="text-lg font-bold text-gray-800 xl:mt-0 lg:mt-0 md:mt-16">Contact Us</h3>
-            <ul className="list lg:mt-6 md:mt-8 mt-4 space-y-4">
-              <li className="md:flex flex-none  md:items-start space-x-4">
+            <ul className=" lg:mt-6 md:mt-8 mt-4 space-y-4">
+              <li className="flex md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
                   <FiMapPin size={20} />
                 </div>
@@ -50,7 +50,7 @@ const Footer = () => {
                   Calibry, Florida 20304
                 </p>
               </li>
-              <li className="md:flex flex-none md:items-start space-x-4">
+              <li className="flex md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
                   <FiPhone size={20} />
                 </div>
@@ -58,7 +58,7 @@ const Footer = () => {
                   Helpline 24/7: <br /> +1 (700) 111 00 222
                 </p>
               </li>
-              <li className="md:flex flex-none md:items-start space-x-4">
+              <li className="flex md:items-start space-x-4">
                 <div className="bg-button-primary text-white w-8 h-8 flex items-center justify-center rounded-full">
                   <FiMail size={20} />
                 </div>
@@ -72,9 +72,9 @@ const Footer = () => {
       </div>
 
       {/* Bottom Section */}
-      <div className="w-full bg-button-primary h-20 flex justify-between items-center px-6 lg:px-40">
+      <div className=" w-full bg-button-primary h-20 flex justify-between items-center px-6 lg:px-40">
         {/* Left Section */}
-        <p className="text-white md:text-sm text-[10px]">© 2024 YourCompany. All Rights Reserved.</p>
+        <p className="text-white md:text-[16px] text-[13px]">© 2024 YourCompany. All Rights Reserved.</p>
 
         {/* Right Section */}
         <div className="flex space-x-4 lg:mr-5 xl:mr-36">
@@ -93,29 +93,31 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Custom Styles for 768px */}
+      {/* Custom Styles for 480px */}
       <style jsx>{`
-        @media (max-width: 768px) {
-          .md\:grid-cols-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            align-items: flex-start;
-          }
-          .lg\:mt-[58px] {
-            margin-top: 0;
-          }
-          ul.mt-6 {
-            margin-top: 0;
-          }
-        }
-
-         @media (max-width: 480px) {
-          .list {
-          align-items: center;}
-        }
-
         
+
+
+        @media (max-width: 480px) {
+          .grid {
+            text-align: left !important;
+          }
+
+          .grid h3,
+          .grid p,
+          .grid ul li,
+          .grid a {
+            text-align: left;
+          }
+
+          .grid ul li {
+            margin-left: 0;
+          }
+
+          .text-center {
+            text-align: left !important;
+          }
+        }
       `}</style>
     </footer>
   );

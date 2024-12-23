@@ -39,29 +39,57 @@
 
 /* Responsive Styles ONLY for 480px */
 /* Responsive Styles ONLY for 480px */
+/* Styles for 480px Frame */
 @media (max-width: 480px) {
-  .bg-[#5C3822] {
+  .order-row-mobile {
     display: flex;
-    flex-direction: col; /* Stack elements vertically */
-    gap: 4px; /* Add spacing between each line */
-    padding: 12px; /* Adjust padding for spacing */
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
   }
 
-  .order-label {
+  .order-row-mobile:last-child {
+    border-bottom: none;
+  }
+
+  .order-img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-right: 16px;
+  }
+
+  .order-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .order-name {
+    font-size: 1rem;
     font-weight: bold;
-    font-size: 0.9rem; /* Smaller font for mobile */
-    color: white; /* Ensure text is readable */
+    margin-bottom: 4px;
   }
 
-  .order-value {
-    font-size: 0.9rem; /* Adjust size for mobile readability */
-    margin-left: 0; /* Align values properly under labels */
+  .order-quantity,
+  .expected-delivery {
+    font-size: 0.875rem;
+    color: #555;
+    margin: 0;
   }
 
-  .bg-[#5C3822] p {
-    margin: 0; /* Remove extra margin for cleaner stacking */
+  .order-arrow {
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    /* font-weight: bold; */
+  }
+
+  .order-arrow img {
+    width: 100%;
+    height: 100%;
   }
 }
-
-  
-  
