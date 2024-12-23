@@ -42,7 +42,7 @@ const Card = ({ name, price, image, productId }) => {
       {/* Cart Icon (Visible on Hover) */}
       <button
         onClick={handleAddToCart}
-        className="absolute top-8 right-8 bg-gray-800 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out z-50"
+        className="absolute top-2 right-3 winter-carousel-button-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-in-out z-50"
         aria-label="Add to Cart"
       >
         <FaShoppingCart />

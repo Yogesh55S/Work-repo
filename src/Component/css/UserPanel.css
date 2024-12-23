@@ -11,12 +11,13 @@
   /* padding-top: 70px; */
 }
 
+
 /* Main wrapper */
 .user-panel {
   display: flex; /* Enables side-by-side alignment */
   flex-direction: row; /* Align elements horizontally */
   width: 100%; /* Full width */
-  max-width: 1240px; /* Limit the maximum width */
+  max-width: 1400px; /* Limit the maximum width */
   margin: 0 auto; /* Center it horizontally */
   background: #fff;
   overflow: hidden;
@@ -62,11 +63,7 @@
 }
 
 
-@media (min-width: 2560px) {
-  .user-panel-container {
-    padding: 0;
-  }
-}
+
 
 @media (max-width: 768px) {
   .user-sidebar {

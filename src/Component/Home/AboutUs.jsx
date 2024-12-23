@@ -69,9 +69,10 @@ const AboutUs = () => {
             </ul>
           </div>
 
-          <button className="px-6 py-3  bg-button-primary text-white hover:bg-primary hover:text-black transition">
-            Shop Now
-          </button>
+          <button className="brown-deep-button">
+    Shop Now
+</button>
+
         </div>
       </div>
     </div>

@@ -80,20 +80,17 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
         {/* Category Buttons */}
         <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-8">
-          {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className={`md:px-3 md:py-2 px-2 sm:px-2 py-1 border mb-2 ${
-                activeCategory === category
-                  ? "bg-button-primary text-white md:text-[16px] text-[12px]"
-                  : "bg-white text-gray-600 md:text-[16px] text-[12px] border-gray-300 hover:bg-primary hover:text-white"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+    {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
+        <button
+            key={category}
+            onClick={() => handleCategoryClick(category)}
+            className={`product-button ${activeCategory === category ? "active" : ""}`}
+        >
+            <span>{category}</span>
+        </button>
+    ))}
+</div>
+
 
         {/* Loading and Error Handling */}
         {loading && <p className="text-gray-600">Loading products...</p>}
@@ -133,7 +130,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           <div className="mt-8">
             <button
               onClick={handleViewAllClick}
-              className="px-6 py-2 bg-button-primary text-white text-lg shadow hover:bg-primary transition"
+              className="brown-deep-button"
             >
               View All
             </button>

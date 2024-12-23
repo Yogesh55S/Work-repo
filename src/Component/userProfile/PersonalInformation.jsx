@@ -167,7 +167,7 @@ const PersonalInformation = () => {
       </form>
 
       {isModified && (
-        <button onClick={handleSaveChanges} className="save-button">
+        <button onClick={handleSaveChanges} className="brown-deep-button ">
           Save Changes
         </button>
       )}

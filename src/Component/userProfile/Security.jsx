@@ -24,7 +24,7 @@ const Security = () => {
             <img src={LeftArrow} alt="Left Arrow" className="w-[100px] h-[70px] ml-4 security-arrow" />
           </h1>
           <p className="text-sm text-gray-600 mt-2">
-            Please enter a strong and secure password to ensure your account's safety.
+            Please enter a strong and secure password to ensure your account&apos;s safety.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ const Security = () => {
           <div className="flex justify-end security-button">
             <button
               type="submit"
-              className="w-full md:w-full lg:w-[160px] lg:h-[50px] bg-button-primary text-white font-bold py-3 px-4 hover:bg-[#70471F] transition duration-300"
+              className="brown-deep-button "
             >
               SAVE CHANGES
             </button>
