@@ -19,3 +19,179 @@ p, a, div, span {
 button {
     font-family: "Inter";
 }
+
+.text-gradient {
+    position: relative;
+    font-size: 4.5rem;
+    text-align: center;
+    background: linear-gradient(90deg, #1E2A5E, #55679C, #1E2A5E); /* Gradient as per the image */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-fill-color: transparent;
+    z-index: 10;
+}
+
+.text-gradient::before {
+    content: attr(data-text); /* Duplicate the text for the stroke effect */
+    position: absolute;
+    top: 10;
+    left: 0;
+    z-index: -1; /* Push the outline behind the gradient text */
+    width: 100%;
+    height: 100%;
+    color: transparent;
+    -webkit-text-stroke: 1px #F3F3E0; /* White outline effect */
+    text-stroke: 1px #F3F3E0;
+}
+
+  
+
+  
+
+.winter-carousel-button-2 {
+    background: rgb(139, 69, 19); /* SaddleBrown */
+    background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, 0.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, 0.5), 
+                inset -4px -4px 6px 0 rgba(255, 255, 255, 0.2),
+                inset 4px 4px 6px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.winter-carousel-button-2.active:hover {
+    background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
+    box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, 0.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, 0.5),
+                inset -4px -4px 6px 0 rgba(255, 255, 255, 0.2),
+                inset 4px 4px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.winter-carousel-button-2.disabled {
+    background: #e0e0e0;
+    color: #a8a8a8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+.shop-now-button {
+    background: rgb(139, 69, 19); /* SaddleBrown */
+    background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
+    border: none;
+    width: auto;
+    padding: 10px 40px;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 5px; /* Makes it rectangular with slightly rounded corners */
+    box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, 0.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, 0.5), 
+                inset -4px -4px 6px 0 rgba(255, 255, 255, 0.2),
+                inset 4px 4px 6px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.3s ease;
+}
+
+.shop-now-button:hover {
+    background: linear-gradient(0deg, rgba(139, 69, 19, 1) 0%, rgba(160, 82, 45, 1) 100%);
+    box-shadow: 4px 4px 6px 0 rgba(255, 255, 255, 0.5),
+                -4px -4px 6px 0 rgba(116, 125, 136, 0.5),
+                inset -4px -4px 6px 0 rgba(255, 255, 255, 0.2),
+                inset 4px 4px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.shop-now-button:disabled {
+    background: #e0e0e0;
+    color: #a8a8a8;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+
+
+.product-button {
+    position: relative;
+    display: inline-block;
+    padding: 10px 20px;
+    /* font-family: 'Lato', sans-serif; */
+    font-weight: 500;
+    background: transparent;
+    border: 2px solid #8B4513; /* Brown Border */
+    color: #8B4513; /* Initial text color */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  
+  .product-button:hover {
+    color: #8B4513; /* Retain the same color on hover */
+  }
+  
+  .product-button:before,
+  .product-button:after,
+  .product-button span:before,
+  .product-button span:after {
+    content: "";
+    position: absolute;
+    background: #8B4513; /* Brown Border Color */
+    transition: all 0.3s ease;
+  }
+  
+  /* Top-Left Animation */
+  .product-button:before {
+    height: 0%;
+    width: 2px;
+    top: 0;
+    left: 0;
+  }
+  
+  .product-button:hover:before {
+    height: 100%;
+  }
+  
+  .product-button:after {
+    width: 0%;
+    height: 2px;
+    top: 0;
+    left: 0;
+  }
+  
+  .product-button:hover:after {
+    width: 100%;
+  }
+  
+  /* Bottom-Right Animation */
+  .product-button span:before {
+    height: 0%;
+    width: 2px;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .product-button:hover span:before {
+    height: 100%;
+  }
+  
+  .product-button span:after {
+    width: 0%;
+    height: 2px;
+    bottom: 0;
+    right: 0;
+  }
+  
+  .product-button:hover span:after {
+    width: 100%;
+  }
+  

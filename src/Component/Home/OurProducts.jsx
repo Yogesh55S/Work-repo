@@ -84,13 +84,10 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
             <button
               key={category}
               onClick={() => handleCategoryClick(category)}
-              className={`md:px-3 md:py-2 px-2 sm:px-2 py-1 border mb-2 ${
-                activeCategory === category
-                  ? "bg-button-primary text-white md:text-[16px] text-[12px]"
-                  : "bg-white text-gray-600 md:text-[16px] text-[12px] border-gray-300 hover:bg-primary hover:text-white"
-              }`}
+              className='product-button'
             >
-              {category}
+              <span>
+              {category}</span>
             </button>
           ))}
         </div>
@@ -133,7 +130,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
           <div className="mt-8">
             <button
               onClick={handleViewAllClick}
-              className="px-6 py-2 bg-button-primary text-white text-lg shadow hover:bg-primary transition"
+              className="shop-now-button"
             >
               View All
             </button>

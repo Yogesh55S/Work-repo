@@ -4,6 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Card from "../Card";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import "./Winter.css"; // Import external CSS file
 
 const Winter = () => {
   const sliderRef = useRef(null); // Initialize the sliderRef
@@ -116,27 +117,19 @@ const Winter = () => {
 
         <button
           onClick={() => sliderRef.current.slickPrev()}
-          className={`absolute w-10 h-10 flex items-center justify-center rounded-full border xl:mt-0 ${
-            isPrevDisabled
-              ? "bg-gray-200 text-gray-400"
-              : "bg-button-primary text-white active:bg-primary"
-          }`}
-          style={{ top: "550px", left: "10px", zIndex: 1 }}
+          className={`winter-carousel-button-2 top-[95%] md:top-[100%] text-2xl ${isPrevDisabled ? "disabled" : "active"}`}
+          style={{ position: "absolute", left: "10px", transform: "translateY(-50%)" }}
           disabled={isPrevDisabled}
         >
-          ←
+          <i className="fa-solid fa-arrow-left"></i>
         </button>
         <button
           onClick={() => sliderRef.current.slickNext()}
-          className={`absolute w-10 h-10 flex items-center justify-center rounded-full border xl:mt-0 ${
-            isNextDisabled
-              ? "bg-gray-200 text-gray-400"
-              : "bg-button-primary text-white active:bg-primary"
-          }`}
-          style={{ top: "550px", right: "10px", zIndex: 1 }}
+          className={`winter-carousel-button-2 text-2xl top-[95%] md:top-[100%] ${isNextDisabled ? "disabled" : "active"}`}
+          style={{ position: "absolute", right: "10px", transform: "translateY(-50%)" }}
           disabled={isNextDisabled}
         >
-          →
+          <i className="fa-solid fa-arrow-right"></i>
         </button>
       </div>
     </div>

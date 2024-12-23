@@ -55,7 +55,7 @@ const Testimonial = () => {
                 <img
                   src={bigrose}
                   alt="Horizontal Decoration"
-                  className="w-[250px] sm:w-[300px] md:w-[400px] opacity-50"
+                  className="w-[250px] sm:w-[300px] md:w-[400px] opacity-20"
                 />
               </div>
               <div className="flex justify-center mt-12 sm:mt-16">
@@ -78,7 +78,7 @@ const Testimonial = () => {
                 <img
                   src={bigrose}
                   alt="Horizontal Decoration"
-                  className="w-[250px] sm:w-[300px] md:w-[400px] rotate-180 opacity-50"
+                  className="w-[250px] sm:w-[300px] md:w-[400px] rotate-180 opacity-20"
                 />
               </div>
             </div>
