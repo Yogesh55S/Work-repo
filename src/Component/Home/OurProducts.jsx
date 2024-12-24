@@ -75,7 +75,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
       <div className="max-w-[1240px] mx-auto text-center">
         <h2 className="text-2xl sm:text-3xl text-gray-800 mb-4">Our Products</h2>
         <p className="text-sm sm:text-base text-gray-600 mb-8">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Nurture your skin naturally with our herbal and homemade skincare essentials
         </p>
 
         {/* Category Buttons */}
@@ -108,7 +108,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
                 return (
                   <div
                     key={product._id}
-                    className="cursor-pointer group transform transition duration-300 hover:scale-105"
+                    className="cursor-pointer group transform transition duration-300 "
                     onClick={() => handleProductClick(product)}
                   >
                     <Card

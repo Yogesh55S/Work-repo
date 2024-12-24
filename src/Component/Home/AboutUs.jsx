@@ -1,5 +1,7 @@
 import React from "react";
 import bannerImage from "../../assets/image/ushape.png"; // Replace with your image path
+import leftArrow from "../../assets/svg/leftarrow.svg"; // Replace with your SVG path
+import about from "../../assets/svg/about.svg"; // Replace
 
 const AboutUs = () => {
   return (
@@ -7,9 +9,9 @@ const AboutUs = () => {
       {/* Centered Container */}
       <div className="container mx-auto max-w-[1240px] flex flex-col md:flex-row items-center gap-8">
         {/* Left Image Section */}
-        <div className="lg:left-[-60px] lg:top-[-15px] md:left-[-55px] md:top-[-10px] sm:left-[-50px] sm:top-[-40px] xs:left-[-50px] xs:top-[-40px]  relative md:w-1/2 flex justify-center">
+        <div className="relative xl:left-[-40px] xl:top-[-20px] lg:left-[-60px] lg:top-[-40px] md:left-[-50px] md:top-[-20px] md-sm:left-[-60px] md-sm:top-[-20px] sm:left-[-35px] sm:top-[-20px] xs:left-[-50px] xs:top-[-20px] md:w-1/2 flex justify-center">
           {/* Background Image with Opacity */}
-          <div className="absolute lg:w-[271px] lg:h-[390px] md:w-[250px] md:h-[360px] sm:w-[271px] sm:h-[390px] xs:w-[220px] xs:h-[320px] rounded-t-[400px] overflow-hidden xl:-top-[-50px] xl:-left-[-300px] lg:-top-[-60px] lg:-left-[-230px] md:-left-[-150px] md:top-[60px] sm:right-[-100px] sm:top-[60px] xs:right-[-100px] xs:top-[60px]">
+          <div className="absolute lg:w-[271px] lg:h-[390px] md:w-[250px] md:h-[360px] sm:w-[271px] sm:h-[390px] xs:w-[220px] xs:h-[320px] rounded-t-[400px] overflow-hidden xl:-top-[-50px] xl:-left-[-260px] lg:-top-[-60px] lg:-left-[-230px] md:-left-[-150px] md:top-[60px] md-sm:right-[-100px] md-sm:top-[60px] xs:right-[-80px] xs:top-[60px] sm:right-[-70px] sm:top-[60px]">
             <img
               src={bannerImage}
               alt="Background Image"
@@ -29,50 +31,61 @@ const AboutUs = () => {
         </div>
 
         {/* Right Content Section */}
-        <div className="md:w-1/2 lg:space-y-5 md:space-y-3 sm:space-y-4 xs:space-y-4 lg:mr-8 sm:mt-10 md:text-left sm:text-center xs:text-center xs:mt-5 tracking-wider">
-          <h2 className="text-[30px]  text-text uppercase">About Us</h2>
-          <h1 className="lg:text-4xl md:text-3xl sm:text-2xl xs:text-2xl  text-black sm:mt-5">
-            We are Put <span className="text-text">Beauty</span> Above Everything
+        <div className="md:w-1/2 lg:space-y-5 md:space-y-3 sm:space-y-4 xs:space-y-4 lg:mr-8 sm:mt-10 md:text-left sm:text-center xs:text-center xs:mt-5 tracking-wider xl:mr-24">
+          {/* Heading with SVG */}
+          <div className="flex items-center xs:justify-center sm:justify-start">
+            <h2 className="text-[16px] text-text">About Us</h2>
+            <img
+              src={leftArrow}
+              alt="Left Arrow"
+              className="ml-2 w-[78px] h-auto xs:ml-2"
+            />
+          </div>
+
+          {/* Subheading */}
+          <h1 className="lg:text-4xl md:text-3xl sm:text-2xl xs:text-2xl text-black sm:mt-5 text-left">
+            Beauty Rooted in Nature
           </h1>
-          <p className="text-black lg:text-lg md:text-[16px] leading-relaxed">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec
-            pellentesque ac urna at malesuada. Nunc mattis cursus massa, non
-            facilisis nisi ultricies id. Cras dapibus porta ultrices. Proin eu
-            eros et nisi tempus egestas elementum quis justo.
+
+          {/* Description */}
+          <p className="text-black lg:text-lg md:text-[16px] leading-relaxed text-left">
+            Discover the magic of 100% natural skincare, lovingly handcrafted to
+            celebrate your natural beauty. Blending the timeless wisdom of
+            ancient Indian herbs with the goodness of pure essential oils, our
+            products are more than skincare, they are a promise of purity and
+            Ayurveda!
           </p>
 
           {/* Image + List Section */}
           <div className="flex items-start lg:gap-4 md:gap-2 sm:mt-5">
             {/* Small Image to the Left */}
-            <div className="xs:w-[140px] xs:h-[70px] sm:w-[156px] sm:h-[80px] md:w-[156px] md:h-[80px] ">
+            <div className="xs:w-[200px] xs:h-[90px] sm:w-[220px] sm:h-[120px] md:w-[250px] md:h-[110px] xl:w-[156px] xl:h-[90px] lg:w-[200px] lg:h-[100px]">
               <img
-                src={bannerImage}
+                src={about}
                 alt="U-Shape Small Image"
                 className="w-full h-full object-cover"
               />
             </div>
 
             {/* List */}
-            <ul className="space-y-1 text-[13px] sm:text-[13px] xs:text-[10px] md:mt-0 sm:mt-0 xs:mt-2">
-              <li className="flex sm:items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full "></span>
-                Lorem ipsum dolor sit amet.
+            <ul className="space-y-1 text-[13px] sm:text-[13px] xs:text-[10px] xl:text-[14px] md:mt-0 sm:mt-0  xs:text-left">
+              <li className="flex sm:items-center gap-3 text-black xs:justify-start lg:ml-0 md:ml-0 sm:ml-5 xs:ml-1">
+                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+                Ancient Indian herbs blended in essential oils
               </li>
-              <li className="flex items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
-                Lorem ipsum dolor sit amet.
+              <li className="flex items-center gap-3 text-black xs:justify-start md:ml-0 sm:ml-5 xs:ml-4">
+                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+                Promise of purity with the principles of Ayurveda
               </li>
-              <li className="flex items-center gap-3 text-black">
-                <span className="lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-1 sm:h-1 xs:w-1 xs:h-1 md:ml-0 sm:ml-3 xs:ml-2 md:mt-0 sm:mt-0 xs:mt-1 bg-text rounded-full"></span>
-                Lorem ipsum dolor sit amet.
+              <li className="flex items-center gap-3 text-black xs:justify-start md:ml-0 sm:ml-5 xs:ml-4">
+                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+                Beauty derived from absolute purity
               </li>
             </ul>
           </div>
 
-          <button className="brown-deep-button">
-    Shop Now
-</button>
-
+          {/* Button */}
+          <button className="brown-deep-button mt-4">Shop Now</button>
         </div>
       </div>
     </div>

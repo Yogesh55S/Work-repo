@@ -49,7 +49,7 @@ const RelatedProducts = ({ productType }) => {
   };
 
   return (
-    <div className="mt-12 border-t pt-8">
+    <div className="mt-16  border-t pt-8">
       <h3 className="text-lg mb-4">You might also like</h3>
       {loading && <p className="text-gray-600">Loading related products...</p>}
       {error && <p className="text-red-600">Error: {error}</p>}
@@ -70,7 +70,7 @@ const RelatedProducts = ({ productType }) => {
             const imagePath = `${baseUrl}/${item.image.replace(/\\/g, "/")}`;
             return (
               <div
-                className="min-w-[300px] max-w-[300px] flex-shrink-0 snap-start transform transition duration-300 hover:scale-105 cursor-pointer"
+                className="min-w-[300px] max-w-[300px] h-[500px] flex-shrink-0 snap-start transform transition  cursor-pointer"
                 key={item._id}
                 onClick={() => handleProductClick(item)}
               >

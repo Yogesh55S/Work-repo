@@ -7,7 +7,7 @@ const Footer = () => {
   return (
     <footer className="bg-white border-t border-[#5C3822] font-bold">
 
-      <div className="container mx-auto px-6 lg:py-10 md:py-5 py-5 xl:px-40 lg:px-32">
+      <div className="container max-w-[1240px] mx-auto px-6 lg:py-10 md:py-5 py-5 ">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-20 text-center lg:text-left md:grid-cols-3 md:gap-10 md:items-center">
           {/* About Us Section with background image */}
           <div 
@@ -18,7 +18,7 @@ const Footer = () => {
               backgroundSize: 'contain',
             }}
           >
-            <div className="relative z-10 text-center xl:mb-28 md:mb-[35px] xl:mt-0 lg:pt-[16px]">
+            <div className="relative text-center xl:pb-[90px] md:pt-[28px] xl:mt-0 lg:pb-[70px]">
               <h3 className="text-lg font-bold text-gray-800">About Us</h3>
               <p className="text-gray-600 mt-4 ">
               Rooted in ancient Indian herbal wisdom, Nida’s Pure prepares 100% natural, handmade products designed to nourish your natural beauty with a promise of purity and ayurveda.

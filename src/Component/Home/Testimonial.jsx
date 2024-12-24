@@ -4,29 +4,23 @@ import quotes from '../../assets/svg/quotes.svg';
 
 const testimonials = [
   {
-    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
-    name: 'Itadori Yuji',
+    text: "I’ve struggled with sensitive skin and acne for a really long time. Finding a product that’s both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it’s made from natural, Ayurvedic ingredients. It’s like I’m treating my skin with love every time I use it.",
+    name: 'Sarah Patel',
     age: 19,
-    country: 'Japan',
   },
   {
     text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
     name: 'Jane Doe',
     age: 25,
-    country: 'USA',
+    // country: 'USA',
   },
   {
     text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
     name: 'John Smith',
     age: 30,
-    country: 'UK',
+    // country: 'UK',
   },
-  {
-    text: "I've struggled with sensitive skin and acne for a really long time. Finding a product that's both effective and gentle has always been a challenge—until I discovered Nida's Pure. Their camel milk soap and saffron and gold face oil is a game changer! It leaves my skin feeling fresh and glowing without any irritation. I love that it's made from natural, Ayurvedic ingredients. It's like I’m treating my skin with love every time I use it.",
-    name: 'Anna Kim',
-    age: 22,
-    country: 'South Korea',
-  },
+ 
 ];
 
 const Testimonial = () => {

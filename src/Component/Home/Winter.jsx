@@ -3,8 +3,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Card from "../Card";
-import { useNavigate } from "react-router-dom"; // Import useNavigate
-import "./Winter.css"; // Import external CSS file
+import { useNavigate } from "react-router-dom";
 
 const Winter = () => {
   const sliderRef = useRef(null); // Initialize the sliderRef
@@ -82,9 +81,11 @@ const Winter = () => {
   return (
     <div id="winter-carousel" className="p-4 md:p-8 bg-gray-50 text-center relative overflow-hidden">
       <div className="max-w-[1240px] h-[600px] mx-auto relative w-full">
-        <h2 className="text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4">Our Winter Collection</h2>
-        <p className="text-sm md:text-base text-gray-600 mb-8">
-          Discover our exclusive winter collection, designed to keep your skin and body healthy and nourished during the cold months.
+        <h2 className="text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">
+          Our Winter Collection
+        </h2>
+        <p className="text-sm md:text-base text-gray-600 mb-8 xs:text-center">
+          Wrap your skin in the pure warmth of our winter care collection!
         </p>
 
         {loading ? (
