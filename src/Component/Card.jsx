@@ -58,14 +58,14 @@ const Card = ({ name, price, image, productId }) => {
         />
       </div>
 
-      <div className="text-center mt-4 px-2">
+      <div className="text-center mt-4 mx-auto">
         <h3
           className="text-sm font-medium text-gray-800 truncate w-full"
           title={name} // Tooltip to show the full name
         >
           {name}
         </h3>
-        <p className="text-gray-600 font-semibold">{price}</p>
+        <p className="text-gray-600 font-semibold" style={{ textAlign: "center" }}>{price}</p>
       </div>
     </div>
   );

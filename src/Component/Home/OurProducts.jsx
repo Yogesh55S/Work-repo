@@ -66,31 +66,29 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
   // Handle category button clicks
   const handleCategoryClick = (category) => {
-    setActiveCategory(category); // Set active category to the clicked one
-    navigate(`/shop`, { state: { category } }); // Pass category to the next page via state
+    setActiveCategory(category); // Set active category locally
   };
 
   return (
     <div className="p-4 bg-gray-50">
       <div className="max-w-[1240px] mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl text-gray-800 mb-4">Our Products</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-8">
-        Nurture your skin naturally with our herbal and homemade skincare essentials
+        <h2 className="text-3xl md:text-5xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">Our Products</h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-8 xs:text-center">
+          Nurture your skin naturally with our herbal and homemade skincare essentials
         </p>
 
         {/* Category Buttons */}
         <div className="flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-8">
-    {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
-        <button
-            key={category}
-            onClick={() => handleCategoryClick(category)}
-            className={`product-button ${activeCategory === category ? "active" : ""}`}
-        >
-            <span>{category}</span>
-        </button>
-    ))}
-</div>
-
+          {["All", "Body Care", "Skin Care", "Hair Care", "Soap Bars"].map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryClick(category)}
+              className={`product-button ${activeCategory === category ? "active" : ""}`}
+            >
+              <span>{category}</span>
+            </button>
+          ))}
+        </div>
 
         {/* Loading and Error Handling */}
         {loading && <p className="text-gray-600">Loading products...</p>}
@@ -127,11 +125,8 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
         {/* View All Button */}
         {!hideViewAllButton && (
-          <div className="mt-8">
-            <button
-              onClick={handleViewAllClick}
-              className="brown-deep-button"
-            >
+          <div className="mt-8 xs:text-center">
+            <button onClick={handleViewAllClick} className="brown-deep-button">
               View All
             </button>
           </div>

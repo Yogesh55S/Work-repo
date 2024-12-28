@@ -9,7 +9,7 @@ const AboutUs = () => {
       {/* Centered Container */}
       <div className="container mx-auto max-w-[1240px] flex flex-col md:flex-row items-center gap-8">
         {/* Left Image Section */}
-        <div className="relative xl:left-[-40px] xl:top-[-20px] lg:left-[-60px] lg:top-[-40px] md:left-[-50px] md:top-[-20px] md-sm:left-[-60px] md-sm:top-[-20px] sm:left-[-35px] sm:top-[-20px] xs:left-[-50px] xs:top-[-20px] md:w-1/2 flex justify-center">
+        <div className="relative xl:left-[-40px] xl:top-[-20px] lg:left-[-60px] lg:top-[-40px] md:left-[-50px] md:top-[-20px] md-sm:left-[-50px] md-sm:top-[-20px] sm:left-[-35px] sm:top-[-20px] xs:left-[-40px] xs:top-[-20px] md:w-1/2 flex justify-center">
           {/* Background Image with Opacity */}
           <div className="absolute lg:w-[271px] lg:h-[390px] md:w-[250px] md:h-[360px] sm:w-[271px] sm:h-[390px] xs:w-[220px] xs:h-[320px] rounded-t-[400px] overflow-hidden xl:-top-[-50px] xl:-left-[-260px] lg:-top-[-60px] lg:-left-[-230px] md:-left-[-150px] md:top-[60px] md-sm:right-[-100px] md-sm:top-[60px] xs:right-[-80px] xs:top-[60px] sm:right-[-70px] sm:top-[60px]">
             <img
@@ -59,7 +59,7 @@ const AboutUs = () => {
           {/* Image + List Section */}
           <div className="flex items-start lg:gap-4 md:gap-2 sm:mt-5">
             {/* Small Image to the Left */}
-            <div className="xs:w-[200px] xs:h-[90px] sm:w-[220px] sm:h-[120px] md:w-[250px] md:h-[110px] xl:w-[156px] xl:h-[90px] lg:w-[200px] lg:h-[100px]">
+            <div className="xs:w-[200px] xs:h-[90px] sm:w-[250px] sm:h-[140px] md-sm:w-[250px] md-sm:h-[120px] md:w-[250px] md:h-[130px] xl:w-[156px] xl:h-[90px] lg:w-[200px] lg:h-[100px]">
               <img
                 src={about}
                 alt="U-Shape Small Image"
@@ -68,17 +68,17 @@ const AboutUs = () => {
             </div>
 
             {/* List */}
-            <ul className="space-y-1 text-[13px] sm:text-[13px] xs:text-[10px] xl:text-[14px] md:mt-0 sm:mt-0  xs:text-left">
-              <li className="flex sm:items-center gap-3 text-black xs:justify-start lg:ml-0 md:ml-0 sm:ml-5 xs:ml-1">
-                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+            <ul className="space-y-1 text-[13px] sm:text-[13px] xs:text-[10px] xl:text-[14px]  xs:text-left">
+              <li className="flex sm:items-center gap-3 text-black xs:justify-start lg:ml-0 md:ml-2 sm:ml-4 xs:ml-3">
+                <span className="dot"></span>
                 Ancient Indian herbs blended in essential oils
               </li>
-              <li className="flex items-center gap-3 text-black xs:justify-start md:ml-0 sm:ml-5 xs:ml-4">
-                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+              <li className="flex items-center gap-3 text-black xs:justify-start lg:ml-0 md:ml-2 sm:ml-4 xs:ml-3">
+                <span className="dot"></span>
                 Promise of purity with the principles of Ayurveda
               </li>
-              <li className="flex items-center gap-3 text-black xs:justify-start md:ml-0 sm:ml-5 xs:ml-4">
-                <span className="xl:w-3 xl:h-3 lg:w-3 lg:h-3 md:w-2 md:h-2 sm:w-2 sm:h-2 xs:w-2 xs:h-2 bg-text rounded-full"></span>
+              <li className="flex items-center gap-3 text-black xs:justify-start lg:ml-0 md:ml-2 sm:ml-4 xs:ml-3">
+                <span className="dot"></span>
                 Beauty derived from absolute purity
               </li>
             </ul>
@@ -88,6 +88,36 @@ const AboutUs = () => {
           <button className="brown-deep-button mt-4">Shop Now</button>
         </div>
       </div>
+
+      {/* CSS Styles */}
+      <style>
+        {`
+          .dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            background-color: var(--text-color, gray);
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+          }
+
+          /* For screens up to 480px */
+          @media (max-width: 480px) {
+            .dot {
+              width: 0.5rem;
+              height: 0.5rem;
+            }
+          }
+
+          /* For screens up to 768px */
+          @media (max-width: 768px) and (min-width: 481px) {
+            .dot {
+              width: 0.6rem;
+              height: 0.6rem;
+            }
+          }
+        `}
+      </style>
     </div>
   );
 };

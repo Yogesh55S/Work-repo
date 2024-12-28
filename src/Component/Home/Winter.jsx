@@ -81,7 +81,7 @@ const Winter = () => {
   return (
     <div id="winter-carousel" className="p-4 md:p-8 bg-gray-50 text-center relative overflow-hidden">
       <div className="max-w-[1240px] h-[600px] mx-auto relative w-full">
-        <h2 className="text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">
+        <h2 className="text-2xl md:text-5xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">
           Our Winter Collection
         </h2>
         <p className="text-sm md:text-base text-gray-600 mb-8 xs:text-center">

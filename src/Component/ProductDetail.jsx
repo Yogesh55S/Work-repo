@@ -80,7 +80,7 @@ const ProductDetail = () => {
           <div className="w-full md:w-[60%]">
             <h1 className="text-2xl mb-4 font-bold">{product.productName}</h1>
             <p className="text-gray-700 mb-6">{product.description}</p>
-            <p className="text-green-600 mb-4 text-lg font-semibold">
+            <p className="text-green-600 mb-4 text-lg font-semibold ">
               ₹{product.price}
             </p>
 

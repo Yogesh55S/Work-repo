@@ -45,7 +45,7 @@ const Care = () => {
   return (
     <div className="bg-gray-50 py-16 px-4 md:px-6">
       <div className="max-w-[1240px] mx-auto">
-        <h2 className="text-3xl md:text-5xl text-button-primary text-center mb-8 md:mb-12">
+        <h2 className="text-3xl md:text-5xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">
           Our Care Collection
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -61,7 +61,7 @@ const Care = () => {
                 className="w-full h-[220px] md:w-[615px] md:h-[290px] object-cover group-hover:opacity-70 transition-opacity duration-300"
               />
               <div className="absolute inset-0 flex items-center bg-black bg-opacity-30">
-                <div className="text-left px-6 md:px-10">
+                <div className="text-left px-6 md:px-10" >
                   <h3 className="text-xl md:text-5xl text-white mb-2 md:mb-4">{item.title}</h3>
                   <p className="text-xs md:text-sm text-white">{item.description}</p>
                 </div>
