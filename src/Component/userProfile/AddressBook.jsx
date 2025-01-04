@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../providers/AuthContext";
 import "../css/AddressBook.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash, faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+
 
 
 const AddressBook = () => {
@@ -132,10 +135,10 @@ const AddressDetails = ({ address, onEdit, onDelete }) => (
     </div>
     <div className="address-actions">
       <button onClick={() => onEdit(address)} className="edit-btn">
-        <i className="fas fa-pencil-alt"></i>
+      <FontAwesomeIcon icon={faPencilAlt} />
       </button>
       <button onClick={() => onDelete(address._id)} className="delete-btn">
-        <i className="fas fa-trash"></i>
+      <FontAwesomeIcon icon={faTrash} />
       </button>
     </div>
   </div>

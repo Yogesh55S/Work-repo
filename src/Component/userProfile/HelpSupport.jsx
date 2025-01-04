@@ -75,7 +75,6 @@ const HelpSupport = () => {
           <h4 className="text-[16px] text-gray-700">Email Id</h4>
           <span className="text-gray-700">support@example.com</span>
         </div>
-       
       </div>
 
 
