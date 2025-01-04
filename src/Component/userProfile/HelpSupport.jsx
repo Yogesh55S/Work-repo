@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import leftarrow from "../../assets/svg/leftarrow.svg";
 import mailIcon from "../../assets/svg/mail.svg";
-import phoneIcon from "../../assets/svg/phone.svg";
+import phoneIcon from "../../assets/svg/Phone.svg";
 
 const HelpSupport = () => {
+
+  
   const [openQuestion, setOpenQuestion] = useState(null);
 
   const toggleQuestion = (index) => {
@@ -56,8 +58,8 @@ const HelpSupport = () => {
 
       {/* Description */}
       <p className="md:mt-2 text-gray-600">
-        Need a hand with your order or have a question that's keeping you from
-        ordering your favorite product? Don't worry, we're here to help! Reach
+        Need a hand with your order or have a question that&apos;s keeping you from
+        ordering your favorite product? Don&apos;t worry, we&apos;re here to help! Reach
         out to our friendly support team 24/7 by phone or email.
       </p>
 
@@ -86,8 +88,8 @@ const HelpSupport = () => {
 
       {/* Description */}
       <p className="mt-2 text-gray-600">
-        Need a hand with your order or have a question that's keeping you from
-        ordering your favorite product? Don't worry, we're here to help! Reach
+        Need a hand with your order or have a question that&apos;s keeping you from
+        ordering your favorite product? Don&apos;t worry, we&apos;re here to help! Reach
         out to our friendly support team 24/7 by phone or email.
       </p>
 

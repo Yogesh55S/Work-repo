@@ -1,45 +1,52 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthContext";
 import "../css/PersonalInformation.css";
 import leftArrow from "../../assets/svg/leftarrow.svg";
 
 const PersonalInformation = () => {
   const { token } = useAuth();
-  const { userData } = useOutletContext() || {};
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    email: "",
-  });
-  const [originalData, setOriginalData] = useState({});
-  const [editableFields, setEditableFields] = useState({
-    fullName: false,
-    phone: false,
-    email: false,
-  });
-  const [isModified, setIsModified] = useState(false);
+  const [formData, setFormData] = useState(null);
+  const [editableFields, setEditableFields] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+
+  const fetchUserData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_URL}/profile`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to fetch user profile");
+
+      const data = await response.json();
+      console.log("Fetched data from backend:", data);
+
+      const user = data.user || {};
+      setFormData({
+        fullName: user.fullName || "",
+        phone: user.phone || "",
+        email: user.email || "",
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (!token) {
       console.error("No token found in AuthContext.");
       navigate("/login");
+      return;
     }
-    if (userData) {
-      setFormData({
-        fullName: userData.fullName || "",
-        phone: userData.phone || "",
-        email: userData.email || "",
-      });
-      setOriginalData({
-        fullName: userData.fullName || "",
-        phone: userData.phone || "",
-        email: userData.email || "",
-      });
-    }
-  }, [userData, token, navigate]);
+    fetchUserData();
+  }, [token, navigate]);
 
   const enableEditing = (field) => {
     setEditableFields((prev) => ({ ...prev, [field]: true }));
@@ -48,41 +55,48 @@ const PersonalInformation = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setIsModified(true);
   };
 
-  const handleSaveChanges = () => {
-    if (!token) {
-      console.error("No token found. Cannot save changes.");
-      navigate("/login");
-      return;
+  const handleSaveChanges = async () => {
+    try {
+      const response = await fetch(`${API_URL}/profile`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) throw new Error("Failed to update user profile");
+
+      const updatedData = await response.json();
+      console.log("Updated data from backend:", updatedData);
+
+      const user = updatedData.user || updatedData;
+
+      setFormData({
+        fullName: user.fullName || "",
+        phone: user.phone || "",
+        email: user.email || "",
+      });
+
+      setEditableFields({});
+      alert("Changes saved successfully!");
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      alert("Failed to save changes. Please try again.");
     }
-
-    fetch(`${API_URL}/profile`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error("Failed to update user profile");
-        return response.json();
-      })
-      .then((updatedData) => {
-        setOriginalData(updatedData);
-        setFormData(updatedData); // Ensure frontend reflects updated data
-        setIsModified(false);
-        setEditableFields({
-          fullName: false,
-          phone: false,
-          email: false,
-        });
-        alert("Changes saved successfully!");
-      })
-      .catch((error) => console.error("Error updating user profile:", error));
   };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!formData) {
+    console.log("formData is null or undefined during render.");
+    return <div>Error: Unable to load user data</div>;
+  }
 
   return (
     <div className="personal-info-container">
@@ -97,12 +111,12 @@ const PersonalInformation = () => {
 
       <form className="personal-info-form">
         <div className="form-group full-name">
-          <label className=" font-semibold" >Full Name</label>
+          <label className="font-semibold">Full Name</label>
           <div className="field-wrapper">
             <input
               type="text"
               name="fullName"
-              value={formData.fullName}
+              value={formData.fullName || ""}
               disabled={!editableFields.fullName}
               onChange={handleInputChange}
               className={`${editableFields.fullName ? "editable" : "disabled"}`}
@@ -123,12 +137,12 @@ const PersonalInformation = () => {
         </div>
         <div className="form-row">
           <div className="form-group">
-            <label className=" font-semibold">Phone Number</label>
+            <label className="font-semibold">Phone Number</label>
             <div className="field-wrapper">
               <input
                 type="text"
                 name="phone"
-                value={formData.phone}
+                value={formData.phone || ""}
                 disabled={!editableFields.phone}
                 onChange={handleInputChange}
                 className={`${editableFields.phone ? "editable" : "disabled"}`}
@@ -144,12 +158,12 @@ const PersonalInformation = () => {
           </div>
 
           <div className="form-group">
-            <label className=" font-semibold" >Email ID</label>
+            <label className="font-semibold">Email ID</label>
             <div className="field-wrapper">
               <input
                 type="text"
                 name="email"
-                value={formData.email}
+                value={formData.email || ""}
                 disabled={!editableFields.email}
                 onChange={handleInputChange}
                 className={`${editableFields.email ? "editable" : "disabled"}`}
@@ -166,8 +180,8 @@ const PersonalInformation = () => {
         </div>
       </form>
 
-      {isModified && (
-        <button onClick={handleSaveChanges} className="brown-deep-button ">
+      {Object.values(editableFields).some((isEditable) => isEditable) && (
+        <button onClick={handleSaveChanges} className="brown-deep-button">
           Save Changes
         </button>
       )}

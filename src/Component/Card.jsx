@@ -1,5 +1,7 @@
 import React from "react";
-import PropTypes from "prop-types";
+import * as PropTypes from "prop-types";
+
+
 import { FaShoppingCart } from "react-icons/fa";
 
 const Card = ({ name, price, image, productId }) => {

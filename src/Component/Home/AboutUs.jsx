@@ -1,5 +1,5 @@
 import React from "react";
-import bannerImage from "../../assets/image/ushape.png"; // Replace with your image path
+import bannerImage from "../../assets/Image/ushape.png"; // Replace with your image path
 import leftArrow from "../../assets/svg/leftarrow.svg"; // Replace with your SVG path
 import about from "../../assets/svg/about.svg"; // Replace
 

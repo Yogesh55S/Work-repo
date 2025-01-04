@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
+import * as PropTypes from "prop-types";
+
 import Card from "../Card";
 
 const API_URL = import.meta.env.VITE_API_URL;
