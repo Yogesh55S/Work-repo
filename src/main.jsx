@@ -1,5 +1,5 @@
 import React from 'react';
-export { createRoot, hydrateRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 
 import './index.css';
 import App from './App.jsx';
