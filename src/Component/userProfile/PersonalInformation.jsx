@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../providers/AuthContext";
 import "../css/PersonalInformation.css";
 import leftArrow from "../../assets/svg/leftarrow.svg";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const PersonalInformation = () => {
   const { token } = useAuth();
@@ -126,7 +128,7 @@ const PersonalInformation = () => {
               className="edit-button"
               onClick={() => enableEditing("fullName")}
             >
-              <i className="fas fa-pencil-alt"></i>
+              <FontAwesomeIcon icon={faPencilAlt} />
             </button>
           </div>
         </div>
@@ -152,7 +154,7 @@ const PersonalInformation = () => {
                 className="edit-button"
                 onClick={() => enableEditing("phone")}
               >
-                <i className="fas fa-pencil-alt"></i>
+                <FontAwesomeIcon icon={faPencilAlt} />
               </button>
             </div>
           </div>
@@ -173,7 +175,7 @@ const PersonalInformation = () => {
                 className="edit-button"
                 onClick={() => enableEditing("email")}
               >
-                <i className="fas fa-pencil-alt"></i>
+                <FontAwesomeIcon icon={faPencilAlt} />
               </button>
             </div>
           </div>
