@@ -3,9 +3,9 @@ import {
   BrowserRouter as Router,
   Routes,
   Route,
-  useLocation,
+  Navigate,
 } from "react-router-dom";
-import GoogleAuthProvider from "./Component/providers/GoogleAuthProvider.jsx";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import Navbar from "./Component/Navbar";
 import Footer from "./Component/Footer";
 import Home from "./Pages/Home";
@@ -13,130 +13,150 @@ import WinterCollection from "./Pages/WinterCollection";
 import Shop from "./Pages/Shop";
 import Contact from "./Pages/Contact";
 import Cart from "./Pages/Cart";
-import Login from "./Pages/Login.jsx";
-import Register from "./Pages/Register.jsx";
-import VerifyOTP from "./Pages/VerifyOtp.jsx";
-import ProductDetail from "./Component/ProductDetail.jsx";
-import AddProductForm from "./Component/admin/AddProductForm.jsx";
-import AdminPanal from "./Pages/AdminPanal.jsx";
-import ProductView from "./Component/admin/ProductView.jsx"; // Product view for admin
-import Orders from "./Component/admin/Orders.jsx"; // Admin orders
-import Settings from "./Component/admin/Settings.jsx"; // Admin settings
-import UserPanel from "./Pages/UserPanel.jsx"; // User Panel (like Admin Panel)
-import PersonalInformation from "./Component/userProfile/PersonalInformation.jsx"; // Personal Information component
-import AddressBook from "./Component/userProfile/AddressBook.jsx"; // Address Book component
-import UserOrders from "./Component/userProfile/UserOrders.jsx"; // Orders component for user
-import OrderDetails from "./Component/userProfile/OrderDetails.jsx"; // Orders component for user
-import Payment from "./Component/userProfile/Payment.jsx"; // Payment component for user
-import Security from "./Component/userProfile/Security.jsx"; // Security component for user
-import HelpSupport from "./Component/userProfile/HelpSupport.jsx"; // Help & Support component for user
+import Login from "./Pages/Login";
+import Register from "./Pages/Register";
+import VerifyOTP from "./Pages/VerifyOtp";
+import Unauthorized from "./Pages/Unauthorized";
+import ForgotPassword from "./Pages/Forgotpassword";
+import ResetPassword from "./Pages/ResetPassword";
+
+// Admin Panel Components
+import AdminPanal from "./Pages/AdminPanal";
+import AddProductForm from "./Component/admin/AddProductForm";
+import ProductView from "./Component/admin/ProductView";
+import Orders from "./Component/admin/Orders";
+import Settings from "./Component/admin/Settings";
+
+// User Panel Components
+import UserPanel from "./Pages/UserPanel";
+import PersonalInformation from "./Component/userProfile/PersonalInformation";
+import AddressBook from "./Component/userProfile/AddressBook";
+import UserOrders from "./Component/userProfile/UserOrders";
+import OrderDetails from "./Component/userProfile/OrderDetails";
+import Payment from "./Component/userProfile/Payment";
+import Security from "./Component/userProfile/Security";
+import HelpSupport from "./Component/userProfile/HelpSupport";
 
 // Create AuthContext
 export const AuthContext = createContext();
 
-// Wrapper to check and exclude footer on admin and user-panel routes
-const AppWrapper = ({ user }) => {
-  const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin-panel");
-  const isUserPanelRoute = location.pathname.startsWith("/user-panel");
+// Utility function to decode JWT
+const parseJwt = (token) => {
+  try {
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  } catch (e) {
+    console.error("Error decoding token:", e);
+    return null;
+  }
+};
 
-  return (
-    <div>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/winter-collection" element={<WinterCollection />} />
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/cart" element={<Cart userId={user?.userId} />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/verify-otp" element={<VerifyOTP />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
+// Protected Route Component
+const ProtectedRoute = ({ children, requiredRole }) => {
+  const storedToken = localStorage.getItem("authToken");
+  if (!storedToken) {
+    return <Navigate to="/login" replace />;
+  }
 
-        {/* Admin Panel */}
-        <Route path="/admin-panel" element={<AdminPanal />}>
-          <Route index element={<AddProductForm />} />
-          <Route path="add-product" element={<AddProductForm />} />
-          <Route path="products" element={<ProductView />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="settings" element={<Settings />} />
-        </Route>
+  const decodedToken = parseJwt(storedToken);
+  if (!decodedToken) {
+    return <Navigate to="/login" replace />;
+  }
 
-        {/* User Panel */}
-        <Route path="/user-panel" element={<UserPanel />}>
-          <Route index element={<PersonalInformation />} />
-          <Route path="profile" element={<PersonalInformation />} />
-          <Route path="address-book" element={<AddressBook />} />
-          <Route path="orders" element={<UserOrders userId={user?.userId} />} />
-          <Route path="orders/:id" element={<OrderDetails/>} />
-          <Route path="payment" element={<Payment />} />
-          <Route path="security" element={<Security />} />
-          <Route path="help-support" element={<HelpSupport />} />
-        </Route>
-      </Routes>
-      {!isAdminRoute && <Footer />}
-    </div>
-  );
+  if (requiredRole && decodedToken.role !== requiredRole) {
+    return <Navigate to="/unauthorized" replace />;
+  }
+
+  return children;
 };
 
 function App() {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
 
+  // Initialize user data from token
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
-    console.log("Stored Token:", storedToken); // Log the raw token
     if (storedToken) {
-      setToken(storedToken);
       const decodedToken = parseJwt(storedToken);
-      console.log("Decoded Token:", decodedToken); // Log the decoded payload
       if (decodedToken?.userId) {
-        console.log("Decoded User ID:", decodedToken.userId); // Confirm userId
-        setUser({ userId: decodedToken.userId });
+        setUser({
+          userId: decodedToken.userId,
+          role: decodedToken.role || "user",
+        });
       } else {
-        console.error("User ID not found in token payload.");
+        localStorage.removeItem("authToken");
       }
-    } else {
-      console.error("No token found in localStorage.");
     }
   }, []);
 
-  // Helper function to decode JWT
-  const parseJwt = (token) => {
-    try {
-      const base64Url = token.split(".")[1];
-      if (!base64Url) throw new Error("Invalid token format.");
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64)
-          .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-      return JSON.parse(jsonPayload);
-    } catch (e) {
-      console.error("Error parsing JWT:", e.message);
-      return null;
-    }
-  };
-
   const logout = () => {
     setUser(null);
-    setToken(null);
     localStorage.removeItem("authToken");
-    localStorage.removeItem("user");
-    console.log("User logged out and localStorage cleared.");
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, logout }}>
-      <GoogleAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <AuthContext.Provider value={{ user, logout }}>
         <Router>
-          <AppWrapper user={user} />
+          <Navbar />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/winter-collection" element={<WinterCollection />} />
+            <Route path="/shop" element={<Shop />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/cart" element={<Cart userId={user?.userId} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/verify-otp" element={<VerifyOTP />} />
+            <Route path="/unauthorized" element={<Unauthorized />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+
+            {/* Protected Admin Panel Routes */}
+            <Route
+              path="/admin-panel/*"
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminPanal />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="add-product" element={<AddProductForm />} />
+              <Route path="products" element={<ProductView />} />
+              <Route path="orders" element={<Orders userId={user?.userId} />} />
+              <Route path="settings" element={<Settings />} />
+            </Route>
+
+            {/* Protected User Panel Routes */}
+            <Route
+              path="/user-panel/*"
+              element={
+                <ProtectedRoute requiredRole="user">
+                  <UserPanel />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="profile" element={<PersonalInformation />} />
+              <Route path="address-book" element={<AddressBook />} />
+              <Route path="orders" element={<UserOrders userId={user?.userId} />} />
+              <Route path="orders/:id" element={<OrderDetails userId={user?.userId} />} />
+              <Route path="payment" element={<Payment />} />
+              <Route path="security" element={<Security userId={user?.userId} />} />
+              <Route path="help-support" element={<HelpSupport />} />
+            </Route>
+          </Routes>
+          <Footer />
         </Router>
-      </GoogleAuthProvider>
-    </AuthContext.Provider>
+      </AuthContext.Provider>
+    </GoogleOAuthProvider>
   );
 }
 

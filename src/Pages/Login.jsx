@@ -1,3 +1,4 @@
+// src/pages/Login.js
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,39 +11,31 @@ export default function Login() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth(); // Access login from AuthContext
+  const { login } = useAuth(); // Access login from your AuthContext
 
   // Handle Email Login
   const handleEmailLogin = async () => {
     setErrorMessage("");
     setIsLoading(true);
-
     try {
-      console.log("Attempting login with:", { email, password }); // Debug payload
-
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, {
-        email,
-        password,
-      });
-
-      console.log("Login API Response:", response.data); // Debug API response
-
+      console.log("Attempting login with:", { email, password });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        { email, password }
+      );
+      console.log("Login API Response:", response.data);
       if (response.data.token && response.data.user) {
         login(response.data.user, response.data.token);
-
-        console.log("Regular Login Token:", response.data.token);
-        console.log("User Data from Regular Login:", response.data.user);
-
         navigate("/");
       } else {
-        console.error("Token or user data missing in the response:", response.data);
+        console.error("Token or user data missing:", response.data);
         setErrorMessage("Login failed. Please try again.");
       }
     } catch (error) {
-      console.error("Login request failed:", error); // Debug error
-      if (error.response?.status === 400) {
+      console.error("Login request failed:", error);
+      if (error.response && error.response.status === 400) {
         setErrorMessage("Invalid email or password. Please try again.");
-      } else if (error.response?.status === 403) {
+      } else if (error.response && error.response.status === 403) {
         setErrorMessage("Please verify your email before logging in.");
       } else {
         setErrorMessage("Something went wrong. Please try again later.");
@@ -57,12 +50,7 @@ export default function Login() {
     try {
       console.log("Google Token received:", googleToken);
       console.log("Google User Data received:", googleUserData);
-
       login(googleUserData, googleToken);
-
-      console.log("Google Login Token stored:", googleToken);
-      console.log("Google User Data stored:", googleUserData);
-
       navigate("/");
     } catch (error) {
       console.error("Google Login handling failed:", error);
@@ -83,7 +71,9 @@ export default function Login() {
 
         {/* Email Input */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-text mb-1">Email</label>
+          <label className="block text-sm font-medium text-text mb-1">
+            Email
+          </label>
           <input
             type="email"
             placeholder="Enter your email"
@@ -95,7 +85,9 @@ export default function Login() {
 
         {/* Password Input */}
         <div className="mb-6">
-          <label className="block text-sm font-medium text-text mb-1">Password</label>
+          <label className="block text-sm font-medium text-text mb-1">
+            Password
+          </label>
           <input
             type="password"
             placeholder="Enter your password"
@@ -107,19 +99,33 @@ export default function Login() {
 
         {/* Error Message */}
         {errorMessage && (
-          <p className="text-center text-red-600 text-sm mb-4">{errorMessage}</p>
+          <p className="text-center text-red-600 text-sm mb-4">
+            {errorMessage}
+          </p>
         )}
 
         {/* Login Button */}
         <button
           onClick={handleEmailLogin}
           className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
-            isLoading ? "bg-opacity-70 cursor-not-allowed" : "bg-button-primary hover:bg-hover"
+            isLoading
+              ? "bg-opacity-70 cursor-not-allowed"
+              : "bg-button-primary hover:bg-hover"
           }`}
           disabled={isLoading}
         >
           {isLoading ? "Logging in..." : "Login"}
         </button>
+
+        {/* Forgot Password Link */}
+        <p className="text-center text-sm text-text mt-4">
+          <span
+            onClick={() => navigate("/forgot-password")}
+            className="text-button-primary hover:underline cursor-pointer"
+          >
+            Forgot Password?
+          </span>
+        </p>
 
         {/* Divider */}
         <div className="flex items-center my-6">

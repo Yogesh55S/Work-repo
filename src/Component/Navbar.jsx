@@ -49,8 +49,9 @@ const Navbar = () => {
     }
   };
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
+    setCartCount(0); // Reset cart count on logout
     navigate("/login");
   };
 
