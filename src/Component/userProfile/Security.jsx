@@ -16,6 +16,8 @@ const Security = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState({ text: "", type: "" });
   const [showPassword, setShowPassword] = useState({
     oldPassword: false,
     newPassword: false,
@@ -71,9 +73,17 @@ const Security = () => {
     }));
   };
 
+  const showMessage = (text, type = "success") => {
+    setPopupMessage({ text, type });
+    setShowPopup(true);
+    setTimeout(() => {
+      setShowPopup(false);
+    }, 3000);
+  };
+
   const requestOtp = async () => {
     try {
-      await fetch(`${API_URL}/auth/forgot-password`, {
+      const response = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -81,6 +91,9 @@ const Security = () => {
         },
         body: JSON.stringify({ email: formData.email }),
       });
+
+      if (!response.ok) throw new Error("Failed to send OTP");
+
       setOtpSent(true);
       alert("OTP sent to your email.");
     } catch (error) {
@@ -120,10 +133,26 @@ const Security = () => {
 
       if (!response.ok) throw new Error("Failed to update password");
 
+      // Clear fields after successful password update
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setOtp("");
+      setOtpSent(false);
+
       alert("Password updated successfully.");
     } catch (error) {
       alert("Error updating password: " + error.message);
     }
+  };
+
+  const handleCancel = () => {
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setOtp("");
+    setOtpSent(false);
+    showMessage("Password update canceled.", "info");
   };
 
   if (loading) return <div>Loading...</div>;
@@ -134,6 +163,16 @@ const Security = () => {
       <div className="section-header">
         <h2 className="personal">Security Settings</h2>
       </div>
+
+      {/* Popup Modal */}
+      {showPopup && (
+        <div className={`popup-overlay`}>
+          <div className={`popup-box ${popupMessage.type}`}>
+            <p>{popupMessage.text}</p>
+          </div>
+        </div>
+      )}
+
       {isGoogleUser ? (
         <div className="text-gray-700">
           <p>You signed in using Google. Manage your account through Google settings.</p>
@@ -142,99 +181,46 @@ const Security = () => {
         <form className="space-y-6">
           <div className="form-group">
             <label className="font-semibold">Email ID</label>
-            <input
-              type="text"
-              name="email"
-              value={formData.email || ""}
-              disabled
-              className="disabled"
-            />
+            <input type="text" name="email" value={formData?.email || ""} disabled className="disabled" />
           </div>
 
-          {/* Old Password Field */}
-          <div className="form-group">
-            <label className="font-semibold">Old Password</label>
-            <div className="field-wrapper">
-              <input
-                type={showPassword.oldPassword ? "text" : "password"}
-                name="oldPassword"
-                value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
-                required
-                className="input-style"
-              />
-              <button
-                type="button"
-                className="eye-button"
-                onClick={() => togglePasswordVisibility("oldPassword")}
-              >
-                <FontAwesomeIcon icon={showPassword.oldPassword ? faEyeSlash : faEye} />
-              </button>
+          {/* Password Fields */}
+          {["oldPassword", "newPassword", "confirmPassword"].map((field) => (
+            <div key={field} className="form-group">
+              <label className="font-semibold">
+                {field === "oldPassword" ? "Old Password" : field === "newPassword" ? "New Password" : "Confirm New Password"}
+              </label>
+              <div className="field-wrapper">
+                <input
+                  type={showPassword[field] ? "text" : "password"}
+                  name={field}
+                  value={field === "oldPassword" ? oldPassword : field === "newPassword" ? newPassword : confirmPassword}
+                  onChange={(e) =>
+                    field === "oldPassword" ? setOldPassword(e.target.value) : field === "newPassword" ? setNewPassword(e.target.value) : setConfirmPassword(e.target.value)
+                  }
+                  required
+                  className="input-style"
+                />
+                <button type="button" className="eye-button" onClick={() => togglePasswordVisibility(field)}>
+                  <FontAwesomeIcon icon={showPassword[field] ? faEyeSlash : faEye} />
+                </button>
+              </div>
             </div>
+          ))}
+
+          <div className="button-group">
+            <button type="button" onClick={handleSaveChanges} className="brown-deep-button">
+              {otpSent ? "UPDATE PASSWORD" : "SEND OTP"}
+            </button>
+            <button
+  type="button"
+  onClick={handleCancel}
+  className="border border-red-500 text-red-500 px-4 ml-5 py-2 rounded-md hover:bg-red-100 transition"
+>
+  CANCEL
+</button>
+
           </div>
-
-          {/* New Password Field */}
-          <div className="form-group">
-            <label className="font-semibold">New Password</label>
-            <div className="field-wrapper">
-              <input
-                type={showPassword.newPassword ? "text" : "password"}
-                name="newPassword"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                required
-                className="input-style"
-              />
-              <button
-                type="button"
-                className="eye-button"
-                onClick={() => togglePasswordVisibility("newPassword")}
-              >
-                <FontAwesomeIcon icon={showPassword.newPassword ? faEyeSlash : faEye} />
-              </button>
-            </div>
-          </div>
-
-          {/* Confirm New Password Field */}
-          <div className="form-group">
-            <label className="font-semibold">Confirm New Password</label>
-            <div className="field-wrapper">
-              <input
-                type={showPassword.confirmPassword ? "text" : "password"}
-                name="confirmPassword"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                className="input-style"
-              />
-              <button
-                type="button"
-                className="eye-button"
-                onClick={() => togglePasswordVisibility("confirmPassword")}
-              >
-                <FontAwesomeIcon icon={showPassword.confirmPassword ? faEyeSlash : faEye} />
-              </button>
-            </div>
-          </div>
-
-          {/* OTP Field */}
-          {otpSent && (
-            <div className="form-group">
-              <label className="font-semibold">Enter OTP</label>
-              <input
-                type="text"
-                placeholder="Enter OTP"
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                required
-                className="input-style"
-              />
-            </div>
-          )}
-
-          <button type="button" onClick={handleSaveChanges} className="brown-deep-button">
-            {otpSent ? "UPDATE PASSWORD" : "SEND OTP"}
-          </button>
         </form>
       )}
     </div>
