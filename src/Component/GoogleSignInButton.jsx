@@ -28,6 +28,7 @@ const GoogleSignInButton = ({ onGoogleSuccess }) => {
       } else if (onGoogleSuccess) {
         // Pass token and user data to the parent component for handling
         onGoogleSuccess(res.data.token, res.data.user);
+
       }
     } catch (error) {
       console.error("Google Sign-In failed:", error?.response?.data || error.message);
