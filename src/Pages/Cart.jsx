@@ -136,6 +136,28 @@ const Cart = ({ userId }) => {
 			console.error("Error during order creation:", error.message);
 		}
 	};
+	const handleRemoveItem = async (productId) => {
+		try {
+			const response = await fetch(`${API_URL}/cart/${userId}`, {  // ✅ Matches backend route
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+				body: JSON.stringify({ productId }),  // ✅ Ensure body contains productId
+			});
+
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status} - ${response.statusText}`);
+			}
+
+			setCartItems(cartItems.filter((item) => item.productDetails._id !== productId));
+		} catch (error) {
+			console.error("Error removing item from cart:", error.message);
+		}
+	};
+
+
 
 	useEffect(() => {
 		if (userId) {
@@ -204,6 +226,14 @@ const Cart = ({ userId }) => {
 										<td className="p-2">
 											₹{(item.productDetails?.price || 0) * item.quantity}
 										</td>
+										<td className="p-2">
+                <button
+                    onClick={() => handleRemoveItem(item.productDetails?._id)}
+                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+                >
+                    Remove
+                </button>
+            </td>
 									</tr>
 								))}
 							</tbody>

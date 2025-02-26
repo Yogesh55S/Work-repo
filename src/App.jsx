@@ -21,7 +21,7 @@ import ForgotPassword from "./Pages/Forgotpassword";
 import ResetPassword from "./Pages/ResetPassword";
 
 // Admin Panel Components
-import AdminPanal from "./Pages/AdminPanal";
+import AdminPanel from "./Pages/AdminPanal";
 import AddProductForm from "./Component/admin/AddProductForm";
 import ProductView from "./Component/admin/ProductView";
 import Orders from "./Component/admin/Orders";
@@ -50,7 +50,7 @@ const parseJwt = (token) => {
 			atob(base64)
 				.split("")
 				.map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-				.join(""),
+				.join("")
 		);
 		return JSON.parse(jsonPayload);
 	} catch (e) {
@@ -80,6 +80,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function App() {
 	const [user, setUser] = useState(null);
+	const [cartCount, setCartCount] = useState(0);
 
 	// Initialize user data from token
 	useEffect(() => {
@@ -97,8 +98,34 @@ function App() {
 		}
 	}, []);
 
+	// Fetch cart count when user logs in
+	useEffect(() => {
+		if (user?.userId) {
+			fetchCartCount(user.userId);
+		}
+	}, [user]);
+
+	const fetchCartCount = async (userId) => {
+		try {
+			const response = await fetch(
+				`${import.meta.env.VITE_API_URL}/users/${userId}`
+			);
+			if (response.ok) {
+				const data = await response.json();
+				const totalItems = data.cart.reduce(
+					(total, item) => total + item.quantity,
+					0
+				);
+				setCartCount(totalItems);
+			}
+		} catch (error) {
+			console.error("Failed to fetch cart count:", error);
+		}
+	};
+
 	const logout = () => {
 		setUser(null);
+		setCartCount(0); // Reset cart count on logout
 		localStorage.removeItem("authToken");
 	};
 
@@ -106,15 +133,14 @@ function App() {
 		<GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
 			<AuthContext.Provider value={{ user, logout }}>
 				<Router>
-					<Navbar />
+					<Navbar cartCount={cartCount} setCartCount={setCartCount} />
 					<Routes>
 						{/* Public Routes */}
 						<Route path="/" element={<Home />} />
 						<Route path="/winter-collection" element={<WinterCollection />} />
 						<Route path="/shop" element={<Shop />} />
-						<Route path="/product/:id" element={<ProductDetail />} />
-
 						<Route path="/contact" element={<Contact />} />
+						<Route path="/product/:id" element={<ProductDetail setCartCount={setCartCount} />} />
 						<Route path="/cart" element={<Cart userId={user?.userId} />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
@@ -128,10 +154,12 @@ function App() {
 							path="/admin-panel/*"
 							element={
 								<ProtectedRoute requiredRole="admin">
-									<AdminPanal />
+									<AdminPanel />
 								</ProtectedRoute>
 							}
 						>
+							<Route index element={<AddProductForm />} />
+
 							<Route path="add-product" element={<AddProductForm />} />
 							<Route path="products" element={<ProductView />} />
 							<Route path="orders" element={<Orders userId={user?.userId} />} />
@@ -147,21 +175,14 @@ function App() {
 								</ProtectedRoute>
 							}
 						>
+							<Route index element={<PersonalInformation />} />
+
 							<Route path="profile" element={<PersonalInformation />} />
 							<Route path="address-book" element={<AddressBook />} />
-							<Route
-								path="orders"
-								element={<UserOrders userId={user?.userId} />}
-							/>
-							<Route
-								path="orders/:id"
-								element={<OrderDetails userId={user?.userId} />}
-							/>
+							<Route path="orders" element={<UserOrders userId={user?.userId} />} />
+							<Route path="orders/:id" element={<OrderDetails userId={user?.userId} />} />
 							<Route path="payment" element={<Payment />} />
-							<Route
-								path="security"
-								element={<Security userId={user?.userId} />}
-							/>
+							<Route path="security" element={<Security userId={user?.userId} />} />
 							<Route path="help-support" element={<HelpSupport />} />
 						</Route>
 					</Routes>
