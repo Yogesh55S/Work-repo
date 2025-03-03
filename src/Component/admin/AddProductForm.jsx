@@ -16,7 +16,7 @@ const AddProductForm = () => {
     // Fetch fields dynamically from the backend
     const fetchFields = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/products/fields");
+        const response = await axios.get("http://localhost:8000/api/products/fields");
         const fetchedFields = response.data;
         setFields(fetchedFields);
 
@@ -53,8 +53,8 @@ const AddProductForm = () => {
     try {
       const token = localStorage.getItem("token");
       const url = product
-        ? `http://localhost:5000/api/products/${product._id}`
-        : `http://localhost:5000/api/products/add`;
+        ? `http://localhost:8000/api/products/${product._id}`
+        : `http://localhost:8000/api/products/add`;
       const method = product ? "put" : "post";
 
       await axios({
