@@ -68,6 +68,27 @@ const Cart = ({ userId }) => {
 		}
 	};
 
+	// const handleAddAddress = async () => {
+	// 	try {
+	// 		const response = await fetch(`${API_URL}/addresses/${userId}`, {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 				Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+	// 			},
+	// 			body: JSON.stringify(newAddress),
+	// 		});
+	// 		if (response.ok) {
+	// 			const addedAddress = await response.json();
+	// 			setAddresses((prev) => [...prev, addedAddress]);
+	// 			setShowAddAddressForm(false);
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Error adding address:", error.message);
+	// 	}
+	// };
+
+
 	const handleAddAddress = async () => {
 		try {
 			const response = await fetch(`${API_URL}/addresses/${userId}`, {
@@ -78,15 +99,17 @@ const Cart = ({ userId }) => {
 				},
 				body: JSON.stringify(newAddress),
 			});
+
 			if (response.ok) {
-				const addedAddress = await response.json();
-				setAddresses((prev) => [...prev, addedAddress]);
+				await fetchAddresses(); // Refetch all addresses instead of manually updating state
 				setShowAddAddressForm(false);
 			}
 		} catch (error) {
 			console.error("Error adding address:", error.message);
 		}
 	};
+
+	
 
 	const updateQuantity = (productId, newQuantity) => {
 		const updatedCart = cartItems.map((item) => {
