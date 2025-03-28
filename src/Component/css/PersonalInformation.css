@@ -10,17 +10,16 @@
   align-items: center;
   gap: 8px;
   font-size: 1rem;
-  color: #909F8C;
+  color: #909f8c;
   font-weight: 600;
   /* margin-bottom: 10px; */
 }
-
 
 .left-arrow {
   width: 77px;
   height: 20px;
   align-items: right;
- /* margin-top: 40px; */
+  /* margin-top: 40px; */
 }
 
 .description {
@@ -40,7 +39,7 @@
   font-size: 0.9rem;
   color: #6b4226;
   margin-bottom: 5px;
-  font-family: "Georgia", serif;
+  font-family: 'Georgia', serif;
 }
 
 .full-name input {
@@ -112,10 +111,7 @@
   background-color: #8c6046;
 }
 
-
 @media (max-width: 1024px) {
-  
-
   .form-row {
     flex-direction: column;
     gap: 10px;
@@ -124,22 +120,17 @@
   .save-button {
     width: auto;
   }
-
-  
 }
-
-
 
 @media (max-width: 768px) {
   /* Adjust spacing for personal-info-container */
-  
 
   /* Section header with left arrow adjustment */
   .section-header {
     display: flex;
     align-items: center;
     font-size: 1rem;
-    color: #909F8C;
+    color: #909f8c;
     font-weight: 600;
     margin-bottom: 8px;
   }
@@ -150,7 +141,6 @@
     position: relative;
     vertical-align: middle; /* Align with the text */
   }
- 
 
   /* Adjust the left arrow */
   .left-arrow {
@@ -162,28 +152,25 @@
   .full-name {
     width: 100%; /* Fixed width for Full Name */
   }
-  
 }
 
 @media (max-width: 480px) {
   /* Adjust spacing for personal-info-container */
- 
 
   /* Section header with left arrow adjustment */
   .section-header {
     display: flex;
     align-items: center;
     font-size: 0.9rem;
-    color: #909F8C;
+    color: #909f8c;
     font-weight: 600;
     margin-bottom: 5px;
   }
 
-
   /* Adjusting Personal and Contact titles */
   .personal,
   .contact {
-    padding-top: 0; 
+    padding-top: 0;
     margin: 0;
   }
 
@@ -191,15 +178,18 @@
   .left-arrow {
     width: 77px;
     height: 20px;
+  }
+
+  .section-header .left-arrow {
+    margin-left: 5px; /* Minimal gap between text and the arrow */
+    margin-right: 0; /* Ensure no gap on the right */
+    position: relative;
+    vertical-align: middle; /* Align with the text */
+  }
+
+  .image-upload-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
-
-.section-header .left-arrow {
-  margin-left: 5px; /* Minimal gap between text and the arrow */
-  margin-right: 0; /* Ensure no gap on the right */
-  position: relative;
-  vertical-align: middle; /* Align with the text */
-}
-
-}
-
-

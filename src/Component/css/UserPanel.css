@@ -5,12 +5,11 @@
   align-items: center; /* Center vertically */
   min-height: 90vh; /* Full viewport height */
   margin: 0 auto; /* Keep container centered horizontally */
-  box-sizing: border-box; 
+  box-sizing: border-box;
   padding: 10% 2%; /* Add padding for smaller screens */
   /* height: 800px; */
   /* padding-top: 70px; */
 }
-
 
 /* Main wrapper */
 .user-panel {
@@ -59,11 +58,7 @@
   margin: 0;
   padding: 0;
   font-weight: 600;
-
 }
-
-
-
 
 @media (max-width: 768px) {
   .user-sidebar {
@@ -88,9 +83,9 @@
   text-align: left;
   width: 100%; /* Full width of sidebar */
   height: 53px; /* Fixed height for each box */
-  background-color: #E8DFDA; /* Light cream background */
+  background-color: #e8dfda; /* Light cream background */
   color: #6b4226; /* Dark brown text */
-  font-family: "Georgia", serif; /* Serif font */
+  font-family: 'Georgia', serif; /* Serif font */
   font-size: 1rem;
   text-decoration: none; /* Remove underline */
   border-bottom: 1px solid #6b422667;
@@ -99,29 +94,35 @@
 
 /* Active sidebar link */
 .sidebar-link.active {
-  background-color: #F1EBE8; /* Dark brown active background */
+  background-color: #f1ebe8; /* Dark brown active background */
   font-weight: bold;
   transition: background-color 0.3s ease;
 }
 
 /* Hover effect for sidebar links */
 .sidebar-link:hover {
-  background-color: #F1EBE8; /* Slightly darker cream on hover */
+  background-color: #f1ebe8; /* Slightly darker cream on hover */
   color: #6b4226; /* Text remains dark brown */
   cursor: pointer;
 }
 
 /* Profile section styling */
 
-
 /* Profile image */
-.profile-image {
+.profile-image-container {
+  position: relative;
   width: 150px;
   height: 150px;
-  margin: 0 auto 10px;
+  margin: 0 auto;
+}
+
+.profile-image {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
   overflow: hidden;
   border: 3px solid #6b4226; /* Circular border */
+  position: relative;
 }
 
 .profile-img {
@@ -130,11 +131,29 @@
   object-fit: cover;
 }
 
+.edit-profile {
+  position: absolute;
+  bottom: -8px;
+  right: 4px;
+  transform: translateY(-50%);
+  border: 2px solid white;
+  background-color: #f1f0e9;
+  width: 35px;
+  height: 35px;
+  border-radius: 100%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.edit-profile:hover {
+  background-color: #727d73;
+}
+
 .sidebar-title {
   font-size: 1.5rem;
   font-weight: bold;
   color: #6b4226;
-  font-family: "Georgia", serif;
+  font-family: 'Georgia', serif;
 }
 
 .sidebar-email {
@@ -146,7 +165,7 @@
 /* Content Section */
 .user-content {
   flex-grow: 1; /* Takes remaining space */
- 
+
   box-sizing: border-box;
   background-color: #fff; /* Consistent background */
 }
@@ -154,20 +173,19 @@
 .user-name {
   font-size: 1.2rem;
   font-weight: bold;
-  color: #5D5C5C;
+  color: #5d5c5c;
   margin-top: 10px;
   text-align: center;
 }
 
 .user-email {
   font-size: 0.9rem;
-  color: #5D5C5C;
+  color: #5d5c5c;
   /* margin-bottom: 20px; */
   /* margin-top: 5px; */
   text-align: center;
   /* margin-bottom: 10px; */
 }
-
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -216,7 +234,7 @@
     display: flex; /* Horizontal layout */
     justify-content: center; /* Center the links */
     gap: 20px; /* Add spacing between links */
-    padding-top:  10px; /* Add some padding for better appearance */
+    padding-top: 10px; /* Add some padding for better appearance */
     background-color: transparent; /* Remove box background */
     border-bottom: none; /* Remove border */
     /* margin-top: 20px; */
@@ -236,15 +254,15 @@
   }
 
   .sidebar-link.active {
-    border-bottom: 2px solid #B09383; /* Highlight the active link */
+    border-bottom: 2px solid #b09383; /* Highlight the active link */
     font-weight: bold; /* Emphasize active link */
     background: transparent;
-    color: #AD8C78;
+    color: #ad8c78;
   }
 
   .sidebar-link:hover {
     background-color: transparent; /* Remove hover background */
-    color: #AD8C78; /* Slightly darker color on hover */
+    color: #ad8c78; /* Slightly darker color on hover */
     cursor: pointer;
   }
 
@@ -280,14 +298,17 @@
     gap: 5px; /* Add space between links */
     overflow-x: auto; /* Enable horizontal scrolling */
     white-space: nowrap; /* Prevent links from wrapping to the next line */
-    padding:  10px; /* Add padding for better appearance */
+    padding: 10px; /* Add padding for better appearance */
     scrollbar-width: thin; /* For Firefox, make scrollbar thinner */
     scrollbar-color: rgb(214, 212, 212) transparent; /* Light scrollbar thumb color */
   }
 
-  
   .sidebar-links::-webkit-scrollbar-thumb {
-    background-color: rgb(226, 220, 220); /* Light color for the scrollbar thumb */
+    background-color: rgb(
+      226,
+      220,
+      220
+    ); /* Light color for the scrollbar thumb */
     border-radius: 10px; /* Rounded scrollbar thumb */
   }
 
@@ -306,12 +327,12 @@
 
   .sidebar-link.active {
     background-color: transparent; /* Ensure active links also have no background */
-    border-bottom: 2px solid #B09383; /* Highlight active links with a bottom border */
+    border-bottom: 2px solid #b09383; /* Highlight active links with a bottom border */
   }
 
   .sidebar-link:hover {
     background-color: transparent; /* Remove hover background color */
-    color: #AD8C78; /* Change text color on hover */
+    color: #ad8c78; /* Change text color on hover */
   }
 
   .my-account {
@@ -325,10 +346,93 @@
     padding-top: 20px;
   }
 
-  
-
   .sidebar-links {
     scroll-behavior: smooth; /* Enable smooth scrolling */
     justify-content: flex-start; /* Ensure links align properly */
   }
+}
+
+/* Image Edit Card Styles */
+.image-edit-card {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.image-edit-card-content {
+  background: white;
+  padding-top: 20px;
+  width: 400px;
+  text-align: center;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.image-preview {
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: center;
+}
+
+.preview-img {
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  /* gap: 10px; */
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.save-btn {
+  flex: 1;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  padding: 15px 0;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.cancel-btn {
+  background: #ddd;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background: #bbb;
+}
+
+.save-btn {
+  background: #6b4226;
+  color: #fff;
+}
+
+.save-btn:hover {
+  background: #55341a;
+}
+
+.image-upload-input {
+  display: none; /* Hide the input element */
 }

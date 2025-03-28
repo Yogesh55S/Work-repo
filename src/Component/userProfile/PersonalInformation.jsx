@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useAuth } from "../providers/AuthContext";
-import "../css/PersonalInformation.css";
-import leftArrow from "../../assets/svg/leftarrow.svg";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../providers/AuthContext';
+import '../css/PersonalInformation.css';
+import leftArrow from '../../assets/svg/leftarrow.svg';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 const PersonalInformation = () => {
   const { token } = useAuth();
@@ -23,19 +23,19 @@ const PersonalInformation = () => {
         },
       });
 
-      if (!response.ok) throw new Error("Failed to fetch user profile");
+      if (!response.ok) throw new Error('Failed to fetch user profile');
 
       const data = await response.json();
-      console.log("Fetched data from backend:", data);
+      console.log('Fetched data from backend:', data);
 
       const user = data.user || {};
       setFormData({
-        fullName: user.fullName || "",
-        phone: user.phone || "",
-        email: user.email || "",
+        fullName: user.fullName || '',
+        phone: user.phone || '',
+        email: user.email || '',
       });
     } catch (error) {
-      console.error("Error fetching user profile:", error);
+      console.error('Error fetching user profile:', error);
     } finally {
       setIsLoading(false);
     }
@@ -43,8 +43,8 @@ const PersonalInformation = () => {
 
   useEffect(() => {
     if (!token) {
-      console.error("No token found in AuthContext.");
-      navigate("/login");
+      console.error('No token found in AuthContext.');
+      navigate('/login');
       return;
     }
     fetchUserData();
@@ -62,32 +62,32 @@ const PersonalInformation = () => {
   const handleSaveChanges = async () => {
     try {
       const response = await fetch(`${API_URL}/profile`, {
-        method: "PUT",
+        method: 'PUT',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Failed to update user profile");
+      if (!response.ok) throw new Error('Failed to update user profile');
 
       const updatedData = await response.json();
-      console.log("Updated data from backend:", updatedData);
+      console.log('Updated data from backend:', updatedData);
 
       const user = updatedData.user || updatedData;
 
       setFormData({
-        fullName: user.fullName || "",
-        phone: user.phone || "",
-        email: user.email || "",
+        fullName: user.fullName || '',
+        phone: user.phone || '',
+        email: user.email || '',
       });
 
       setEditableFields({});
-      alert("Changes saved successfully!");
+      alert('Changes saved successfully!');
     } catch (error) {
-      console.error("Error updating user profile:", error);
-      alert("Failed to save changes. Please try again.");
+      console.error('Error updating user profile:', error);
+      alert('Failed to save changes. Please try again.');
     }
   };
 
@@ -96,84 +96,84 @@ const PersonalInformation = () => {
   }
 
   if (!formData) {
-    console.log("formData is null or undefined during render.");
+    console.log('formData is null or undefined during render.');
     return <div>Error: Unable to load user data</div>;
   }
 
   return (
-    <div className="personal-info-container">
-      <div className="section-header">
-        <h2 className="personal">Personal Information</h2>
-        <img src={leftArrow} alt="Left Arrow" className="left-arrow" />
+    <div className='personal-info-container'>
+      <div className='section-header'>
+        <h2 className='personal'>Personal Information</h2>
+        <img src={leftArrow} alt='Left Arrow' className='left-arrow' />
       </div>
-      <p className="description">
+      <p className='description'>
         Lorem ipsum odor amet, consectetuer adipiscing elit. Sed faucibus morbi
         curae maecenas dignissim volutpat hac quam.
       </p>
 
-      <form className="personal-info-form">
-        <div className="form-group full-name">
-          <label className="font-semibold">Full Name</label>
-          <div className="field-wrapper">
+      <form className='personal-info-form'>
+        <div className='form-group full-name'>
+          <label className='font-semibold'>Full Name</label>
+          <div className='field-wrapper'>
             <input
-              type="text"
-              name="fullName"
-              value={formData.fullName || ""}
+              type='text'
+              name='fullName'
+              value={formData.fullName || ''}
               disabled={!editableFields.fullName}
               onChange={handleInputChange}
-              className={`${editableFields.fullName ? "editable" : "disabled"}`}
+              className={`${editableFields.fullName ? 'editable' : 'disabled'}`}
             />
             <button
-              type="button"
-              className="edit-button"
-              onClick={() => enableEditing("fullName")}
+              type='button'
+              className='edit-button'
+              onClick={() => enableEditing('fullName')}
             >
               <FontAwesomeIcon icon={faPencilAlt} />
             </button>
           </div>
         </div>
 
-        <div className="section-header">
-          <h2 className="contact">Contact Information</h2>
-          <img src={leftArrow} alt="Left Arrow" className="left-arrow" />
+        <div className='section-header'>
+          <h2 className='contact'>Contact Information</h2>
+          <img src={leftArrow} alt='Left Arrow' className='left-arrow' />
         </div>
-        <div className="form-row">
-          <div className="form-group">
-            <label className="font-semibold">Phone Number</label>
-            <div className="field-wrapper">
+        <div className='form-row'>
+          <div className='form-group'>
+            <label className='font-semibold'>Phone Number</label>
+            <div className='field-wrapper'>
               <input
-                type="text"
-                name="phone"
-                value={formData.phone || ""}
+                type='text'
+                name='phone'
+                value={formData.phone || ''}
                 disabled={!editableFields.phone}
                 onChange={handleInputChange}
-                className={`${editableFields.phone ? "editable" : "disabled"}`}
+                className={`${editableFields.phone ? 'editable' : 'disabled'}`}
               />
               <button
-                type="button"
-                className="edit-button"
-                onClick={() => enableEditing("phone")}
+                type='button'
+                className='edit-button'
+                onClick={() => enableEditing('phone')}
               >
                 <FontAwesomeIcon icon={faPencilAlt} />
               </button>
             </div>
           </div>
 
-          <div className="form-group">
-            <label className="font-semibold">Email ID</label>
-            <div className="field-wrapper">
+          <div className='form-group'>
+            <label className='font-semibold'>Email ID</label>
+            <div className='field-wrapper'>
               <input
-                type="text"
-                name="email"
-                value={formData.email || ""}
+                type='text'
+                name='email'
+                value={formData.email || ''}
                 disabled={!editableFields.email}
                 onChange={handleInputChange}
-                className={`${editableFields.email ? "editable" : "disabled"}`}
+                className={`${editableFields.email ? 'editable' : 'disabled'}`}
               />
               <button
-                type="button"
-                className="edit-button"
-                onClick={() => enableEditing("email")}
+                type='button'
+                className='edit-button'
+                onClick={() => enableEditing('email')}
               >
                 <FontAwesomeIcon icon={faPencilAlt} />
               </button>
@@ -183,7 +183,7 @@ const PersonalInformation = () => {
       </form>
 
       {Object.values(editableFields).some((isEditable) => isEditable) && (
-        <button onClick={handleSaveChanges} className="brown-deep-button">
+        <button onClick={handleSaveChanges} className='brown-deep-button'>
           Save Changes
         </button>
       )}
