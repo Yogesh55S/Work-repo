@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../Card';
 import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 
@@ -16,7 +16,9 @@ const WinterProducts = () => {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
         const data = await response.json();
-        const filteredProducts = data.filter(product => product.subType === 'Winter Collection');
+        const filteredProducts = data.filter(
+          (product) => product.subType === 'Winter Collection'
+        );
         setWinterProducts(filteredProducts);
       } catch (error) {
         console.error('Error fetching winter products:', error);
@@ -30,39 +32,47 @@ const WinterProducts = () => {
   }, [API_URL]);
 
   return (
-    <div className="p-4 bg-gray-50">
-      <div className="max-w-[1240px] mx-auto text-center">
-        <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">Winter Collection</h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-8">
-          Discover our exclusive winter collection, designed to keep your skin and body healthy and nourished during the cold months.
+    <div className='p-4 bg-gray-50'>
+      <div className='max-w-[1240px] mx-auto text-center'>
+        <h2 className='text-2xl sm:text-3xl font-bold text-gray-800 mb-4'>
+          Winter Collection
+        </h2>
+        <p className='text-sm sm:text-base text-gray-600 mb-8'>
+          Discover our exclusive winter collection, designed to keep your skin
+          and body healthy and nourished during the cold months.
         </p>
 
-        {loading && <p className="text-gray-600">Loading products...</p>}
-        {error && <p className="text-red-600">Error: {error}</p>}
+        {loading && <p className='text-gray-600'>Loading products...</p>}
+        {error && <p className='text-red-600'>Error: {error}</p>}
 
         {!loading && !error && (
           <>
             {winterProducts.length === 0 ? (
-              <p className="text-gray-600">No products found for the Winter Collection.</p>
+              <p className='text-gray-600'>
+                No products found for the Winter Collection.
+              </p>
             ) : (
-              <div className="grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                {winterProducts.map(product => {
+              <div className='grid gap-4 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+                {winterProducts.map((product) => {
                   const baseUrl = API_URL.replace('/api', '');
-                  const imagePath = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
+                  const imagePath = `${baseUrl}/${product.image.replace(
+                    /\\/g,
+                    '/'
+                  )}`;
 
                   return (
                     <Link
                       key={product._id}
-                      to={`/product/${product._id}`}  // Navigate to ProductDetail page with product ID
-                      state={{ product }}             // Optionally pass product data to ProductDetail page
-                      className="cursor-pointer group"
+                      to={`/product/${product._id}`} // Navigate to ProductDetail page with product ID
+                      state={{ product }} // Optionally pass product data to ProductDetail page
+                      className='cursor-pointer group'
                     >
                       <Card
-                       name={product.productName}
-                       price={`₹${product.price}`}
-                       image={imagePath}
-                       description={product.description}
-                       productId={product._id}
+                        name={product.productName}
+                        price={`₹${product.price}`}
+                        image={imagePath}
+                        description={product.description}
+                        productId={product._id}
                       />
                     </Link>
                   );

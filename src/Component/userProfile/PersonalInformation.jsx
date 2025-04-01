@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthContext';
 import '../css/PersonalInformation.css';
@@ -26,8 +26,6 @@ const PersonalInformation = () => {
       if (!response.ok) throw new Error('Failed to fetch user profile');
 
       const data = await response.json();
-      console.log('Fetched data from backend:', data);
-
       const user = data.user || {};
       setFormData({
         fullName: user.fullName || '',
@@ -73,8 +71,6 @@ const PersonalInformation = () => {
       if (!response.ok) throw new Error('Failed to update user profile');
 
       const updatedData = await response.json();
-      console.log('Updated data from backend:', updatedData);
-
       const user = updatedData.user || updatedData;
 
       setFormData({

@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-import * as PropTypes from "prop-types";
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import * as PropTypes from 'prop-types';
 
-import Card from "./Card";
+import Card from './Card';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -18,20 +18,23 @@ const RelatedProducts = ({ productType }) => {
     try {
       const response = await fetch(`${API_URL}/products`);
       if (!response.ok) {
-        throw new Error(`Failed to fetch related products: ${response.statusText}`);
+        throw new Error(
+          `Failed to fetch related products: ${response.statusText}`
+        );
       }
       const data = await response.json();
 
       if (Array.isArray(data)) {
         const filtered = data.filter(
-          (item) => item.type?.trim().toLowerCase() === productType.trim().toLowerCase()
+          (item) =>
+            item.type?.trim().toLowerCase() === productType.trim().toLowerCase()
         );
         setRelatedProducts(filtered);
       } else {
-        throw new Error("Invalid data format received from the API.");
+        throw new Error('Invalid data format received from the API.');
       }
     } catch (err) {
-      console.error("Error fetching related products:", err);
+      console.error('Error fetching related products:', err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -50,28 +53,28 @@ const RelatedProducts = ({ productType }) => {
   };
 
   return (
-    <div className="mt-16  border-t pt-8">
-      <h3 className="text-lg mb-4">You might also like</h3>
-      {loading && <p className="text-gray-600">Loading related products...</p>}
-      {error && <p className="text-red-600">Error: {error}</p>}
+    <div className='mt-16  border-t pt-8'>
+      <h3 className='text-lg mb-4'>You might also like</h3>
+      {loading && <p className='text-gray-600'>Loading related products...</p>}
+      {error && <p className='text-red-600'>Error: {error}</p>}
       {!loading && !error && relatedProducts.length === 0 && (
-        <p className="text-gray-600">No related products found.</p>
+        <p className='text-gray-600'>No related products found.</p>
       )}
 
-      <div className="relative">
+      <div className='relative'>
         <div
-          className="flex overflow-x-auto snap-x snap-mandatory gap-6 px-6"
+          className='flex overflow-x-auto snap-x snap-mandatory gap-6 px-6'
           style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
           }}
         >
           {relatedProducts.map((item) => {
-            const baseUrl = API_URL.replace("/api", "");
-            const imagePath = `${baseUrl}/${item.image.replace(/\\/g, "/")}`;
+            const baseUrl = API_URL.replace('/api', '');
+            const imagePath = `${baseUrl}/${item.image.replace(/\\/g, '/')}`;
             return (
               <div
-                className="min-w-[300px] max-w-[300px] h-[500px] flex-shrink-0 snap-start transform transition  cursor-pointer"
+                className='min-w-[300px] max-w-[300px] h-[500px] flex-shrink-0 snap-start transform transition  cursor-pointer'
                 key={item._id}
                 onClick={() => handleProductClick(item)}
               >

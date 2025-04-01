@@ -8,11 +8,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCamera, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const UserPanel = () => {
-  const { token, user, logout } = useAuth();
-  const [userData, setUserData] = useState(user || null);
-  const [editMode, setEditMode] = useState(false); // To track whether the image editing card is open
-  const [selectedImage, setSelectedImage] = useState(null); // To store the selected image file (for preview)
-  const [imageBase64, setImageBase64] = useState(userData?.profileImg || ''); // To track the profile image URL
+  const { token, logout } = useAuth();
+  const [userData, setUserData] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageBase64, setImageBase64] = useState('');
   const location = useLocation();
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,22 +32,32 @@ const UserPanel = () => {
         return;
       }
 
-      if (!userData) {
-        try {
-          const data = await fetchWithAuth(`${API_URL}/profile`, token);
-          setUserData(data);
-          setImageBase64(data.profileImage || '');
-        } catch (error) {
-          console.error('Error fetching user profile:', error.message);
-          if (error.message.includes('Unauthorized')) {
-            logout();
-          }
+      try {
+        const response = await fetchWithAuth('profile', token);
+        // Check if response has user property
+        const data = response.user || response;
+        setUserData(data);
+
+        // Set the image base64 data with proper data URI
+        if (data.profileImg) {
+          // Always ensure we have the complete data URI
+          const base64Data = data.profileImg.startsWith('data:')
+            ? data.profileImg
+            : `data:image/jpeg;base64,${data.profileImg}`;
+          setImageBase64(base64Data);
+        } else {
+          setImageBase64('');
+        }
+      } catch (error) {
+        console.error('Error fetching user profile:', error.message);
+        if (error.message.includes('Unauthorized')) {
+          logout();
         }
       }
     };
 
     fetchUserData();
-  }, [API_URL, token, userData, logout]);
+  }, [token, API_URL, logout]);
 
   // Function to handle image upload and convert to base64 for preview
   const handleImageChange = (e) => {
@@ -55,22 +65,19 @@ const UserPanel = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSelectedImage(reader.result); // Set the base64 string for preview
+        setSelectedImage(reader.result);
       };
-      reader.readAsDataURL(file); // Convert to base64
+      reader.readAsDataURL(file);
     }
   };
 
-  // Issue in profile image display !!!
   // Function to save the image and store it in backend
   const handleSaveImage = async () => {
     if (!selectedImage) return;
 
     // Create a new Image object to get its size
-    const image = selectedImage.split(',')[1]; // Extract the base64 image data
-    const byteLength = atob(image).length; // Decode base64 and check the length
-
-    // Convert to KB/MB for better readability
+    const image = selectedImage.split(',')[1];
+    const byteLength = atob(image).length;
     const imageSizeInMB = byteLength / (1024 * 1024);
 
     if (imageSizeInMB > 5) {
@@ -90,29 +97,25 @@ const UserPanel = () => {
 
       if (response.ok) {
         const updatedUserData = await response.json();
-        setUserData(updatedUserData.user); // Update user data
-        setImageBase64(updatedUserData.user.profileImg); // Update profile image in UI
-        setEditMode(false); // Close the edit card
-        fetchUserImage(); // Fetch the updated profile image from backend
+        // Check if response has user property
+        const data = updatedUserData.user || updatedUserData;
+        setUserData(data);
+
+        // Update the image base64 data with proper data URI
+        if (data.profileImg) {
+          const base64Data = data.profileImg.startsWith('data:')
+            ? data.profileImg
+            : `data:image/jpeg;base64,${data.profileImg}`;
+          setImageBase64(base64Data);
+        } else {
+          setImageBase64('');
+        }
+        setEditMode(false);
       } else {
         console.error('Error updating profile image');
       }
     } catch (error) {
       console.error('Error saving profile image:', error);
-    }
-  };
-
-  // Function to fetch the profile image after upload or on page load
-  const fetchUserImage = async () => {
-    try {
-      const data = await fetchWithAuth(`${API_URL}/profile`, token);
-      if (data.profileImg) {
-        setImageBase64(data.profileImg);
-      } else {
-        setImageBase64(''); // Set to Blank if no image found
-      }
-    } catch (error) {
-      console.error('Error fetching profile image: ', error.message);
     }
   };
 
@@ -129,6 +132,10 @@ const UserPanel = () => {
                     src={imageBase64 || blank}
                     alt='User Avatar'
                     className='profile-img'
+                    onError={(e) => {
+                      console.error('Image failed to load:', e);
+                      e.target.src = blank;
+                    }}
                   />
                 </div>
                 <button

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link, Outlet } from 'react-router-dom'; // Use Outlet to render nested routes
 import {
   FiShoppingCart,

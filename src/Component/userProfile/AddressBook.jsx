@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../providers/AuthContext';
 import '../css/AddressBook.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
