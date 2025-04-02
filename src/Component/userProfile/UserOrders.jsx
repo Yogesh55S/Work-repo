@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../../utils/api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import '../css/Order.css';
 import swipeArrow from '../../assets/svg/swipearrow.svg'; // Import the SVG file
 
-const UserOrders = ({ userId }) => {
+const UserOrders = () => {
+  const { userData } = useOutletContext();
   const [orders, setOrders] = useState([]); // State to store orders
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480); // State to track screen size for responsive design
   const IMAGE_BASE_URL =
@@ -29,8 +30,13 @@ const UserOrders = ({ userId }) => {
           return;
         }
 
+        if (!userData?._id) {
+          console.error('User ID is missing from context');
+          return;
+        }
+
         // Fetch orders associated with the user
-        const data = await fetchWithAuth(`/orders/${userId}`, token);
+        const data = await fetchWithAuth(`/orders/${userData._id}`, token);
         const ordersWithDetails = await Promise.all(
           data.orders.map(async (order) => {
             // Fetch details for each product in the order
@@ -60,12 +66,8 @@ const UserOrders = ({ userId }) => {
       }
     };
 
-    if (userId) {
-      fetchOrdersWithProductDetails();
-    } else {
-      console.warn('User ID is missing. Unable to fetch orders.');
-    }
-  }, [userId]);
+    fetchOrdersWithProductDetails();
+  }, [userData?._id]);
 
   if (orders.length === 0) {
     return <p className='p-4 text-center text-gray-600'>No orders found.</p>;

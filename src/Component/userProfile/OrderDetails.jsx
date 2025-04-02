@@ -3,52 +3,76 @@ import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../../utils/api';
 
 const OrderDetails = () => {
-  const { orderId } = useParams(); // Retrieve the order ID from the route params
+  const { id } = useParams();
   const [orderDetails, setOrderDetails] = useState(null);
-  const API_URL = import.meta.env.VITE_API_URL;
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
   const IMAGE_BASE_URL =
-    import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace('/api', '');
+    import.meta.env.VITE_IMAGE_BASE_URL ||
+    import.meta.env.VITE_API_URL.replace('/api', '');
 
   useEffect(() => {
     const fetchOrderDetails = async () => {
       try {
+        setIsLoading(true);
+        setError(null);
         const token = localStorage.getItem('authToken');
+
         if (!token) {
-          console.error('No token found in localStorage.');
-          return;
+          throw new Error('No authentication token found');
         }
 
-        console.log(`Fetching order details for orderId: ${orderId}`);
-
-        const data = await fetchWithAuth(
-          `${API_URL}/orders/details/${orderId}`,
-          token,
-          { method: 'GET' }
-        );
-        console.log('API Response:', data);
-
-        if (data && data.order) {
-          setOrderDetails(data.order);
-        } else {
-          console.error('Order data not found in API response:', data);
+        if (!id) {
+          throw new Error('No order ID provided');
         }
+
+        const data = await fetchWithAuth(`orders/details/${id}`, token);
+
+        if (!data || !data.order) {
+          throw new Error('Invalid order data received');
+        }
+
+        setOrderDetails(data.order);
       } catch (error) {
-        console.error('Error fetching order details:', error.message);
+        console.error('Error fetching order details:', error);
+        setError(error.message || 'Failed to fetch order details');
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    if (orderId) {
-      fetchOrderDetails();
-    }
-  }, [API_URL, orderId]);
+    fetchOrderDetails();
+  }, [id]);
 
-  useEffect(() => {
-    console.log('Updated orderDetails:', orderDetails);
-  }, [orderDetails]);
+  if (isLoading) {
+    return (
+      <div className='flex justify-center items-center min-h-[400px]'>
+        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5C3822]'></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className='max-w-6xl mx-auto p-4 pt-28'>
+        <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
+          <h2 className='text-red-800 font-semibold mb-2'>Error</h2>
+          <p className='text-red-600'>{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!orderDetails) {
     return (
-      <p className='p-4 text-center text-gray-600'>Loading order details...</p>
+      <div className='max-w-6xl mx-auto p-4 pt-28'>
+        <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
+          <h2 className='text-yellow-800 font-semibold mb-2'>No Order Found</h2>
+          <p className='text-yellow-600'>
+            The requested order could not be found.
+          </p>
+        </div>
+      </div>
     );
   }
 
@@ -95,14 +119,11 @@ const OrderDetails = () => {
         <div className='border p-6 rounded-lg shadow-md'>
           <h2 className='text-xl font-semibold mb-4'>Customer Info</h2>
           <p className='mb-2'>
-            <strong>Name:</strong> {orderDetails.customerName || 'N/A'}
-          </p>
-          <p className='mb-2'>
-            <strong>Email:</strong> {orderDetails.customerEmail || 'N/A'}
+            <strong>Name:</strong> {orderDetails.address?.deliveryName || 'N/A'}
           </p>
           <p className='mb-2'>
             <strong>Mobile Number:</strong>{' '}
-            {orderDetails.customerMobile || 'N/A'}
+            {orderDetails.address?.deliveryNumber || 'N/A'}
           </p>
           <p className='mb-2'>
             <strong>Address:</strong>{' '}
@@ -110,7 +131,7 @@ const OrderDetails = () => {
               <span>
                 {orderDetails.address.streetAddress},{' '}
                 {orderDetails.address.city}, {orderDetails.address.state} -{' '}
-                {orderDetails.address.zip}, {orderDetails.address.country}
+                {orderDetails.address.zip}
               </span>
             ) : (
               'N/A'
@@ -130,25 +151,25 @@ const OrderDetails = () => {
             >
               <img
                 src={
-                  item.productDetails?.image
-                    ? `${IMAGE_BASE_URL}/${item.productDetails.image.replace(
+                  item.productId.image
+                    ? `${IMAGE_BASE_URL}/${item.productId.image.replace(
                         /\\/g,
                         '/'
                       )}`
                     : 'https://via.placeholder.com/100'
                 }
-                alt={item.productDetails?.productName || 'Product Image'}
+                alt={item.name || 'Product Image'}
                 className='w-20 h-20 object-cover rounded mr-4'
               />
               <div>
                 <p className='text-lg font-semibold text-gray-800'>
-                  {item.productDetails?.productName || 'Unknown Product'}
+                  {item.name || 'Unknown Product'}
                 </p>
                 <p className='text-sm text-gray-600'>
                   Quantity: {item.quantity || 0}
                 </p>
                 <p className='text-sm text-gray-600'>
-                  Price: ₹{item.productDetails?.price || 0}
+                  Price: ₹{item.price || 0}
                 </p>
               </div>
             </div>
