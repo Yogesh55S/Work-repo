@@ -1,468 +1,506 @@
-import { useState, useEffect } from 'react';
-import '../Component/css/AddressBook.css';
+import { useState, useEffect } from "react";
+import "../Component/css/AddressBook.css";
 
 const Cart = ({ userId }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [totalAmount, setTotalAmount] = useState(0);
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [showAddressModal, setShowAddressModal] = useState(false);
-  const [showAddAddressForm, setShowAddAddressForm] = useState(false);
-  const [newAddress, setNewAddress] = useState({
-    tag: 'home',
-    deliveryName: '',
-    deliveryNumber: '',
-    streetAddress: '',
-    city: '',
-    state: '',
-    zip: '',
-  });
+	const [cartItems, setCartItems] = useState([]);
+	const [totalAmount, setTotalAmount] = useState(0);
+	const [addresses, setAddresses] = useState([]);
+	const [selectedAddress, setSelectedAddress] = useState(null);
+	const [showAddressModal, setShowAddressModal] = useState(false);
+	const [showAddAddressForm, setShowAddAddressForm] = useState(false);
+	const [newAddress, setNewAddress] = useState({
+		tag: "home",
+		deliveryName: "",
+		deliveryNumber: "",
+		streetAddress: "",
+		city: "",
+		state: "",
+		zip: "",
+	});
 
-  const API_URL = import.meta.env.VITE_API_URL;
-  const IMAGE_BASE_URL =
-    import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace('/api', '');
+	const API_URL = import.meta.env.VITE_API_URL;
+	const IMAGE_BASE_URL =
+		import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace("/api", "");
 
-  const fetchCartItems = async () => {
-    try {
-      const response = await fetch(`${API_URL}/users/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-      if (response.ok) {
-        const userData = await response.json();
-        const cartWithDetails = await Promise.all(
-          userData.cart.map(async (item) => {
-            const productResponse = await fetch(
-              `${API_URL}/products/${item.productId}`
-            );
-            if (productResponse.ok) {
-              const productData = await productResponse.json();
-              return {
-                ...item,
-                productDetails: productData,
-              };
-            }
-            return item;
-          })
-        );
-        setCartItems(cartWithDetails);
-      }
-    } catch (error) {
-      console.error('Error fetching cart items:', error.message);
-    }
-  };
+	const fetchCartItems = async () => {
+		try {
+			const response = await fetch(`${API_URL}/users/${userId}`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+			});
+			if (response.ok) {
+				const userData = await response.json();
+				const cartWithDetails = await Promise.all(
+					userData.cart.map(async (item) => {
+						const productResponse = await fetch(
+							`${API_URL}/products/${item.productId}`,
+						);
+						if (productResponse.ok) {
+							const productData = await productResponse.json();
+							return {
+								...item,
+								productDetails: productData,
+							};
+						}
+						return item;
+					}),
+				);
+				setCartItems(cartWithDetails);
+			}
+		} catch (error) {
+			console.error("Error fetching cart items:", error.message);
+		}
+	};
 
-  const fetchAddresses = async () => {
-    try {
-      const response = await fetch(`${API_URL}/addresses/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setAddresses(data.addresses || []);
-      }
-    } catch (error) {
-      console.error('Error fetching addresses:', error.message);
-    }
-  };
+	const fetchAddresses = async () => {
+		try {
+			const response = await fetch(`${API_URL}/addresses/${userId}`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+			});
+			if (response.ok) {
+				const data = await response.json();
+				setAddresses(data.addresses || []);
+			}
+		} catch (error) {
+			console.error("Error fetching addresses:", error.message);
+		}
+	};
 
-  // const handleAddAddress = async () => {
-  // 	try {
-  // 		const response = await fetch(`${API_URL}/addresses/${userId}`, {
-  // 			method: "POST",
-  // 			headers: {
-  // 				"Content-Type": "application/json",
-  // 				Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  // 			},
-  // 			body: JSON.stringify(newAddress),
-  // 		});
-  // 		if (response.ok) {
-  // 			const addedAddress = await response.json();
-  // 			setAddresses((prev) => [...prev, addedAddress]);
-  // 			setShowAddAddressForm(false);
-  // 		}
-  // 	} catch (error) {
-  // 		console.error("Error adding address:", error.message);
-  // 	}
-  // };
+	// const handleAddAddress = async () => {
+	// 	try {
+	// 		const response = await fetch(`${API_URL}/addresses/${userId}`, {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 				Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+	// 			},
+	// 			body: JSON.stringify(newAddress),
+	// 		});
+	// 		if (response.ok) {
+	// 			const addedAddress = await response.json();
+	// 			setAddresses((prev) => [...prev, addedAddress]);
+	// 			setShowAddAddressForm(false);
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Error adding address:", error.message);
+	// 	}
+	// };
 
-  const handleAddAddress = async () => {
-    try {
-      const response = await fetch(`${API_URL}/addresses/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify(newAddress),
-      });
+	const handleAddAddress = async () => {
+		try {
+			const response = await fetch(`${API_URL}/addresses/${userId}`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+				body: JSON.stringify(newAddress),
+			});
 
-      if (response.ok) {
-        await fetchAddresses(); // Refetch all addresses instead of manually updating state
-        setShowAddAddressForm(false);
-      }
-    } catch (error) {
-      console.error('Error adding address:', error.message);
-    }
-  };
+			if (response.ok) {
+				await fetchAddresses(); // Refetch all addresses instead of manually updating state
+				setShowAddAddressForm(false);
+			}
+		} catch (error) {
+			console.error("Error adding address:", error.message);
+		}
+	};
 
-  const updateQuantity = (productId, newQuantity) => {
-    const updatedCart = cartItems.map((item) => {
-      if (item.productDetails?._id === productId) {
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    });
-    setCartItems(updatedCart);
-  };
+	const updateQuantity = (productId, newQuantity) => {
+		const updatedCart = cartItems.map((item) => {
+			if (item.productDetails?._id === productId) {
+				return { ...item, quantity: newQuantity };
+			}
+			return item;
+		});
+		setCartItems(updatedCart);
+	};
 
-  const calculateTotal = () => {
-    const total = cartItems.reduce(
-      (sum, item) => sum + (item.productDetails?.price || 0) * item.quantity,
-      0
-    );
-    setTotalAmount(total);
-  };
+	const calculateTotal = () => {
+		const total = cartItems.reduce(
+			(sum, item) => sum + (item.productDetails?.price || 0) * item.quantity,
+			0,
+		);
+		setTotalAmount(total);
+	};
 
-  const handleCheckout = async () => {
-    if (!selectedAddress) {
-      alert('Please select an address first!');
-      return;
-    }
-    try {
-      const response = await fetch(`${API_URL}/orders/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({
-          userId,
-          addressId: selectedAddress._id,
-          cart: cartItems.map((item) => ({
-            productId: item.productDetails?._id,
-            quantity: item.quantity,
-          })),
-        }),
-      });
-      if (response.ok) {
-        alert('Order placed successfully!');
-        setCartItems([]);
-        setShowAddressModal(false);
-      }
-    } catch (error) {
-      console.error('Error during order creation:', error.message);
-    }
-  };
-  const handleRemoveItem = async (productId) => {
-    try {
-      const response = await fetch(`${API_URL}/cart/${userId}`, {
-        // ✅ Matches backend route
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({ productId }), // ✅ Ensure body contains productId
-      });
+	const handleCheckout = async () => {
+		if (!selectedAddress) {
+			alert("Please select an address first!");
+			return;
+		}
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
-      }
+		try {
+			const response = await fetch(`${API_URL}/orders/checkout`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+				body: JSON.stringify({
+					addressId: selectedAddress._id,
+				}),
+			});
 
-      setCartItems(
-        cartItems.filter((item) => item.productDetails._id !== productId)
-      );
-    } catch (error) {
-      console.error('Error removing item from cart:', error.message);
-    }
-  };
+			const data = await response.json();
+			if (!data.paymentSessionId) {
+				alert("Failed to initiate payment");
+				return;
+			}
 
-  useEffect(() => {
-    if (userId) {
-      fetchCartItems();
-    }
-  }, [userId]);
+			// Cashfree Checkout
+			const script = document.createElement("script");
+			script.src = "https://sdk.cashfree.com/js/ui/2.0.0/cashfree.prod.js";
+			script.onload = () => {
+				const checkout = new window.Cashfree(data.paymentSessionId);
+				checkout.open();
+			};
+			document.body.appendChild(script);
+		} catch (error) {
+			console.error("Error during checkout:", error.message);
+		}
+	};
 
-  useEffect(() => {
-    calculateTotal();
-  }, [cartItems]);
+	// const handleCheckout = async () => {
+	//   if (!selectedAddress) {
+	//     alert('Please select an address first!');
+	//     return;
+	//   }
+	//   try {
+	//     const response = await fetch(`${API_URL}/orders/`, {
+	//       method: 'POST',
+	//       headers: {
+	//         'Content-Type': 'application/json',
+	//         Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+	//       },
+	//       body: JSON.stringify({
+	//         userId,
+	//         addressId: selectedAddress._id,
+	//         cart: cartItems.map((item) => ({
+	//           productId: item.productDetails?._id,
+	//           quantity: item.quantity,
+	//         })),
+	//       }),
+	//     });
+	//     if (response.ok) {
+	//       alert('Order placed successfully!');
+	//       setCartItems([]);
+	//       setShowAddressModal(false);
+	//     }
+	//   } catch (error) {
+	//     console.error('Error during order creation:', error.message);
+	//   }
+	// };
+	const handleRemoveItem = async (productId) => {
+		try {
+			const response = await fetch(`${API_URL}/cart/${userId}`, {
+				// ✅ Matches backend route
+				method: "DELETE",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+				},
+				body: JSON.stringify({ productId }), // ✅ Ensure body contains productId
+			});
 
-  return (
-    <div className='container mx-auto p-4 pt-28'>
-      <h1 className='text-2xl font-bold mb-6'>Your Cart</h1>
+			if (!response.ok) {
+				throw new Error(`Error: ${response.status} - ${response.statusText}`);
+			}
 
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <div className='flex flex-col md:flex-row md:space-x-8'>
-          {/* Cart Items */}
-          <div className='flex-1'>
-            <table className='w-full text-left table-auto mb-4 border-collapse'>
-              <thead>
-                <tr>
-                  <th className='border-b p-2'>Product</th>
-                  <th className='border-b p-2'>Price</th>
-                  <th className='border-b p-2'>Quantity</th>
-                  <th className='border-b p-2'>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item) => (
-                  <tr key={item.productDetails?._id}>
-                    <td className='p-2'>
-                      <div className='flex items-center'>
-                        <img
-                          src={
-                            item.productDetails?.image
-                              ? `${IMAGE_BASE_URL}/${item.productDetails.image.replace(
-                                  /\\/g,
-                                  '/'
-                                )}`
-                              : 'https://via.placeholder.com/100'
-                          }
-                          alt={item.productDetails?.productName || 'Product'}
-                          className='w-16 h-16 object-cover mr-4'
-                        />
-                        <span>
-                          {item.productDetails?.productName ||
-                            'Unknown Product'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className='p-2'>₹{item.productDetails?.price || 0}</td>
-                    <td className='p-2'>
-                      <input
-                        type='number'
-                        min='1'
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(
-                            item.productDetails?._id,
-                            parseInt(e.target.value, 10)
-                          )
-                        }
-                        className='border w-16 text-center'
-                      />
-                    </td>
-                    <td className='p-2'>
-                      ₹{(item.productDetails?.price || 0) * item.quantity}
-                    </td>
-                    <td className='p-2'>
-                      <button
-                        onClick={() =>
-                          handleRemoveItem(item.productDetails?._id)
-                        }
-                        className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+			setCartItems(
+				cartItems.filter((item) => item.productDetails._id !== productId),
+			);
+		} catch (error) {
+			console.error("Error removing item from cart:", error.message);
+		}
+	};
 
-          {/* Checkout Section */}
-          <div className='w-full md:w-1/3 bg-gray-100 p-4 rounded-lg shadow'>
-            <h2 className='text-xl font-bold mb-4'>Order Summary</h2>
-            <div className='mb-4'>
-              <p className='text-gray-600'>Subtotal</p>
-              <p className='text-3xl font-bold'>₹{totalAmount}</p>
-            </div>
-            <button
-              onClick={() => {
-                fetchAddresses();
-                setShowAddressModal(true);
-              }}
-              className='w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600'
-            >
-              Book Order
-            </button>
-          </div>
-        </div>
-      )}
+	useEffect(() => {
+		if (userId) {
+			fetchCartItems();
+		}
+	}, [userId]);
 
-      {/* Address Modal */}
-      {showAddressModal && (
-        <div className='fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center'>
-          <div className='bg-white p-6 rounded-lg max-w-lg w-full relative'>
-            <button
-              onClick={() => setShowAddressModal(false)}
-              className='absolute top-3 right-3 text-xl'
-            >
-              &times;
-            </button>
-            <h2 className='text-xl font-bold mb-4'>Select an Address</h2>
-            {addresses.length > 0 ? (
-              <div className='space-y-4'>
-                {addresses.map((address) => (
-                  <div
-                    key={address._id}
-                    className='border p-4 rounded flex items-center gap-4'
-                  >
-                    <input
-                      type='radio'
-                      name='address'
-                      value={address._id}
-                      checked={selectedAddress?._id === address._id}
-                      onChange={() => setSelectedAddress(address)}
-                    />
-                    <div>
-                      <p className='font-bold'>{address.deliveryName}</p>
-                      <p className='text-sm'>
-                        {address.streetAddress}, {address.city}, {address.state}{' '}
-                        - {address.zip}
-                      </p>
-                      <p className='text-sm'>{address.deliveryNumber}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p>No saved addresses. Please add one.</p>
-            )}
+	useEffect(() => {
+		calculateTotal();
+	}, [cartItems]);
 
-            <div className='flex gap-4 mt-4'>
-              <button
-                onClick={() => setShowAddAddressForm(true)}
-                className='brown-deep-button '
-              >
-                Add Address
-              </button>
-              <button
-                onClick={handleCheckout}
-                disabled={!selectedAddress}
-                className={`brown-deep-button ${
-                  selectedAddress
-                    ? 'bg-blue-500 hover:bg-blue-600'
-                    : 'bg-gray-300 cursor-not-allowed'
-                }`}
-              >
-                Proceed
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+	return (
+		<div className="container mx-auto p-4 pt-28">
+			<h1 className="text-2xl font-bold mb-6">Your Cart</h1>
 
-      {/* Add Address Form */}
-      {showAddAddressForm && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <h3 className='modal-title'>Add New Address</h3>
-            <div className='modal-grid'>
-              <div className='form-group full-width'>
-                <label>Name *</label>
-                <input
-                  type='text'
-                  name='deliveryName'
-                  value={newAddress.deliveryName}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      deliveryName: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              {/* <br /> */}
-              <div className='form-group full-width'>
-                <label>Mobile Number *</label>
-                <input
-                  type='text'
-                  name='deliveryNumber'
-                  value={newAddress.deliveryNumber}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      deliveryNumber: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className='form-group full-width'>
-                <label>Street Address *</label>
-                <input
-                  type='text'
-                  name='streetAddress'
-                  value={newAddress.streetAddress}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      streetAddress: e.target.value,
-                    })
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>City *</label>
-                <input
-                  type='text'
-                  name='city'
-                  value={newAddress.city}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, city: e.target.value })
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>State *</label>
-                <input
-                  type='text'
-                  name='state'
-                  value={newAddress.state}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, state: e.target.value })
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>ZIP *</label>
-                <input
-                  type='text'
-                  name='zip'
-                  value={newAddress.zip}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, zip: e.target.value })
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>Tag *</label>
-                <select
-                  name='tag'
-                  value={newAddress.tag}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, tag: e.target.value })
-                  }
-                >
-                  <option value='home'>Home</option>
-                  <option value='work'>Work</option>
-                  <option value='other'>Other</option>
-                </select>
-              </div>
-            </div>
-            <div className='modal-actions'>
-              <button
-                onClick={() => setShowAddAddressForm(false)}
-                className='cancel-btn'
-              >
-                CANCEL
-              </button>
-              <button onClick={handleAddAddress} className='save-btn'>
-                SAVE
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
+			{cartItems.length === 0 ? (
+				<p>Your cart is empty.</p>
+			) : (
+				<div className="flex flex-col md:flex-row md:space-x-8">
+					{/* Cart Items */}
+					<div className="flex-1">
+						<table className="w-full text-left table-auto mb-4 border-collapse">
+							<thead>
+								<tr>
+									<th className="border-b p-2">Product</th>
+									<th className="border-b p-2">Price</th>
+									<th className="border-b p-2">Quantity</th>
+									<th className="border-b p-2">Total</th>
+								</tr>
+							</thead>
+							<tbody>
+								{cartItems.map((item) => (
+									<tr key={item.productDetails?._id}>
+										<td className="p-2">
+											<div className="flex items-center">
+												<img
+													src={
+														item.productDetails?.image
+															? `${IMAGE_BASE_URL}/${item.productDetails.image.replace(
+																	/\\/g,
+																	"/",
+																)}`
+															: "https://via.placeholder.com/100"
+													}
+													alt={item.productDetails?.productName || "Product"}
+													className="w-16 h-16 object-cover mr-4"
+												/>
+												<span>
+													{item.productDetails?.productName ||
+														"Unknown Product"}
+												</span>
+											</div>
+										</td>
+										<td className="p-2">₹{item.productDetails?.price || 0}</td>
+										<td className="p-2">
+											<input
+												type="number"
+												min="1"
+												value={item.quantity}
+												onChange={(e) =>
+													updateQuantity(
+														item.productDetails?._id,
+														parseInt(e.target.value, 10),
+													)
+												}
+												className="border w-16 text-center"
+											/>
+										</td>
+										<td className="p-2">
+											₹{(item.productDetails?.price || 0) * item.quantity}
+										</td>
+										<td className="p-2">
+											{/* biome-ignore lint/a11y/useButtonType: <explanation> */}
+											<button
+												onClick={() =>
+													handleRemoveItem(item.productDetails?._id)
+												}
+												className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600"
+											>
+												Remove
+											</button>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
+
+					{/* Checkout Section */}
+					<div className="w-full md:w-1/3 bg-gray-100 p-4 rounded-lg shadow">
+						<h2 className="text-xl font-bold mb-4">Order Summary</h2>
+						<div className="mb-4">
+							<p className="text-gray-600">Subtotal</p>
+							<p className="text-3xl font-bold">₹{totalAmount}</p>
+						</div>
+						<button
+							onClick={() => {
+								fetchAddresses();
+								setShowAddressModal(true);
+							}}
+							className="w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600"
+						>
+							Book Order
+						</button>
+					</div>
+				</div>
+			)}
+
+			{/* Address Modal */}
+			{showAddressModal && (
+				<div className="fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center">
+					<div className="bg-white p-6 rounded-lg max-w-lg w-full relative">
+						<button
+							onClick={() => setShowAddressModal(false)}
+							className="absolute top-3 right-3 text-xl"
+						>
+							&times;
+						</button>
+						<h2 className="text-xl font-bold mb-4">Select an Address</h2>
+						{addresses.length > 0 ? (
+							<div className="space-y-4">
+								{addresses.map((address) => (
+									<div
+										key={address._id}
+										className="border p-4 rounded flex items-center gap-4"
+									>
+										<input
+											type="radio"
+											name="address"
+											value={address._id}
+											checked={selectedAddress?._id === address._id}
+											onChange={() => setSelectedAddress(address)}
+										/>
+										<div>
+											<p className="font-bold">{address.deliveryName}</p>
+											<p className="text-sm">
+												{address.streetAddress}, {address.city}, {address.state}{" "}
+												- {address.zip}
+											</p>
+											<p className="text-sm">{address.deliveryNumber}</p>
+										</div>
+									</div>
+								))}
+							</div>
+						) : (
+							<p>No saved addresses. Please add one.</p>
+						)}
+
+						<div className="flex gap-4 mt-4">
+							<button
+								onClick={() => setShowAddAddressForm(true)}
+								className="brown-deep-button "
+							>
+								Add Address
+							</button>
+							<button
+								onClick={handleCheckout}
+								disabled={!selectedAddress}
+								className={`brown-deep-button ${
+									selectedAddress
+										? "bg-blue-500 hover:bg-blue-600"
+										: "bg-gray-300 cursor-not-allowed"
+								}`}
+							>
+								Proceed
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
+			{/* Add Address Form */}
+			{showAddAddressForm && (
+				<div className="modal-overlay">
+					<div className="modal-content">
+						<h3 className="modal-title">Add New Address</h3>
+						<div className="modal-grid">
+							<div className="form-group full-width">
+								<label>Name *</label>
+								<input
+									type="text"
+									name="deliveryName"
+									value={newAddress.deliveryName}
+									onChange={(e) =>
+										setNewAddress({
+											...newAddress,
+											deliveryName: e.target.value,
+										})
+									}
+								/>
+							</div>
+							{/* <br /> */}
+							<div className="form-group full-width">
+								<label>Mobile Number *</label>
+								<input
+									type="text"
+									name="deliveryNumber"
+									value={newAddress.deliveryNumber}
+									onChange={(e) =>
+										setNewAddress({
+											...newAddress,
+											deliveryNumber: e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="form-group full-width">
+								<label>Street Address *</label>
+								<input
+									type="text"
+									name="streetAddress"
+									value={newAddress.streetAddress}
+									onChange={(e) =>
+										setNewAddress({
+											...newAddress,
+											streetAddress: e.target.value,
+										})
+									}
+								/>
+							</div>
+							<div className="form-group">
+								<label>City *</label>
+								<input
+									type="text"
+									name="city"
+									value={newAddress.city}
+									onChange={(e) =>
+										setNewAddress({ ...newAddress, city: e.target.value })
+									}
+								/>
+							</div>
+							<div className="form-group">
+								<label>State *</label>
+								<input
+									type="text"
+									name="state"
+									value={newAddress.state}
+									onChange={(e) =>
+										setNewAddress({ ...newAddress, state: e.target.value })
+									}
+								/>
+							</div>
+							<div className="form-group">
+								<label>ZIP *</label>
+								<input
+									type="text"
+									name="zip"
+									value={newAddress.zip}
+									onChange={(e) =>
+										setNewAddress({ ...newAddress, zip: e.target.value })
+									}
+								/>
+							</div>
+							<div className="form-group">
+								<label>Tag *</label>
+								<select
+									name="tag"
+									value={newAddress.tag}
+									onChange={(e) =>
+										setNewAddress({ ...newAddress, tag: e.target.value })
+									}
+								>
+									<option value="home">Home</option>
+									<option value="work">Work</option>
+									<option value="other">Other</option>
+								</select>
+							</div>
+						</div>
+						<div className="modal-actions">
+							<button
+								onClick={() => setShowAddAddressForm(false)}
+								className="cancel-btn"
+							>
+								CANCEL
+							</button>
+							<button onClick={handleAddAddress} className="save-btn">
+								SAVE
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
 };
 
 export default Cart;
