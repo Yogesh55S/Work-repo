@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
 
 const Cart = ({ userId }) => {
@@ -9,6 +11,7 @@ const Cart = ({ userId }) => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const [newAddress, setNewAddress] = useState({
     tag: 'home',
     deliveryName: '',
@@ -19,9 +22,147 @@ const Cart = ({ userId }) => {
     zip: '',
   });
 
+  const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
   const IMAGE_BASE_URL =
     import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace('/api', '');
+
+  // Check if user is logged in
+  useEffect(() => {
+    if (!userId) {
+      console.warn('User ID is undefined, redirecting to login');
+      navigate('/login');
+      return;
+    }
+  }, [userId, navigate]);
+
+  useEffect(() => {
+    // Simple function to check if Cashfree SDK is available
+    const checkCashfreeSDK = () => {
+      if (window.Cashfree) {
+        console.log('Cashfree SDK is available');
+        return true;
+      }
+      return false;
+    };
+
+    // Check if SDK is already loaded
+    if (checkCashfreeSDK()) {
+      return;
+    }
+
+    // If not loaded, try to load it
+    const script = document.createElement('script');
+    script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
+    script.async = true;
+    script.onload = () => {
+      console.log('Cashfree SDK script loaded');
+      // Check again after script loads
+      checkCashfreeSDK();
+    };
+    script.onerror = () => {
+      console.error('Failed to load Cashfree SDK script');
+    };
+    document.body.appendChild(script);
+
+    // Cleanup function
+    return () => {
+      // Remove any script elements we added
+      const scripts = document.querySelectorAll(
+        'script[src="https://sdk.cashfree.com/js/v3/cashfree.js"]'
+      );
+      scripts.forEach((script) => {
+        if (script.parentNode) {
+          script.parentNode.removeChild(script);
+        }
+      });
+    };
+  }, []); // Empty dependency array ensures this runs once when the component mounts
+
+  const handleCheckout = async () => {
+    if (!userId) {
+      alert('Please log in to continue with checkout');
+      navigate('/login');
+      return;
+    }
+
+    if (!selectedAddress) {
+      alert('Please select an address first!');
+      return;
+    }
+
+    // Check if Cashfree SDK is available
+    if (!window.Cashfree) {
+      console.error('Cashfree SDK is not available at checkout time');
+      alert('Payment system is not ready. Please try again in a moment.');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Step 1: Create order on your backend
+      const response = await fetch(`${API_URL}/orders/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({
+          addressId: selectedAddress._id,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Checkout failed');
+      }
+
+      const data = await response.json();
+      console.log('Checkout response data:', data);
+
+      // Ensure Cashfree SDK is available
+      if (window.Cashfree) {
+        if (data.paymentSessionId) {
+          // Store order ID in local storage for reference
+          localStorage.setItem('currentOrderId', data.orderId);
+
+          // Initialize Cashfree checkout
+          const cashfree = window.Cashfree({
+            mode: 'sandbox', // or "production" for live environment
+          });
+
+          console.log(
+            'Initializing Cashfree checkout with session ID:',
+            data.paymentSessionId
+          );
+
+          // Start Cashfree checkout
+          cashfree
+            .checkout({
+              paymentSessionId: data.paymentSessionId,
+              redirectTarget: '_self', // Redirect in the same tab
+            })
+            .then(() => {
+              console.log('Cashfree checkout completed');
+            })
+            .catch((error) => {
+              console.error('Error during Cashfree checkout:', error);
+              throw new Error('Failed to complete payment');
+            });
+        } else {
+          throw new Error('Invalid payment data received from server');
+        }
+      } else {
+        throw new Error('Cashfree SDK is not loaded properly');
+      }
+    } catch (error) {
+      console.error('❌ Error during checkout:', error.message);
+      alert(`Checkout failed: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const fetchCartItems = async () => {
     try {
@@ -82,7 +223,7 @@ const Cart = ({ userId }) => {
       });
 
       if (response.ok) {
-        await fetchAddresses(); // Refetch all addresses instead of manually updating state
+        await fetchAddresses();
         setShowAddAddressForm(false);
       }
     } catch (error) {
@@ -107,55 +248,15 @@ const Cart = ({ userId }) => {
     );
     setTotalAmount(total);
   };
-
-  const handleCheckout = async () => {
-    if (!selectedAddress) {
-      toast.info('Please select an address first!');
-      return;
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({
-          addressId: selectedAddress._id,
-        }),
-      });
-
-      const data = await response.json();
-      if (!data.paymentSessionId) {
-        toast.error('Failed to initiate payment');
-        return;
-      }
-
-      // Cashfree Checkout
-      const script = document.createElement('script');
-      script.src = 'https://sdk.cashfree.com/js/ui/2.0.0/cashfree.prod.js';
-      script.onload = () => {
-        const checkout = new window.Cashfree(data.paymentSessionId);
-        checkout.open();
-      };
-      document.body.appendChild(script);
-    } catch (error) {
-      console.error('Error during checkout:', error.message);
-      toast.error('Error during checkout: ' + error.message);
-    }
-  };
-
   const handleRemoveItem = async (productId) => {
     try {
       const response = await fetch(`${API_URL}/cart/${userId}`, {
-        // ✅ Matches backend route
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
         },
-        body: JSON.stringify({ productId }), // ✅ Ensure body contains productId
+        body: JSON.stringify({ productId }),
       });
 
       if (!response.ok) {
@@ -185,7 +286,7 @@ const Cart = ({ userId }) => {
       <h1 className='text-2xl font-bold mb-6'>Your Cart</h1>
 
       {cartItems.length === 0 ? (
-        <p>There is nothing in your cart. Let's add something.</p>
+        <p>Your cart is empty.</p>
       ) : (
         <div className='flex flex-col md:flex-row md:space-x-8'>
           {/* Cart Items */}
@@ -197,6 +298,7 @@ const Cart = ({ userId }) => {
                   <th className='border-b p-2'>Price</th>
                   <th className='border-b p-2'>Quantity</th>
                   <th className='border-b p-2'>Total</th>
+                  <th className='border-b p-2'>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -241,7 +343,6 @@ const Cart = ({ userId }) => {
                       ₹{(item.productDetails?.price || 0) * item.quantity}
                     </td>
                     <td className='p-2'>
-                      {/* biome-ignore lint/a11y/useButtonType: <explanation> */}
                       <button
                         onClick={() =>
                           handleRemoveItem(item.productDetails?._id)
@@ -270,8 +371,9 @@ const Cart = ({ userId }) => {
                 setShowAddressModal(true);
               }}
               className='w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600'
+              disabled={isProcessing}
             >
-              Book Order
+              {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
             </button>
           </div>
         </div>
@@ -293,23 +395,31 @@ const Cart = ({ userId }) => {
                 {addresses.map((address) => (
                   <div
                     key={address._id}
-                    className='border p-4 rounded flex items-center gap-4'
+                    className={`border p-4 rounded flex items-center gap-4 ${
+                      selectedAddress?._id === address._id
+                        ? 'border-blue-500 bg-blue-50'
+                        : ''
+                    }`}
                   >
                     <input
                       type='radio'
                       name='address'
+                      id={`address-${address._id}`}
                       value={address._id}
                       checked={selectedAddress?._id === address._id}
                       onChange={() => setSelectedAddress(address)}
                     />
-                    <div>
+                    <label
+                      htmlFor={`address-${address._id}`}
+                      className='flex-1 cursor-pointer'
+                    >
                       <p className='font-bold'>{address.deliveryName}</p>
                       <p className='text-sm'>
                         {address.streetAddress}, {address.city}, {address.state}{' '}
                         - {address.zip}
                       </p>
                       <p className='text-sm'>{address.deliveryNumber}</p>
-                    </div>
+                    </label>
                   </div>
                 ))}
               </div>
@@ -320,20 +430,20 @@ const Cart = ({ userId }) => {
             <div className='flex gap-4 mt-4'>
               <button
                 onClick={() => setShowAddAddressForm(true)}
-                className='brown-deep-button '
+                className='brown-deep-button bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
               >
                 Add Address
               </button>
               <button
                 onClick={handleCheckout}
-                disabled={!selectedAddress}
+                disabled={!selectedAddress || isProcessing}
                 className={`brown-deep-button ${
-                  selectedAddress
-                    ? 'bg-blue-500 hover:bg-blue-600'
-                    : 'bg-gray-300 cursor-not-allowed'
-                }`}
+                  selectedAddress && !isProcessing
+                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    : 'bg-gray-300 cursor-not-allowed text-gray-600'
+                } px-4 py-2 rounded`}
               >
-                Proceed
+                {isProcessing ? 'Processing...' : 'Proceed to Payment'}
               </button>
             </div>
           </div>
@@ -358,9 +468,9 @@ const Cart = ({ userId }) => {
                       deliveryName: e.target.value,
                     })
                   }
+                  required
                 />
               </div>
-              {/* <br /> */}
               <div className='form-group full-width'>
                 <label>Mobile Number *</label>
                 <input
@@ -373,6 +483,7 @@ const Cart = ({ userId }) => {
                       deliveryNumber: e.target.value,
                     })
                   }
+                  required
                 />
               </div>
               <div className='form-group full-width'>
@@ -387,6 +498,7 @@ const Cart = ({ userId }) => {
                       streetAddress: e.target.value,
                     })
                   }
+                  required
                 />
               </div>
               <div className='form-group'>
@@ -398,6 +510,7 @@ const Cart = ({ userId }) => {
                   onChange={(e) =>
                     setNewAddress({ ...newAddress, city: e.target.value })
                   }
+                  required
                 />
               </div>
               <div className='form-group'>
@@ -409,6 +522,7 @@ const Cart = ({ userId }) => {
                   onChange={(e) =>
                     setNewAddress({ ...newAddress, state: e.target.value })
                   }
+                  required
                 />
               </div>
               <div className='form-group'>
@@ -420,6 +534,7 @@ const Cart = ({ userId }) => {
                   onChange={(e) =>
                     setNewAddress({ ...newAddress, zip: e.target.value })
                   }
+                  required
                 />
               </div>
               <div className='form-group'>
@@ -453,6 +568,10 @@ const Cart = ({ userId }) => {
       )}
     </div>
   );
+};
+
+Cart.propTypes = {
+  userId: PropTypes.string,
 };
 
 export default Cart;

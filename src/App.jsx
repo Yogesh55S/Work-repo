@@ -21,6 +21,7 @@ import VerifyOTP from './Pages/VerifyOtp';
 import Unauthorized from './Pages/Unauthorized';
 import ForgotPassword from './Pages/Forgotpassword';
 import ResetPassword from './Pages/ResetPassword';
+import PaymentStatus from './Pages/PaymentStatus';
 
 // Admin Panel Components
 import AdminPanel from './Pages/AdminPanal';
@@ -153,6 +154,14 @@ function App() {
             <Route path='/unauthorized' element={<Unauthorized />} />
             <Route path='/forgot-password' element={<ForgotPassword />} />
             <Route path='/reset-password' element={<ResetPassword />} />
+            <Route
+              path='/payment-status'
+              element={
+                <ProtectedRoute>
+                  <PaymentStatus />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Admin Panel Routes */}
             <Route
