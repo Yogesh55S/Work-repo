@@ -1,6 +1,6 @@
 import React from 'react';
 import * as PropTypes from 'prop-types';
-
+import { toast } from 'react-toastify';
 import { FaShoppingCart } from 'react-icons/fa';
 
 const Card = ({ name, price, image, productId, setCartCount }) => {
@@ -10,7 +10,7 @@ const Card = ({ name, price, image, productId, setCartCount }) => {
     const userId = user?._id;
 
     if (!token || !userId) {
-      alert('You need to log in to add items to the cart.');
+      toast.warning('You need to log in to add items to the cart.');
       return;
     }
 
@@ -28,20 +28,19 @@ const Card = ({ name, price, image, productId, setCartCount }) => {
       );
 
       if (response.ok) {
-        alert('Product added to cart successfully!');
+        toast.success('Product added to cart successfully!');
         setCartCount((prev) => prev + 1); // Update cart count instantly
       } else {
-        alert('Failed to add product to cart.');
+        toast.error('Failed to add product to cart.');
       }
     } catch (error) {
-      alert('An error occurred while adding the product to the cart.');
-      console.error('Error:', error);
+      toast.error('Error adding product to cart. Please try again later.');
+      console.error('Error adding product to cart:', error);
     }
   };
 
   return (
     <div className='relative flex flex-col items-center gap-2 group'>
-      {/* Cart Icon (Visible on Hover) */}
       {/* Cart Icon (Visible on Hover) */}
       <button
         onClick={handleAddToCart}
@@ -64,7 +63,7 @@ const Card = ({ name, price, image, productId, setCartCount }) => {
       <div className='text-center mt-4 mx-auto'>
         <h3
           className='text-sm font-medium text-gray-800 truncate w-full'
-          title={name} // Tooltip to show the full name
+          title={name}
         >
           {name}
         </h3>

@@ -1,4 +1,6 @@
 import { useState, useEffect, createContext } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   BrowserRouter as Router,
   Routes,
@@ -179,7 +181,6 @@ function App() {
               }
             >
               <Route index element={<PersonalInformation />} />
-
               <Route path='profile' element={<PersonalInformation />} />
               <Route path='address-book' element={<AddressBook />} />
               <Route
@@ -199,6 +200,18 @@ function App() {
             </Route>
           </Routes>
           <Footer />
+          <ToastContainer
+            position='bottom-right'
+            autoClose={3000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme='light'
+          />
         </Router>
       </AuthContext.Provider>
     </GoogleOAuthProvider>

@@ -1,5 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import RelatedProducts from './RelatedProducts';
+import { toast } from 'react-toastify';
 
 const ProductDetail = () => {
   const location = useLocation();
@@ -19,7 +20,7 @@ const ProductDetail = () => {
     const userId = user?._id;
 
     if (!token || !userId) {
-      alert('You need to log in to add items to the cart.');
+      toast.info('You need to log in to add items to the cart.');
       return;
     }
 
@@ -37,20 +38,16 @@ const ProductDetail = () => {
       );
 
       if (response.ok) {
-        const updatedCart = await response.json();
-        console.log('Item added to cart:', updatedCart);
-        alert('Product added to cart successfully!');
+        await response.json();
+        toast.success('Product added to cart successfully!');
       } else {
-        console.error('Failed to add item to cart. Status:', response.status);
-        alert('Failed to add product to cart.');
+        const error = await response.json();
+        toast.error(error.message || 'Failed to add product to cart.');
       }
     } catch (error) {
-      console.error('Error adding to cart:', error.message);
-      alert('An error occurred while adding the product to the cart.');
+      toast.error('An error occurred while adding the product to the cart.');
     }
   };
-  console.log('Token:', localStorage.getItem('token'));
-  console.log('User:', localStorage.getItem('user'));
 
   return (
     <div className='max-w-full mx-auto p-4 pt-28'>

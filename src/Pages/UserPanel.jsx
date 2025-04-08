@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../Component/providers/AuthContext';
 import '../Component/css/UserPanel.css';
@@ -81,7 +82,7 @@ const UserPanel = () => {
     const imageSizeInMB = byteLength / (1024 * 1024);
 
     if (imageSizeInMB > 5) {
-      alert('Image size exceeds 5MB limit.');
+      toast.error('Image size exceeds 5MB limit.');
       return;
     }
 

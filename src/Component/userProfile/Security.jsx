@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../providers/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-// import "../../css/Security.css";
+import { toast } from 'react-toastify';
 
 const Security = () => {
   const { token } = useAuth();
@@ -95,15 +95,15 @@ const Security = () => {
       if (!response.ok) throw new Error('Failed to send OTP');
 
       setOtpSent(true);
-      alert('OTP sent to your email.');
+      toast.success('OTP sent to your email.');
     } catch (error) {
-      alert('Error sending OTP: ' + error.message);
+      toast.error('Error sending OTP: ' + error.message);
     }
   };
 
   const handleSaveChanges = async () => {
     if (newPassword !== confirmPassword) {
-      alert('New passwords do not match.');
+      toast.warning('New passwords do not match.');
       return;
     }
 
@@ -113,7 +113,7 @@ const Security = () => {
     }
 
     if (!otp) {
-      alert('Please enter the OTP sent to your email.');
+      toast.warning('Please enter the OTP sent to your email.');
       return;
     }
 
@@ -140,9 +140,9 @@ const Security = () => {
       setOtp('');
       setOtpSent(false);
 
-      alert('Password updated successfully.');
+      toast.success('Password updated successfully.');
     } catch (error) {
-      alert('Error updating password: ' + error.message);
+      toast.error('Error updating password: ' + error.message);
     }
   };
 

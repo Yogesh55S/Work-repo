@@ -4,6 +4,7 @@ import { useAuth } from '../providers/AuthContext';
 import '../css/PersonalInformation.css';
 import leftArrow from '../../assets/svg/leftarrow.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toast } from 'react-toastify';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 
 const PersonalInformation = () => {
@@ -80,10 +81,10 @@ const PersonalInformation = () => {
       });
 
       setEditableFields({});
-      alert('Changes saved successfully!');
+      toast.success('Changes saved successfully!');
     } catch (error) {
       console.error('Error updating user profile:', error);
-      alert('Failed to save changes. Please try again.');
+      toast.error('Failed to save changes. Please try again.');
     }
   };
 
