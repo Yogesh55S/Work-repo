@@ -1,11 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
 import { CartContext } from '../Component/providers/CartContext';
+import { useAuth } from '../Component/providers/AuthContext';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
 
-const Cart = ({ userId }) => {
+const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
   const [addresses, setAddresses] = useState([]);
@@ -27,6 +28,16 @@ const Cart = ({ userId }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const IMAGE_BASE_URL =
     import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace('/api', '');
+
+  const { user } = useAuth();
+  const userId = user?._id || localStorage.getItem('userId');
+
+  // Persist userId in localStorage
+  useEffect(() => {
+    if (user?._id) {
+      localStorage.setItem('userId', user._id);
+    }
+  }, [user]);
 
   // Check if user is logged in
   useEffect(() => {
@@ -267,9 +278,11 @@ const Cart = ({ userId }) => {
   useEffect(() => {
     if (!userId) {
       setCartItems([]);
+      console.log('No User Id');
       return;
     }
     fetchCartItems();
+    console.log('User Id: ' + userId);
   }, [userId]);
 
   useEffect(() => {
