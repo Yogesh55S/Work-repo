@@ -8,6 +8,7 @@ import {
   Navigate,
 } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CartProvider } from './Component/providers/CartContext';
 import Navbar from './Component/Navbar';
 import Footer from './Component/Footer';
 import Home from './Pages/Home';
@@ -83,7 +84,6 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [cartCount, setCartCount] = useState(0);
 
   // Initialize user data from token
   useEffect(() => {
@@ -101,127 +101,102 @@ function App() {
     }
   }, []);
 
-  // Fetch cart count when user logs in
-  useEffect(() => {
-    if (user?.userId) {
-      fetchCartCount(user.userId);
-    }
-  }, [user]);
-
-  const fetchCartCount = async (userId) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`
-      );
-      if (response.ok) {
-        const data = await response.json();
-        const totalItems = data.cart.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-        setCartCount(totalItems);
-      }
-    } catch (error) {
-      console.error('Failed to fetch cart count:', error);
-    }
-  };
-
   const logout = () => {
     setUser(null);
-    setCartCount(0); // Reset cart count on logout
     localStorage.removeItem('authToken');
   };
 
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthContext.Provider value={{ user, logout }}>
-        <Router>
-          <Navbar cartCount={cartCount} setCartCount={setCartCount} />
-          <Routes>
-            {/* Public Routes */}
-            <Route path='/' element={<Home />} />
-            <Route path='/winter-collection' element={<WinterCollection />} />
-            <Route path='/shop' element={<Shop />} />
-            <Route path='/contact' element={<Contact />} />
-            <Route
-              path='/product/:id'
-              element={<ProductDetail setCartCount={setCartCount} />}
+        <CartProvider>
+          <Router>
+            <Navbar />
+            <Routes>
+              {/* Public Routes */}
+              <Route path='/' element={<Home />} />
+              <Route path='/winter-collection' element={<WinterCollection />} />
+              <Route path='/shop' element={<Shop />} />
+              <Route path='/contact' element={<Contact />} />
+              <Route path='/product/:id' element={<ProductDetail />} />
+              <Route path='/cart' element={<Cart userId={user?.userId} />} />
+              <Route path='/login' element={<Login />} />
+              <Route path='/register' element={<Register />} />
+              <Route path='/verify-otp' element={<VerifyOTP />} />
+              <Route path='/unauthorized' element={<Unauthorized />} />
+              <Route path='/forgot-password' element={<ForgotPassword />} />
+              <Route path='/reset-password' element={<ResetPassword />} />
+              <Route
+                path='/payment-status'
+                element={
+                  <ProtectedRoute>
+                    <PaymentStatus />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Admin Panel Routes */}
+              <Route
+                path='/admin-panel/*'
+                element={
+                  <ProtectedRoute requiredRole='admin'>
+                    <AdminPanel />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AddProductForm />} />
+                <Route path='add-product' element={<AddProductForm />} />
+                <Route path='products' element={<ProductView />} />
+                <Route
+                  path='orders'
+                  element={<Orders userId={user?.userId} />}
+                />
+                <Route path='settings' element={<Settings />} />
+              </Route>
+
+              {/* Protected User Panel Routes */}
+              <Route
+                path='/user-panel/*'
+                element={
+                  <ProtectedRoute requiredRole='user'>
+                    <UserPanel />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<PersonalInformation />} />
+                <Route path='profile' element={<PersonalInformation />} />
+                <Route path='address-book' element={<AddressBook />} />
+                <Route
+                  path='orders'
+                  element={<UserOrders userId={user?.userId} />}
+                />
+                <Route
+                  path='orders/:id'
+                  element={<OrderDetails userId={user?.userId} />}
+                />
+                <Route path='payment' element={<Payment />} />
+                <Route
+                  path='security'
+                  element={<Security userId={user?.userId} />}
+                />
+                <Route path='help-support' element={<HelpSupport />} />
+              </Route>
+            </Routes>
+            <Footer />
+            <ToastContainer
+              position='bottom-right'
+              autoClose={3000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme='light'
             />
-            <Route path='/cart' element={<Cart userId={user?.userId} />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/register' element={<Register />} />
-            <Route path='/verify-otp' element={<VerifyOTP />} />
-            <Route path='/unauthorized' element={<Unauthorized />} />
-            <Route path='/forgot-password' element={<ForgotPassword />} />
-            <Route path='/reset-password' element={<ResetPassword />} />
-            <Route
-              path='/payment-status'
-              element={
-                <ProtectedRoute>
-                  <PaymentStatus />
-                </ProtectedRoute>
-              }
-            />
-
-            {/* Protected Admin Panel Routes */}
-            <Route
-              path='/admin-panel/*'
-              element={
-                <ProtectedRoute requiredRole='admin'>
-                  <AdminPanel />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AddProductForm />} />
-
-              <Route path='add-product' element={<AddProductForm />} />
-              <Route path='products' element={<ProductView />} />
-              <Route path='orders' element={<Orders userId={user?.userId} />} />
-              <Route path='settings' element={<Settings />} />
-            </Route>
-
-            {/* Protected User Panel Routes */}
-            <Route
-              path='/user-panel/*'
-              element={
-                <ProtectedRoute requiredRole='user'>
-                  <UserPanel />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<PersonalInformation />} />
-              <Route path='profile' element={<PersonalInformation />} />
-              <Route path='address-book' element={<AddressBook />} />
-              <Route
-                path='orders'
-                element={<UserOrders userId={user?.userId} />}
-              />
-              <Route
-                path='orders/:id'
-                element={<OrderDetails userId={user?.userId} />}
-              />
-              <Route path='payment' element={<Payment />} />
-              <Route
-                path='security'
-                element={<Security userId={user?.userId} />}
-              />
-              <Route path='help-support' element={<HelpSupport />} />
-            </Route>
-          </Routes>
-          <Footer />
-          <ToastContainer
-            position='bottom-right'
-            autoClose={3000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-            theme='light'
-          />
-        </Router>
+          </Router>
+        </CartProvider>
       </AuthContext.Provider>
     </GoogleOAuthProvider>
   );

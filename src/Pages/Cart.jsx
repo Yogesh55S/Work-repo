@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { toast } from 'react-toastify';
+import { CartContext } from '../Component/providers/CartContext';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
@@ -81,13 +82,13 @@ const Cart = ({ userId }) => {
 
   const handleCheckout = async () => {
     if (!userId) {
-      alert('Please log in to continue with checkout');
+      toast.info('Please log in to continue with checkout');
       navigate('/login');
       return;
     }
 
     if (!selectedAddress) {
-      alert('Please select an address first!');
+      toast.info('Please select an address first!');
       return;
     }
 
@@ -248,33 +249,27 @@ const Cart = ({ userId }) => {
     );
     setTotalAmount(total);
   };
+
+  const { removeFromCart } = useContext(CartContext);
+
   const handleRemoveItem = async (productId) => {
-    try {
-      const response = await fetch(`${API_URL}/cart/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({ productId }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
-      }
-
+    const success = await removeFromCart(userId, productId);
+    if (success) {
       setCartItems(
         cartItems.filter((item) => item.productDetails._id !== productId)
       );
-    } catch (error) {
-      console.error('Error removing item from cart:', error.message);
+      toast.success('Item removed from cart');
+    } else {
+      toast.error('Failed to remove item from cart');
     }
   };
 
   useEffect(() => {
-    if (userId) {
-      fetchCartItems();
+    if (!userId) {
+      setCartItems([]);
+      return;
     }
+    fetchCartItems();
   }, [userId]);
 
   useEffect(() => {

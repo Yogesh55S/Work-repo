@@ -1,8 +1,10 @@
 import { useLocation } from 'react-router-dom';
 import RelatedProducts from './RelatedProducts';
 import { toast } from 'react-toastify';
+import { useCart } from './providers/CartContext';
 
 const ProductDetail = () => {
+  const { updateCartCount } = useCart();
   const location = useLocation();
   const product = location.state?.product;
 
@@ -40,11 +42,13 @@ const ProductDetail = () => {
       if (response.ok) {
         await response.json();
         toast.success('Product added to cart successfully!');
+        updateCartCount(userId);
       } else {
         const error = await response.json();
         toast.error(error.message || 'Failed to add product to cart.');
       }
     } catch (error) {
+      console.error('Error adding product to cart:', error);
       toast.error('An error occurred while adding the product to the cart.');
     }
   };

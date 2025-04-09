@@ -1,9 +1,10 @@
-import React from 'react';
 import * as PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
+import { useCart } from './providers/CartContext';
 import { FaShoppingCart } from 'react-icons/fa';
 
-const Card = ({ name, price, image, productId, setCartCount }) => {
+const Card = ({ name, price, image, productId }) => {
+  const { updateCartCount } = useCart();
   const handleAddToCart = async () => {
     const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user'));
@@ -29,7 +30,10 @@ const Card = ({ name, price, image, productId, setCartCount }) => {
 
       if (response.ok) {
         toast.success('Product added to cart successfully!');
-        setCartCount((prev) => prev + 1); // Update cart count instantly
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user?._id) {
+          updateCartCount(user?._id);
+        }
       } else {
         toast.error('Failed to add product to cart.');
       }

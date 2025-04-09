@@ -4,9 +4,10 @@ import { FiShoppingCart, FiUser, FiLogOut } from 'react-icons/fi';
 import { HiMenu, HiX } from 'react-icons/hi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from './providers/AuthContext';
-import axios from 'axios';
+import { useCart } from './providers/CartContext';
 
-const Navbar = ({ cartCount, setCartCount }) => {
+const Navbar = () => {
+  const { cartCount, updateCartCount } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
   const location = useLocation();
@@ -23,30 +24,9 @@ const Navbar = ({ cartCount, setCartCount }) => {
 
   useEffect(() => {
     if (isLoggedIn && user) {
-      fetchUserCart();
+      updateCartCount(user?._id);
     }
-  }, [isLoggedIn, user, location]);
-
-  const fetchUserCart = async () => {
-    try {
-      if (!user?._id) return;
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/users/${user._id}`
-      );
-      const totalItems = response.data.cart.reduce(
-        (total, item) => total + item.quantity,
-        0
-      );
-      setCartCount(totalItems);
-    } catch (error) {
-      console.error('Failed to fetch user cart', error);
-    }
-  };
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      fetchUserCart();
-    }
-  }, [isLoggedIn, user, location]);
+  }, [isLoggedIn, user, location, updateCartCount]);
 
   useEffect(() => {
     // Scroll to top on location change
@@ -55,22 +35,17 @@ const Navbar = ({ cartCount, setCartCount }) => {
 
   const handleLogout = async () => {
     await logout();
-    setCartCount(0); // Reset cart count on logout
+    updateCartCount(null);
     navigate('/login');
   };
 
   const handleUserIconClick = () => {
     if (isLoggedIn) {
-      // Navigate to user panel or admin panel based on user role
       navigate(user.role === 'admin' ? '/admin-panel' : '/user-panel');
     } else {
-      // Redirect to login page if user is not logged in
       navigate('/login');
     }
   };
-
-  // Helper function to determine if the nav item is active
-  const isActive = (path) => location.pathname === path;
 
   return (
     <nav className='bg-primary text-white h-20 fixed w-full z-50 shadow-md'>
@@ -174,7 +149,6 @@ const Navbar = ({ cartCount, setCartCount }) => {
 
         {/* Icons */}
         <div className='flex items-center space-x-6 text-xl'>
-          {/* Cart Icon with Badge */}
           {/* Cart Icon with Badge */}
           <Link
             to='/cart'
