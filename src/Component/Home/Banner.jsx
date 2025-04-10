@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { FaLeaf } from 'react-icons/fa'; // Import the Font Awesome Leaf icon
 import kittenImage from '../../assets/Image/banner2.png'; // Import the first image
 import yogaImage from '../../assets/Image/banner2.png'; // Import the second image
-import backgroundImage from '../../assets/Image/bannerbackground.png'; // Import the background image
+import backgroundImage from '../../assets/Image/bannerbackground.jpeg'; // Import the background image
 
 const banners = [
   {
