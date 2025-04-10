@@ -44,7 +44,7 @@ const Card = ({ name, price, image, productId }) => {
   };
 
   return (
-    <div className='relative flex flex-col items-center gap-2 group'>
+    <div className='max-w-[300px] relative flex flex-col items-center gap-2 mx-auto group'>
       {/* Cart Icon (Visible on Hover) */}
       <button
         onClick={handleAddToCart}

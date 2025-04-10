@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as PropTypes from 'prop-types';
-
 import Card from '../Card';
+import CardSkeleton from '../skeltons/Cardskelton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -11,6 +11,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [cardsToShow, setCardsToShow] = useState(4); // Move cardsToShow state directly into component
   const navigate = useNavigate();
   const location = useLocation(); // To access the passed state (category)
 
@@ -24,12 +25,38 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     }
   }, [categoryFromState]);
 
-  // Fetch products from API
+  // Calculate number of cards to show based on screen width - integrated from useCardCount
+  const calculateCardsToShow = () => {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth >= 1440) {
+      setCardsToShow(4); // Show 4 cards for large screens
+    } else if (screenWidth >= 1024) {
+      setCardsToShow(3); // 3 cards for large screens
+    } else if (screenWidth >= 768) {
+      setCardsToShow(2); // 2 cards for medium screens
+    } else {
+      setCardsToShow(1); // 1 card for small screens
+    }
+  };
+
+  // Set up resize listener
+  useEffect(() => {
+    calculateCardsToShow();
+    window.addEventListener('resize', calculateCardsToShow);
+    return () => {
+      window.removeEventListener('resize', calculateCardsToShow);
+    };
+  }, []);
+
+  // Fetch products from API with delay
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
       try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
@@ -58,7 +85,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
   const displayedProducts = showAll
     ? filteredProducts
-    : filteredProducts.slice(0, 8);
+    : filteredProducts.slice(0, cardsToShow); // Use cardsToShow for dynamic display
 
   const handleProductClick = (product) => {
     navigate(`/product/${product._id}`, { state: { product } });
@@ -102,12 +129,12 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
         </div>
 
         {/* Loading and Error Handling */}
-        {loading && <p className='text-gray-600'>Loading products...</p>}
+        {loading && <CardSkeleton />}
         {error && <p className='text-red-600'>Error: {error}</p>}
 
         {/* Products Grid */}
         {!loading && !error && (
-          <div className='grid gap-6 grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+          <div className='flex flex-wrap justify-center mx-auto gap-3'>
             {displayedProducts.length === 0 ? (
               <p className='text-gray-600'>
                 No products found for this category.
