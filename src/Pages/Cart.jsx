@@ -318,12 +318,13 @@ const Cart = () => {
           </p>
         </div>
       ) : (
-        <div className='flex flex-col md:flex-row gap-5'>
-          <div className='flex-1 space-y-4'>
+        <div className='flex flex-col lg:flex-row items-center gap-5'>
+          {/* Cart Items */}
+          <div className='flex-1 space-y-4 w-full'>
             {cartItems.map((item) => (
               <div
                 key={item.productDetails?._id}
-                className='flex items-start border-b-2 p-4'
+                className='flex items-start border-b-2 p-4 sm:p-2'
               >
                 <img
                   src={
@@ -335,20 +336,18 @@ const Cart = () => {
                       : 'https://via.placeholder.com/100'
                   }
                   alt={item.productDetails?.productName || 'Product'}
-                  className='w-24 h-24 object-cover mr-4'
+                  className='md:w-24 md:h-24 sm:w-32 sm:h-32 object-cover mr-4'
                 />
                 <div className='flex-1'>
-                  {/* Product Name and Price in a Row */}
-                  <div className='flex justify-between items-center'>
-                    <h3 className='font-semibold text-lg'>
+                  <div className='flex justify-between md:items-center'>
+                    <h3 className='font-semibold text-sm sm:text-base md:text-lg'>
                       {item.productDetails?.productName || 'Unknown Product'}
                     </h3>
-                    <p className='text-gray-700 font-medium text-base'>
+                    <p className='text-gray-700 font-medium text-base mt-10 md:mt-0'>
                       ₹{item.productDetails?.price || 0}
                     </p>
                   </div>
 
-                  {/* Quantity Selector */}
                   <div className='mt-2 flex items-center gap-2'>
                     <label htmlFor='qty' className='text-sm text-gray-600'>
                       Qty:
@@ -371,7 +370,6 @@ const Cart = () => {
                     </select>
                   </div>
 
-                  {/* Action Buttons */}
                   <div className='mt-2 text-sm text-red-600 flex gap-4'>
                     <button
                       onClick={() => handleRemoveItem(item.productDetails?._id)}
@@ -385,7 +383,7 @@ const Cart = () => {
           </div>
 
           {/* Order Summary */}
-          <div className='w-full h-[132px] md:w-1/3 bg-gray-100 p-4 rounded-lg'>
+          <div className='w-[350px] h-[132px] bg-gray-100 p-4 rounded-lg sticky top-6 lg:self-start'>
             <div className='text-xl font-semibold flex justify-between'>
               <span>Subtotal ({cartItems.length} items):</span>
               <span className='text-black font-bold'>₹{totalAmount}</span>
