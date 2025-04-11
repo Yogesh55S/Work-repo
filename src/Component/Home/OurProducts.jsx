@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as PropTypes from 'prop-types';
 import Card from '../Card';
-import CardSkeleton from '../skeltons/Cardskelton';
+import CardSkeleton from '../skeltons/Cardskeleton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,18 +25,21 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     }
   }, [categoryFromState]);
 
-  // Calculate number of cards to show based on screen width - integrated from useCardCount
+  // Calculate number of cards to show based on screen width - using the same logic as Winter.jsx
   const calculateCardsToShow = () => {
     const screenWidth = window.innerWidth;
+    const cardWidth = 300;
+    const spaceBetweenCards = 20;
+    const totalCardWidth = cardWidth + spaceBetweenCards;
 
     if (screenWidth >= 1440) {
-      setCardsToShow(4); // Show 4 cards for large screens
-    } else if (screenWidth >= 1024) {
-      setCardsToShow(3); // 3 cards for large screens
-    } else if (screenWidth >= 768) {
-      setCardsToShow(2); // 2 cards for medium screens
+      setCardsToShow(4); // Show 4 cards for extra large screens
     } else {
-      setCardsToShow(1); // 1 card for small screens
+      const calculatedSlides = Math.max(
+        1,
+        Math.floor(screenWidth / totalCardWidth)
+      );
+      setCardsToShow(calculatedSlides);
     }
   };
 
