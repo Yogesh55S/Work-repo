@@ -25,7 +25,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     }
   }, [categoryFromState]);
 
-  // Calculate number of cards to show based on screen width - using the same logic as Winter.jsx
+  // Calculate number of cards to show based on screen width
   const calculateCardsToShow = () => {
     const screenWidth = window.innerWidth;
     const cardWidth = 300;
