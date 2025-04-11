@@ -5,6 +5,8 @@ import { useAuth } from '../Component/providers/AuthContext';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
+import emptyCart from '../assets/svg/empty-cart.svg';
+import CartSkeleton from '../Component/skeltons/Cartskeleton'; // Import the skeleton component
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -14,6 +16,7 @@ const Cart = () => {
   const [showAddressModal, setShowAddressModal] = useState(false);
   const [showAddAddressForm, setShowAddAddressForm] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [loading, setLoading] = useState(true); // Add loading state
   const [newAddress, setNewAddress] = useState({
     tag: 'home',
     deliveryName: '',
@@ -177,7 +180,13 @@ const Cart = () => {
   };
 
   const fetchCartItems = async () => {
+    setLoading(true); // Start loading state
     try {
+      // Add a small delay to show the skeleton (can be removed in production)
+      if (import.meta.env.DEV) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+      }
+
       const response = await fetch(`${API_URL}/users/${userId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`,
@@ -204,6 +213,9 @@ const Cart = () => {
       }
     } catch (error) {
       console.error('Error fetching cart items:', error.message);
+      toast.error('Failed to load your cart items');
+    } finally {
+      setLoading(false); // End loading state
     }
   };
 
@@ -278,6 +290,7 @@ const Cart = () => {
   useEffect(() => {
     if (!userId) {
       setCartItems([]);
+      setLoading(false); // Also set loading to false when there's no user
       console.log('No User Id');
       return;
     }
@@ -291,98 +304,105 @@ const Cart = () => {
 
   return (
     <div className='container mx-auto p-4 pt-28'>
-      <h1 className='text-2xl font-bold mb-6'>Your Cart</h1>
+      <h1 className='text-2xl font-bold mb-5'>Your Cart</h1>
 
-      {cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+      {/* Show skeleton while loading */}
+      {loading ? (
+        <CartSkeleton />
+      ) : cartItems.length === 0 ? (
+        <div className='flex flex-col items-center justify-center'>
+          <img src={emptyCart} alt='empty-cart' />
+          <h4>Nothing Here Yet!</h4>
+          <p className='text-gray-500'>
+            Browse our collections and find something special.
+          </p>
+        </div>
       ) : (
-        <div className='flex flex-col md:flex-row md:space-x-8'>
-          {/* Cart Items */}
-          <div className='flex-1'>
-            <table className='w-full text-left table-auto mb-4 border-collapse'>
-              <thead>
-                <tr>
-                  <th className='border-b p-2'>Product</th>
-                  <th className='border-b p-2'>Price</th>
-                  <th className='border-b p-2'>Quantity</th>
-                  <th className='border-b p-2'>Total</th>
-                  <th className='border-b p-2'>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cartItems.map((item) => (
-                  <tr key={item.productDetails?._id}>
-                    <td className='p-2'>
-                      <div className='flex items-center'>
-                        <img
-                          src={
-                            item.productDetails?.image
-                              ? `${IMAGE_BASE_URL}/${item.productDetails.image.replace(
-                                  /\\/g,
-                                  '/'
-                                )}`
-                              : 'https://via.placeholder.com/100'
-                          }
-                          alt={item.productDetails?.productName || 'Product'}
-                          className='w-16 h-16 object-cover mr-4'
-                        />
-                        <span>
-                          {item.productDetails?.productName ||
-                            'Unknown Product'}
-                        </span>
-                      </div>
-                    </td>
-                    <td className='p-2'>₹{item.productDetails?.price || 0}</td>
-                    <td className='p-2'>
-                      <input
-                        type='number'
-                        min='1'
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(
-                            item.productDetails?._id,
-                            parseInt(e.target.value, 10)
-                          )
-                        }
-                        className='border w-16 text-center'
-                      />
-                    </td>
-                    <td className='p-2'>
-                      ₹{(item.productDetails?.price || 0) * item.quantity}
-                    </td>
-                    <td className='p-2'>
-                      <button
-                        onClick={() =>
-                          handleRemoveItem(item.productDetails?._id)
-                        }
-                        className='bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600'
-                      >
-                        Remove
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <div className='flex flex-col md:flex-row gap-5'>
+          <div className='flex-1 space-y-4'>
+            {cartItems.map((item) => (
+              <div
+                key={item.productDetails?._id}
+                className='flex items-start border-b-2 p-4'
+              >
+                <img
+                  src={
+                    item.productDetails?.image
+                      ? `${IMAGE_BASE_URL}/${item.productDetails.image.replace(
+                          /\\/g,
+                          '/'
+                        )}`
+                      : 'https://via.placeholder.com/100'
+                  }
+                  alt={item.productDetails?.productName || 'Product'}
+                  className='w-24 h-24 object-cover mr-4'
+                />
+                <div className='flex-1'>
+                  {/* Product Name and Price in a Row */}
+                  <div className='flex justify-between items-center'>
+                    <h3 className='font-semibold text-lg'>
+                      {item.productDetails?.productName || 'Unknown Product'}
+                    </h3>
+                    <p className='text-gray-700 font-medium text-base'>
+                      ₹{item.productDetails?.price || 0}
+                    </p>
+                  </div>
+
+                  {/* Quantity Selector */}
+                  <div className='mt-2 flex items-center gap-2'>
+                    <label htmlFor='qty' className='text-sm text-gray-600'>
+                      Qty:
+                    </label>
+                    <select
+                      value={item.quantity}
+                      onChange={(e) =>
+                        updateQuantity(
+                          item.productDetails?._id,
+                          parseInt(e.target.value, 10)
+                        )
+                      }
+                      className='border rounded px-2 py-1'
+                    >
+                      {[...Array(10)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className='mt-2 text-sm text-red-600 flex gap-4'>
+                    <button
+                      onClick={() => handleRemoveItem(item.productDetails?._id)}
+                    >
+                      Remove Item
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Checkout Section */}
-          <div className='w-full md:w-1/3 bg-gray-100 p-4 rounded-lg shadow'>
-            <h2 className='text-xl font-bold mb-4'>Order Summary</h2>
-            <div className='mb-4'>
-              <p className='text-gray-600'>Subtotal</p>
-              <p className='text-3xl font-bold'>₹{totalAmount}</p>
+          {/* Order Summary */}
+          <div className='w-full h-[132px] md:w-1/3 bg-gray-100 p-4 rounded-lg'>
+            <div className='text-xl font-semibold flex justify-between'>
+              <span>Subtotal ({cartItems.length} items):</span>
+              <span className='text-black font-bold'>₹{totalAmount}</span>
             </div>
-            <button
-              onClick={() => {
-                fetchAddresses();
-                setShowAddressModal(true);
-              }}
-              className='w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600'
-              disabled={isProcessing}
-            >
-              {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
-            </button>
+            <div className='flex justify-center mt-6'>
+              <button
+                onClick={() => {
+                  fetchAddresses();
+                  setShowAddressModal(true);
+                }}
+                className='brown-deep-button'
+                style={{ width: '100%' }}
+                disabled={isProcessing}
+              >
+                {isProcessing ? 'Processing...' : 'Proceed to Buy'}
+              </button>
+            </div>
           </div>
         </div>
       )}

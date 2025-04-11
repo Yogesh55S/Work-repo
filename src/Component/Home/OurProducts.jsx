@@ -55,8 +55,6 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
       setLoading(true);
       setError(null);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);

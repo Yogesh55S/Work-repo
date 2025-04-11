@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import Skeleton from 'react-loading-skeleton';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 const CardSkeleton = () => {
@@ -30,16 +30,14 @@ const CardSkeleton = () => {
   const SingleCardSkeleton = () => (
     <div className='max-w-[300px] relative flex flex-col items-center gap-2 mx-auto'>
       <div className='animate-pulse flex flex-col'>
-        {/* Image placeholder - match Card.jsx exactly */}
+        {/* Image placeholder */}
         <div className='relative overflow-hidden'>
           <Skeleton className='rounded-lg' height={400} width={300} />
         </div>
 
-        {/* Title and price container - match Card.jsx */}
+        {/* Title and price container */}
         <div className='text-center mt-4 mx-auto w-full'>
-          {/* Title placeholder */}
           <Skeleton className='mb-2 rounded' height={20} width='75%' />
-          {/* Price placeholder */}
           <Skeleton className='rounded' height={20} width='25%' />
         </div>
       </div>
@@ -47,18 +45,20 @@ const CardSkeleton = () => {
   );
 
   return (
-    <div className='flex flex-wrap justify-center mx-auto gap-3'>
-      {Array(skeletonsToShow)
-        .fill()
-        .map((_, index) => (
-          <div
-            key={index}
-            className='cursor-pointer transform transition duration-300'
-          >
-            <SingleCardSkeleton />
-          </div>
-        ))}
-    </div>
+    <SkeletonTheme baseColor='#efe6dc' highlightColor='#f5eee6'>
+      <div className='flex flex-wrap justify-center mx-auto gap-3'>
+        {Array(skeletonsToShow)
+          .fill()
+          .map((_, index) => (
+            <div
+              key={index}
+              className='cursor-pointer transform transition duration-300'
+            >
+              <SingleCardSkeleton />
+            </div>
+          ))}
+      </div>
+    </SkeletonTheme>
   );
 };
 

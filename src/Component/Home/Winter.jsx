@@ -22,10 +22,6 @@ const Winter = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-
-        // Add artificial delay to see skeleton loading state
-        await new Promise((resolve) => setTimeout(resolve, 7000)); // 3 second delay
-
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
