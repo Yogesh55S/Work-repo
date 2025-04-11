@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import * as PropTypes from 'prop-types';
 import Card from '../Card';
-import CardSkeleton from '../skeltons/Cardskeleton';
+import CardSkeleton from '../skeletons/Cardskeleton';
 
 const API_URL = import.meta.env.VITE_API_URL;
 

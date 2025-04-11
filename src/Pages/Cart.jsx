@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
 import emptyCart from '../assets/svg/empty-cart.svg';
-import CartSkeleton from '../Component/skeltons/Cartskeleton'; // Import the skeleton component
+import CartSkeleton from '../Component/skeletons/Cartskeleton'; // Import the skeleton component
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);

@@ -3,12 +3,14 @@ import { useAuth } from '../providers/AuthContext';
 import '../css/AddressBook.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import AddressBookSkeleton from '../skeletons/AddressBookSkeleton';
 
 const AddressBook = () => {
-  const { token, user } = useAuth(); // Extract user and token dynamically
+  const { token, user } = useAuth();
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -17,12 +19,19 @@ const AddressBook = () => {
   }, [token, user?._id]);
 
   const fetchAddresses = () => {
+    setLoading(true);
     fetch(`${API_URL}/addresses/${user._id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
-      .then((data) => setAddresses(data.addresses || []))
-      .catch((error) => console.error('Error fetching addresses:', error));
+      .then((data) => {
+        setAddresses(data.addresses || []);
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error('Error fetching addresses:', error);
+        setLoading(false);
+      });
   };
 
   const handleEdit = (address) => {
@@ -61,6 +70,10 @@ const AddressBook = () => {
       })
       .catch((error) => console.error('Error saving address:', error));
   };
+
+  if (loading) {
+    return <AddressBookSkeleton />;
+  }
 
   const defaultAddress = addresses[0]; // Assume the first address as default
   const otherAddresses = addresses.slice(1);

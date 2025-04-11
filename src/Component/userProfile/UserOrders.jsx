@@ -2,12 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { fetchWithAuth } from '../../utils/api';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import '../css/Order.css';
-import swipeArrow from '../../assets/svg/swipearrow.svg'; // Import the SVG file
+import swipeArrow from '../../assets/svg/swipearrow.svg';
+import UserOrdersSkeleton from '../skeletons/UserOrdersSkeleton';
 
 const UserOrders = () => {
   const { userData } = useOutletContext();
   const [orders, setOrders] = useState([]); // State to store orders
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480); // State to track screen size for responsive design
+  const [loading, setLoading] = useState(true); // Add loading state
+  const [dataFetched, setDataFetched] = useState(false); // Add a flag to track if data has been fetched
   const IMAGE_BASE_URL =
     import.meta.env.VITE_IMAGE_BASE_URL ||
     import.meta.env.VITE_API_URL.replace('/api', ''); // Base URL for images
@@ -23,16 +26,20 @@ const UserOrders = () => {
   // Fetch orders and their associated product details
   useEffect(() => {
     const fetchOrdersWithProductDetails = async () => {
+      if (!userData?._id) return; // Don't run if there's no user ID
+
       try {
+        setLoading(true); // Start loading state
+
         const token = localStorage.getItem('authToken');
         if (!token) {
           console.error('No authentication token found. Redirecting to login.');
           return;
         }
 
-        if (!userData?._id) {
-          console.error('User ID is missing from context');
-          return;
+        // For development only: add a delay to see the skeleton
+        if (import.meta.env.DEV) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
         }
 
         // Fetch orders associated with the user
@@ -58,25 +65,37 @@ const UserOrders = () => {
         );
 
         setOrders(ordersWithDetails); // Update state with enriched orders
+        setDataFetched(true); // Mark data as fetched
       } catch (error) {
         console.error(
           'Failed to fetch orders or product details:',
           error.message
         );
+        setDataFetched(true); // Still mark as fetched even on error
+      } finally {
+        setLoading(false); // End loading state
       }
     };
 
     fetchOrdersWithProductDetails();
   }, [userData?._id]);
 
-  if (orders.length === 0) {
+  // Show skeleton while loading
+  if (loading) {
+    return <UserOrdersSkeleton />;
+  }
+
+  // Only show "No orders found" after data has been fetched and orders array is empty
+  if (dataFetched && orders.length === 0) {
     return <p className='p-4 text-center text-gray-600'>No orders found.</p>;
   }
 
+  // Rest of the component remains the same
   return (
     <div className='max-w-4xl mx-auto'>
       <h1 className='text-2xl font-bold mb-6 text-gray-800'>Your Orders</h1>
       <div className='user-orders-scroll-container'>
+        {/* Existing render code for orders... */}
         {orders.map((order, index) => (
           <React.Fragment key={order._id}>
             {isMobile ? (

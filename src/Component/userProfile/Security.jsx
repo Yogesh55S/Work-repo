@@ -4,6 +4,7 @@ import { useAuth } from '../providers/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import SecuritySkeleton from '../skeletons/SecuritySkeleton'; // Import the skeleton component
 
 const Security = () => {
   const { token } = useAuth();
@@ -155,7 +156,11 @@ const Security = () => {
     showMessage('Password update canceled.', 'info');
   };
 
-  if (loading) return <div>Loading...</div>;
+  // Show skeleton while loading
+  if (loading) {
+    return <SecuritySkeleton />;
+  }
+
   if (error) return <div className='text-red-500'>{error}</div>;
 
   return (
@@ -236,6 +241,22 @@ const Security = () => {
               </div>
             </div>
           ))}
+
+          {/* OTP field that appears after sending OTP */}
+          {otpSent && (
+            <div className='form-group'>
+              <label className='font-semibold'>OTP</label>
+              <input
+                type='text'
+                name='otp'
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+                className='input-style'
+                placeholder='Enter OTP sent to your email'
+              />
+            </div>
+          )}
 
           <div className='button-group'>
             <button

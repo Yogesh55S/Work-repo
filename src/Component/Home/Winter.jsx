@@ -6,7 +6,7 @@ import Card from '../Card';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
-import CardSkeleton from '../skeltons/Cardskeleton';
+import CardSkeleton from '../skeletons/Cardskeleton';
 
 const Winter = () => {
   const sliderRef = useRef(null);

@@ -21,7 +21,6 @@ const UserPanel = () => {
     profile: 'Profile',
     'address-book': 'Address Book',
     orders: 'Orders',
-    payment: 'Payment',
     security: 'Security',
     'help-support': 'Help & Support',
   };
@@ -157,7 +156,6 @@ const UserPanel = () => {
               { label: 'Profile', path: 'profile' },
               { label: 'Address Book', path: 'address-book' },
               { label: 'Orders', path: 'orders' },
-              { label: 'Payment', path: 'payment' },
               { label: 'Security', path: 'security' },
               { label: 'Help & Support', path: 'help-support' },
             ].map((item) => (

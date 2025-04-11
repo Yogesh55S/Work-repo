@@ -6,6 +6,7 @@ import leftArrow from '../../assets/svg/leftarrow.svg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import PersonalInformationSkeleton from '../skeletons/PersonalInformationSkeleton';
 
 const PersonalInformation = () => {
   const { token } = useAuth();
@@ -89,7 +90,7 @@ const PersonalInformation = () => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <PersonalInformationSkeleton />;
   }
 
   if (!formData) {
