@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchWithAuth } from '../../utils/api';
+import OrderDetailsSkeleton from '../skeletons/OrderDetailsSkeleton';
 
 const OrderDetails = () => {
   const { id } = useParams();
@@ -26,6 +27,11 @@ const OrderDetails = () => {
           throw new Error('No order ID provided');
         }
 
+        // For development only: add a delay to see the skeleton
+        if (import.meta.env.DEV) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
         const data = await fetchWithAuth(`orders/details/${id}`, token);
 
         if (!data || !data.order) {
@@ -44,12 +50,9 @@ const OrderDetails = () => {
     fetchOrderDetails();
   }, [id]);
 
+  // Show skeleton while loading
   if (isLoading) {
-    return (
-      <div className='flex justify-center items-center min-h-[400px]'>
-        <div className='animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5C3822]'></div>
-      </div>
-    );
+    return <OrderDetailsSkeleton />;
   }
 
   if (error) {
