@@ -205,11 +205,6 @@
     gap: 10px;
   }
 
-  .profile-image {
-    width: 120px;
-    height: 120px;
-  }
-
   .user-name {
     font-size: 1rem;
   }
@@ -278,11 +273,6 @@
 
   .breadcrumb-container {
     display: none;
-  }
-
-  .profile-image {
-    width: 100px;
-    height: 100px;
   }
 
   .user-name {
