@@ -201,7 +201,7 @@ const PaymentStatus = () => {
 								Check Status Again
 							</button>
 							<Link
-								to="/orders"
+								to="/user-panel/orders"
 								className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md font-medium hover:bg-gray-300 text-center"
 							>
 								View Orders
