@@ -57,7 +57,7 @@ const OrderDetails = () => {
 
   if (error) {
     return (
-      <div className='max-w-6xl mx-auto p-4 pt-28'>
+      <div className='max-w-6xl mx-auto p-4'>
         <div className='bg-red-50 border border-red-200 rounded-lg p-4'>
           <h2 className='text-red-800 font-semibold mb-2'>Error</h2>
           <p className='text-red-600'>{error}</p>
@@ -68,7 +68,7 @@ const OrderDetails = () => {
 
   if (!orderDetails) {
     return (
-      <div className='max-w-6xl mx-auto p-4 pt-28'>
+      <div className='max-w-6xl mx-auto p-4'>
         <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-4'>
           <h2 className='text-yellow-800 font-semibold mb-2'>No Order Found</h2>
           <p className='text-yellow-600'>
@@ -80,7 +80,7 @@ const OrderDetails = () => {
   }
 
   return (
-    <div className='max-w-6xl mx-auto p-4 pt-28'>
+    <div className='max-w-6xl mx-auto p-4'>
       <h1 className='text-2xl font-bold mb-6 text-gray-800'>Order Details</h1>
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
