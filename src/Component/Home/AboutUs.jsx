@@ -3,6 +3,21 @@ import leftArrow from '../../assets/svg/leftarrow.svg'; // Replace with your SVG
 import about from '../../assets/svg/about.svg'; // Replace
 
 const AboutUs = () => {
+  // Function to handle scroll to OurProducts section
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('our-products-section');
+    if (productsSection) {
+      // Calculate the scroll position (element's position from the top minus navbar height)
+      const offsetPosition =
+        productsSection.getBoundingClientRect().top + window.pageYOffset - 100;
+      // Scroll to the adjusted position
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
     <div className='bg-white py-16 px-6'>
       {/* Centered Container */}
@@ -83,8 +98,14 @@ const AboutUs = () => {
             </ul>
           </div>
 
-          {/* Button */}
-          <button className='brown-deep-button mt-4'>Shop Now</button>
+          {/* Button - Added onClick handler for smooth scrolling */}
+          <button
+            className='brown-deep-button mt-4'
+            onClick={scrollToProducts}
+            aria-label='Shop now - go to products section'
+          >
+            Shop Now
+          </button>
         </div>
       </div>
 

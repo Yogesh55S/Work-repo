@@ -11,6 +11,7 @@ import { faCamera, faTimes } from '@fortawesome/free-solid-svg-icons';
 const UserPanel = () => {
   const { token, logout } = useAuth();
   const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
   const [editMode, setEditMode] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageBase64, setImageBase64] = useState('');
@@ -32,6 +33,7 @@ const UserPanel = () => {
         return;
       }
 
+      setLoading(true); // Start loading
       try {
         const response = await fetchWithAuth('profile', token);
         // Check if response has user property
@@ -53,6 +55,8 @@ const UserPanel = () => {
         if (error.message.includes('Unauthorized')) {
           logout();
         }
+      } finally {
+        setLoading(false); // End loading regardless of success/failure
       }
     };
 
@@ -127,28 +131,46 @@ const UserPanel = () => {
             <div className='account space-y-2'>
               <p className='my-account'>My Account</p>
               <div className='profile-image-container'>
-                <div className='profile-image'>
-                  <img
-                    src={imageBase64 || blank}
-                    alt='User Avatar'
-                    className='profile-img'
-                    onError={(e) => {
-                      console.error('Image failed to load:', e);
-                      e.target.src = blank;
-                    }}
-                  />
-                </div>
-                <button
-                  className='edit-profile'
-                  onClick={() => setEditMode(true)}
-                >
-                  <FontAwesomeIcon icon={faCamera} />
-                </button>
+                {loading ? (
+                  <div className='skeleton-image'></div>
+                ) : (
+                  <div className='profile-image'>
+                    <img
+                      src={imageBase64 || blank}
+                      alt='User Avatar'
+                      className='profile-img'
+                      onError={(e) => {
+                        console.error('Image failed to load:', e);
+                        e.target.src = blank;
+                      }}
+                    />
+                  </div>
+                )}
+                {!loading && (
+                  <button
+                    className='edit-profile'
+                    onClick={() => setEditMode(true)}
+                    aria-label='Edit profile picture'
+                  >
+                    <FontAwesomeIcon icon={faCamera} />
+                  </button>
+                )}
               </div>
-              <p className='user-name'>{userData?.fullName || 'User Name'}</p>
-              <p className='user-email'>
-                {userData?.email || 'user@example.com'}
-              </p>
+              {loading ? (
+                <div className='skeleton-container'>
+                  <div className='skeleton-text skeleton-name'></div>
+                  <div className='skeleton-text skeleton-email'></div>
+                </div>
+              ) : (
+                <>
+                  <p className='user-name'>
+                    {userData?.fullName || 'User Name'}
+                  </p>
+                  <p className='user-email'>
+                    {userData?.email || 'user@example.com'}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           <ul className='sidebar-links'>

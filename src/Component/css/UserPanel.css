@@ -205,11 +205,6 @@
     gap: 10px;
   }
 
-  .profile-image {
-    width: 120px;
-    height: 120px;
-  }
-
   .user-name {
     font-size: 1rem;
   }
@@ -278,11 +273,6 @@
 
   .breadcrumb-container {
     display: none;
-  }
-
-  .profile-image {
-    width: 100px;
-    height: 100px;
   }
 
   .user-name {
@@ -435,4 +425,120 @@
 
 .image-upload-input {
   display: none; /* Hide the input element */
+}
+
+/* Skeleton Loading Animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+/* Skeleton styles for profile image */
+.skeleton-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #efe6dc 25%, #f5eee6 50%, #efe6dc 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+}
+
+/* Skeleton styles for text */
+.skeleton-text {
+  height: 16px;
+  margin: 8px auto;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #efe6dc 25%, #f5eee6 50%, #efe6dc 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite linear;
+}
+
+/* Specific dimensions for name and email skeletons */
+.skeleton-name {
+  width: 70%;
+  height: 20px;
+}
+
+.skeleton-email {
+  width: 85%;
+  height: 16px;
+  margin-bottom: 20px; /* Add bottom margin to create space between email and sidebar list */
+  padding-bottom: 20px; /* Add padding as well for extra spacing */
+  border-bottom: 1px solid transparent; /* Add invisible border to force spacing */
+}
+
+/* Add space after the account section */
+.account.space-y-2 {
+  margin-bottom: 30px; /* Increased to ensure there's a gap */
+}
+
+/* Separate container for skeleton items to ensure gap */
+.skeleton-container {
+  margin-bottom: 30px;
+}
+
+/* Responsive adjustments for skeletons */
+@media (max-width: 768px) {
+  .skeleton-name {
+    width: 60%;
+    height: 18px;
+  }
+
+  .skeleton-email {
+    width: 75%;
+    height: 14px;
+    padding-bottom: 15px;
+  }
+
+  .account.space-y-2 {
+    margin-bottom: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-name {
+    width: 50%;
+    height: 16px;
+  }
+
+  .skeleton-email {
+    width: 65%;
+    height: 12px;
+    padding-bottom: 12px;
+  }
+
+  .account.space-y-2 {
+    margin-bottom: 12px;
+  }
+}
+
+/* Responsive adjustments for skeletons */
+@media (max-width: 768px) {
+  .skeleton-name {
+    width: 60%;
+    height: 18px;
+  }
+
+  .skeleton-email {
+    width: 75%;
+    height: 14px;
+    margin-bottom: 15px; /* Slightly reduced margin for medium screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-name {
+    width: 50%;
+    height: 16px;
+  }
+
+  .skeleton-email {
+    width: 65%;
+    height: 12px;
+    margin-bottom: 12px; /* Even smaller margin for mobile screens */
+  }
 }
