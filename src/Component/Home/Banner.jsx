@@ -1,106 +1,180 @@
-import { useState, useEffect } from 'react';
-import { FaLeaf } from 'react-icons/fa'; // Import the Font Awesome Leaf icon
-import kittenImage from '../../assets/Image/banner2.png'; // Import the first image
-import yogaImage from '../../assets/Image/banner2.png'; // Import the second image
-import backgroundImage from '../../assets/Image/bannerbackground.jpeg'; // Import the background image
+import { useState, useEffect } from "react";
+import { FaLeaf } from "react-icons/fa";
 
-const banners = [
-  {
-    id: 1,
-    title: 'Transforming',
-    subtitleLine1: 'Surgical Artistry',
-    subtitleLine2: 'Unveiling Beauty',
-    buttonText: 'Our Services',
-    image: kittenImage,
-  },
-  {
-    id: 2,
-    title: 'Transforming',
-    subtitleLine1: 'Surgical Artistry',
-    subtitleLine2: 'Unveiling Beauty',
-    buttonText: 'Learn More',
-    image: yogaImage,
-  },
+// Product images as backgrounds
+import saffronOilDesktop from "../../assets/Image/banner/20.png";
+import saffronOilMobile from "../../assets/Image/banner/20m.jpeg";
+
+import hairOilDesktop from "../../assets/Image/banner/22.png";
+import hairOilMobile from "../../assets/Image/banner/20.png";
+
+import camelMilkDesktop from "../../assets/Image/banner/25.png";
+import camelMilkMobile from "../../assets/Image/banner/20.png";
+
+import handCreamDesktop from "../../assets/Image/banner/25.png";
+import handCreamMobile from "../../assets/Image/banner/20.png";
+
+const products = [
+	{
+		id: 1,
+		title: "Saffron & Gold Face Oil",
+		subtitle: "Indulge in Timeless Beauty",
+		description:
+			"A luxurious blend of over 40 herbs and oils with 24k certified gold and Kashmiri saffron",
+		buttonText: "Shop Now",
+		desktopImage: saffronOilDesktop,
+		mobileImage: saffronOilMobile,
+	},
+	{
+		id: 2,
+		title: "Energizing Hair Oil",
+		subtitle: "Transform Your Hair",
+		description:
+			"17-oil blend enriched with Vitamin E, Lavender, Fenugreek, Argan, and Almond oils",
+		buttonText: "Discover More",
+		desktopImage: hairOilDesktop,
+		mobileImage: hairOilMobile,
+	},
+	{
+		id: 3,
+		title: "Camel Milk Soap Bar",
+		subtitle: "Embrace Winter Skincare",
+		description:
+			"Plant-based therapeutic blend with camel milk's natural lactic acid for deep hydration",
+		buttonText: "View Details",
+		desktopImage: camelMilkDesktop,
+		mobileImage: camelMilkMobile,
+	},
+	{
+		id: 4,
+		title: "Restoring Hand Cream",
+		subtitle: "Pamper Your Hands",
+		description:
+			"Luxurious blend with rose absolute and helichrysum essential oils for deep nourishment",
+		buttonText: "Explore Now",
+		desktopImage: handCreamDesktop,
+		mobileImage: handCreamMobile,
+	},
 ];
 
 const Banner = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+	const [currentIndex, setCurrentIndex] = useState(0);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) =>
-        prevIndex === banners.length - 1 ? 0 : prevIndex + 1
-      );
-    }, 5000); // Change banner every 5 seconds
-    return () => clearInterval(interval); // Cleanup interval on component unmount
-  }, []);
+	useEffect(() => {
+		const interval = setInterval(() => {
+			setCurrentIndex((prevIndex) =>
+				prevIndex === products.length - 1 ? 0 : prevIndex + 1,
+			);
+		}, 6000); // Change banner every 6 seconds
+		return () => clearInterval(interval);
+	}, []);
 
-  return (
-    <div className='relative h-[100vh] md:h-[100vh]  lg:h-[100vh]'>
-      {/* Background Image */}
-      <div
-        className='absolute inset-0 bg-cover bg-center bg-no-repeat'
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Overlay to increase opacity */}
-        <div className='absolute inset-0 bg-primary opacity-5'></div>
-      </div>
+	const handleDotClick = (index) => {
+		setCurrentIndex(index);
+	};
 
-      {banners.map((banner, index) => (
-        <div
-          key={banner.id}
-          className={`absolute inset-0 mx-auto flex items-center justify-center transition-opacity duration-1000 ${
-            index === currentIndex ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <div className='w-full xs:mt-20 sm:mt-0 h-full  mx-auto flex flex-col md:flex-row items-center md:items-start px-6 md:px-8 lg:px-12 relative z-10'>
-            {/* Left Side Text */}
-            <div className='w-full md:w-[500px] xs:pt-10  flex flex-col items-start text-left space-y-3 my-auto mx-auto'>
-              {/* Leaf Icon and Natural Beauty Text */}
-              <div className='flex items-center space-x-2 text-white text-sm font-medium'>
-                <FaLeaf className='text-xl' />
-                <span>Natural Beauty</span>
-              </div>
+	return (
+		<div className="relative h-screen w-full overflow-hidden">
+			{/* Products Carousel */}
+			{products.map((product, index) => (
+				<div
+					key={product.id}
+					className={`absolute inset-0 transition-opacity duration-1000 ${
+						index === currentIndex ? "opacity-100" : "opacity-0"
+					}`}
+				>
+					{/* Background Product Image - Different for desktop vs mobile */}
+					<div className="absolute inset-0 w-full h-full">
+						{/* Desktop Background - Adjusted to be less right-focused */}
+						<div
+							className="hidden md:block absolute inset-0 bg-cover bg-center md:bg-right-top bg-no-repeat"
+							style={{
+								backgroundImage: `url(${product.desktopImage})`,
+							}}
+						/>
 
-              <h1 className='text-4xl sm:text-4xl xl:text-7xl lg:text-6xl md:text-5xl  text-white tracking-wider'>
-                {banner.title}
-              </h1>
-              <h2 className='text-3xl sm:text-3xl lg:text-5xl xl:text-5xl md:text-4xl  text-white tracking-wider'>
-                {banner.subtitleLine1}
-              </h2>
-              <h2 className='text-3xl sm:text-3xl lg:text-5xl xl:text-5xl md:text-4xl  text-white tracking-wider'>
-                {banner.subtitleLine2}
-              </h2>
-              <button className='px-6 py-2 bg-button-primary text-white text-lg shadow hover:bg-primary transition'>
-                {banner.buttonText}
-              </button>
+						{/* Mobile Background */}
+						<div
+							className="md:hidden absolute inset-0 bg-cover bg-center bg-no-repeat"
+							style={{
+								backgroundImage: `url(${product.mobileImage})`,
+							}}
+						/>
 
-              {/* Right Side with Dynamic Image */}
-              <div className=' md:hidden w-full md:w-1/2 flex items-center justify-center md:mb-0 xs:mb-10 md-sm:mb-36 sm:mb-36'>
-                <img
-                  src={banner.image}
-                  alt='Banner Image'
-                  className='w-full  md:w-full h-full'
-                />
-              </div>
-            </div>
+						{/* Overlay for better text visibility - Desktop only */}
+						<div className="hidden md:block absolute inset-0 bg-gradient-to-r from-button-primary/80 via-button-primary/10 to-transparent"></div>
+					</div>
 
-            <div className=' hidden md:block w-full md:w-1/2  items-center  justify-center mt-28'>
-              <img
-                src={banner.image}
-                alt='Banner Image'
-                className='  lg:w-[600px] lg:h-[600px]'
-              />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+					{/* Content Layer */}
+					<div className="relative z-10 h-full flex items-center">
+						{/* Mobile View - Moved up from center */}
+						<div className="md:hidden w-full h-full flex flex-col justify-center pb-80">
+							<div className="px-6 mx-auto text-center space-y-4">
+								<div className="flex items-center space-x-2 text-button-primary text-sm font-medium justify-center">
+									<FaLeaf className="text-xl" />
+									<span>Natural Beauty</span>
+								</div>
+
+								<h1 className="text-4xl text-button-primary tracking-wider font-bold">
+									{product.title}
+								</h1>
+
+								<div>
+									<button className="px-3 py-2 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4">
+										{product.buttonText}
+									</button>
+								</div>
+							</div>
+						</div>
+
+						{/* Desktop View - Full Content */}
+						<div className="hidden md:block w-full md:w-[60%] xl:w-[80%] px-6 md:px-12 lg:px-24">
+							<div className="max-w-3xl mx-auto md:mx-0 text-left  md:space-y-6">
+								<div className="flex items-center space-x-2 text-white text-sm font-medium">
+									<FaLeaf className="text-xl" />
+									<span>Natural Beauty</span>
+								</div>
+
+								<h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-wider font-bold">
+									{product.title}
+								</h1>
+
+								<h2 className="text-2xl sm:text-3xl md:text-4xl text-white tracking-wide">
+									{product.subtitle}
+								</h2>
+
+								<p className="text-lg text-white opacity-90">
+									{product.description}
+								</p>
+
+								<div>
+									<button className="px-6 py-3 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4">
+										{product.buttonText}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			))}
+
+			{/* Navigation Dots */}
+			<div className="absolute bottom-6 left-0 right-0 flex justify-center space-x-3 z-20">
+				{products.map((_, index) => (
+					<button
+						key={index}
+						onClick={() => handleDotClick(index)}
+						className={`w-3 h-3 rounded-full transition-all ${
+							index === currentIndex
+								? "bg-white w-8"
+								: "bg-white/50 hover:bg-white/80"
+						}`}
+						aria-label={`Go to slide ${index + 1}`}
+					/>
+				))}
+			</div>
+		</div>
+	);
 };
 
 export default Banner;
