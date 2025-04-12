@@ -102,7 +102,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   };
 
   return (
-    <div className='p-4 bg-gray-50'>
+    <div id='our-products-section' className='p-4 bg-gray-50'>
       <div className='max-w-[1240px] mx-auto text-center'>
         <h2 className='text-3xl md:text-5xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center'>
           Our Products
