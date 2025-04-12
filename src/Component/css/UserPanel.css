@@ -442,7 +442,7 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #efe6dc 25%, #f5eee6 50%, #efe6dc 75%);
   background-size: 200px 100%;
   animation: skeleton-loading 1.5s infinite linear;
 }
@@ -452,7 +452,7 @@
   height: 16px;
   margin: 8px auto;
   border-radius: 4px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #efe6dc 25%, #f5eee6 50%, #efe6dc 75%);
   background-size: 200px 100%;
   animation: skeleton-loading 1.5s infinite linear;
 }
@@ -473,7 +473,12 @@
 
 /* Add space after the account section */
 .account.space-y-2 {
-  margin-bottom: 20px; /* Add margin to the entire account section */
+  margin-bottom: 30px; /* Increased to ensure there's a gap */
+}
+
+/* Separate container for skeleton items to ensure gap */
+.skeleton-container {
+  margin-bottom: 30px;
 }
 
 /* Responsive adjustments for skeletons */

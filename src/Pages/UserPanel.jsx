@@ -157,10 +157,10 @@ const UserPanel = () => {
                 )}
               </div>
               {loading ? (
-                <>
+                <div className='skeleton-container'>
                   <div className='skeleton-text skeleton-name'></div>
                   <div className='skeleton-text skeleton-email'></div>
-                </>
+                </div>
               ) : (
                 <>
                   <p className='user-name'>
