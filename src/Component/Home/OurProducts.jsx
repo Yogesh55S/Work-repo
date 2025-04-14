@@ -7,39 +7,42 @@ import CardSkeleton from '../skeletons/Cardskeleton';
 const API_URL = import.meta.env.VITE_API_URL;
 
 const OurProducts = ({ showAll, hideViewAllButton }) => {
-  const [activeCategory, setActiveCategory] = useState('All'); // Keep active category state
+  const [activeCategory, setActiveCategory] = useState('All');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cardsToShow, setCardsToShow] = useState(4); // Move cardsToShow state directly into component
+  const [cardsToShow, setCardsToShow] = useState(4);
   const navigate = useNavigate();
-  const location = useLocation(); // To access the passed state (category)
+  const location = useLocation();
 
   // Extract the category from location state (if any)
-  const categoryFromState = location.state?.category || 'All'; // Default to "All" if category is not passed
+  const categoryFromState = location.state?.category || 'All';
 
   // Set the active category when coming from Care (via navigate)
   useEffect(() => {
     if (categoryFromState !== 'All') {
-      setActiveCategory(categoryFromState); // Update active category if passed
+      setActiveCategory(categoryFromState);
     }
   }, [categoryFromState]);
 
-  // Calculate number of cards to show based on screen width
+  // Calculate number of cards to show based on screen width and current page
   const calculateCardsToShow = () => {
     const screenWidth = window.innerWidth;
-    const cardWidth = 300;
-    const spaceBetweenCards = 20;
-    const totalCardWidth = cardWidth + spaceBetweenCards;
 
-    if (screenWidth >= 1440) {
-      setCardsToShow(4); // Show 4 cards for extra large screens
+    // Home page layout: specific number of cards based on screen size
+    if (!showAll) {
+      if (screenWidth >= 1440) {
+        setCardsToShow(4); // 4 products in 1 row for XL screens
+      } else if (screenWidth >= 1024) {
+        setCardsToShow(3); // 3 products in 1 row for large screens
+      } else if (screenWidth >= 768) {
+        setCardsToShow(4); // 4 products in 2 rows for medium screens (2x2)
+      } else {
+        setCardsToShow(4); // 4 products in 4 rows for small screens
+      }
     } else {
-      const calculatedSlides = Math.max(
-        1,
-        Math.floor(screenWidth / totalCardWidth)
-      );
-      setCardsToShow(calculatedSlides);
+      // Shop page - always show all products
+      setCardsToShow(Infinity);
     }
   };
 
@@ -50,14 +53,17 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     return () => {
       window.removeEventListener('resize', calculateCardsToShow);
     };
-  }, []);
+  }, [showAll]); // Re-run when showAll changes
 
-  // Fetch products from API with delay
+  // Fetch products from API with added delay
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
       try {
+        // Add a 2-second delay to observe the skeleton
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
@@ -86,7 +92,7 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
   const displayedProducts = showAll
     ? filteredProducts
-    : filteredProducts.slice(0, cardsToShow); // Use cardsToShow for dynamic display
+    : filteredProducts.slice(0, cardsToShow);
 
   const handleProductClick = (product) => {
     navigate(`/product/${product._id}`, { state: { product } });
@@ -98,7 +104,18 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
 
   // Handle category button clicks
   const handleCategoryClick = (category) => {
-    setActiveCategory(category); // Set active category locally
+    setActiveCategory(category);
+  };
+
+  // Generate dynamic grid classes based on the page type
+  const getGridClasses = () => {
+    if (showAll) {
+      // Shop page - standard responsive grid
+      return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center';
+    } else {
+      // Home page - specific layout requirements
+      return 'grid gap-4 justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
+    }
   };
 
   return (
@@ -130,40 +147,42 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
         </div>
 
         {/* Loading and Error Handling */}
-        {loading && <CardSkeleton />}
+        {loading && <CardSkeleton isHomePage={!showAll} />}
         {error && <p className='text-red-600'>Error: {error}</p>}
 
         {/* Products Grid */}
         {!loading && !error && (
-          <div className='flex flex-wrap justify-center mx-auto gap-3'>
-            {displayedProducts.length === 0 ? (
-              <p className='text-gray-600'>
-                No products found for this category.
-              </p>
-            ) : (
-              displayedProducts.map((product) => {
-                const baseUrl = API_URL.replace('/api', '');
-                const imagePath = `${baseUrl}/${product.image.replace(
-                  /\\/g,
-                  '/'
-                )}`;
-                return (
-                  <div
-                    key={product._id}
-                    className='cursor-pointer group transform transition duration-300 '
-                    onClick={() => handleProductClick(product)}
-                  >
-                    <Card
-                      name={product.productName}
-                      price={`₹${product.price}`}
-                      image={imagePath}
-                      description={product.description}
-                      productId={product._id}
-                    />
-                  </div>
-                );
-              })
-            )}
+          <div className='w-full max-w-[1240px] mx-auto'>
+            <div className={getGridClasses()}>
+              {displayedProducts.length === 0 ? (
+                <p className='text-gray-600 col-span-full text-center'>
+                  No products found for this category.
+                </p>
+              ) : (
+                displayedProducts.map((product) => {
+                  const baseUrl = API_URL.replace('/api', '');
+                  const imagePath = `${baseUrl}/${product.image.replace(
+                    /\\/g,
+                    '/'
+                  )}`;
+                  return (
+                    <div
+                      key={product._id}
+                      className='cursor-pointer group transform transition duration-300 w-full max-w-[280px]'
+                      onClick={() => handleProductClick(product)}
+                    >
+                      <Card
+                        name={product.productName}
+                        price={`₹${product.price}`}
+                        image={imagePath}
+                        description={product.description}
+                        productId={product._id}
+                      />
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         )}
 

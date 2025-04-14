@@ -1,77 +1,96 @@
 import { useState, useEffect } from 'react';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
+import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
 const CardSkeleton = () => {
-  const [skeletonsToShow, setSkeletonsToShow] = useState(4);
+  // Custom theme colors to match your design
+  const skeletonBaseColor = '#efe6dc';
+  const skeletonHighlightColor = '#f5eee6';
 
-  // Using the exact same calculation logic as Winter.jsx
-  const calculateSlidesToShow = () => {
+  // State to track number of skeletons to show based on screen size
+  const [skeletonsToShow, setSkeletonsToShow] = useState(4);
+  const [columns, setColumns] = useState(4);
+
+  // Calculate how many skeletons and columns to show based on screen width
+  const calculateSkeletonsToShow = () => {
     const screenWidth = window.innerWidth;
-    const cardWidth = 300;
-    const spaceBetweenCards = 20;
-    const totalCardWidth = cardWidth + spaceBetweenCards;
 
     if (screenWidth >= 1440) {
+      // xl breakpoint
       setSkeletonsToShow(4);
+      setColumns(4);
+    } else if (screenWidth >= 1024) {
+      // lg breakpoint
+      setSkeletonsToShow(3);
+      setColumns(3);
+    } else if (screenWidth >= 768) {
+      // md breakpoint
+      setSkeletonsToShow(2);
+      setColumns(2);
     } else {
-      // Matching Winter.jsx exactly
-      const calculatedSlides = Math.floor(screenWidth / totalCardWidth);
-      setSkeletonsToShow(calculatedSlides);
+      setSkeletonsToShow(1);
+      setColumns(1);
     }
   };
 
+  // Add window resize listener to update skeleton count
   useEffect(() => {
-    calculateSlidesToShow();
-    window.addEventListener('resize', calculateSlidesToShow);
+    calculateSkeletonsToShow();
+    window.addEventListener('resize', calculateSkeletonsToShow);
     return () => {
-      window.removeEventListener('resize', calculateSlidesToShow);
+      window.removeEventListener('resize', calculateSkeletonsToShow);
     };
   }, []);
 
-  return (
-    <SkeletonTheme baseColor='#efe6dc' highlightColor='#f5eee6'>
-      <div className='relative w-full'>
-        <div className='flex' style={{ margin: '0 -10px' }}>
-          {/* Display skeletonToShow cards exactly like Winter.jsx */}
-          {Array(skeletonsToShow || 1)
-            .fill()
-            .map((_, index) => (
-              <div
-                key={index}
-                className='cursor-pointer'
-                style={{
-                  padding: '0 10px',
-                  width: `${100 / Math.max(skeletonsToShow, 1)}%`,
-                }}
-              >
-                <div className='max-w-[300px] w-full mx-auto'>
-                  <div className='animate-pulse flex flex-col'>
-                    {/* Image placeholder */}
-                    <div className='relative overflow-hidden'>
-                      <Skeleton
-                        className='rounded-lg'
-                        height={400}
-                        width='100%'
-                      />
-                    </div>
+  // Generate grid style based on columns
+  const gridStyle = {
+    display: 'grid',
+    gridTemplateColumns: `repeat(${columns}, 1fr)`,
+    gap: '1rem',
+    justifyItems: 'center',
+  };
 
-                    {/* Title and price container */}
-                    <div className='text-center mt-4 w-full'>
-                      <Skeleton
-                        className='mb-2 rounded'
-                        height={20}
-                        width='75%'
-                      />
-                      <Skeleton className='rounded' height={20} width='25%' />
-                    </div>
-                  </div>
-                </div>
+  return (
+    <div className='w-full max-w-[1240px] mx-auto'>
+      <div style={gridStyle}>
+        {/* Generate the appropriate number of skeleton cards based on screen size */}
+        {Array(skeletonsToShow)
+          .fill()
+          .map((_, idx) => (
+            <div key={idx} className='w-full max-w-[280px]'>
+              <div className='p-3 shadow-sm rounded-lg'>
+                {/* Image skeleton */}
+                <Skeleton
+                  height='400px'
+                  width='100%'
+                  baseColor={skeletonBaseColor}
+                  highlightColor={skeletonHighlightColor}
+                  borderRadius={8}
+                  className='mb-3'
+                />
+
+                {/* Product name skeleton */}
+                <Skeleton
+                  height={24}
+                  width='80%'
+                  baseColor={skeletonBaseColor}
+                  highlightColor={skeletonHighlightColor}
+                  className='mb-2'
+                />
+
+                {/* Price skeleton */}
+                <Skeleton
+                  height={20}
+                  width='40%'
+                  baseColor={skeletonBaseColor}
+                  highlightColor={skeletonHighlightColor}
+                  className='mb-2'
+                />
               </div>
-            ))}
-        </div>
+            </div>
+          ))}
       </div>
-    </SkeletonTheme>
+    </div>
   );
 };
 
