@@ -1,24 +1,73 @@
-import { useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 import RelatedProducts from './RelatedProducts';
 import { toast } from 'react-toastify';
 import { useCart } from './providers/CartContext';
+import ProductDetailSkeleton from './skeletons/ProductDetailSkeleton';
 
 const ProductDetail = () => {
   const { updateCartCount } = useCart();
   const location = useLocation();
-  const product = location.state?.product;
+  const { productId } = useParams();
+  const [product, setProduct] = useState(location.state?.product);
+  const [loading, setLoading] = useState(true); // Always start with loading
+  const [mainImage, setMainImage] = useState('');
+  const [images, setImages] = useState([]);
 
-  if (!product) {
-    return <div className='text-center text-gray-600'>Product not found.</div>;
-  }
+  useEffect(() => {
+    const fetchProductData = async () => {
+      try {
+        setLoading(true);
 
-  const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-  const mainImage = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
-  const images = product.images || [mainImage];
+        // If we have product from location state, we still simulate loading
+        if (location.state?.product) {
+          const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+          const mainImg = `${baseUrl}/${location.state.product.image.replace(
+            /\\/g,
+            '/'
+          )}`;
+          setMainImage(mainImg);
+          setImages(location.state.product.images || [mainImg]);
+        }
+        // Otherwise fetch from API
+        else if (productId) {
+          // Real API call + delay for testing
+          await new Promise((resolve) => setTimeout(resolve, 1500));
+          const response = await fetch(
+            `${import.meta.env.VITE_API_URL}/products/${productId}`
+          );
+
+          if (response.ok) {
+            const productData = await response.json();
+            setProduct(productData);
+
+            const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+            const mainImg = `${baseUrl}/${productData.image.replace(
+              /\\/g,
+              '/'
+            )}`;
+            setMainImage(mainImg);
+            setImages(productData.images || [mainImg]);
+          } else {
+            toast.error('Error fetching product details');
+          }
+        } else {
+          toast.error('No product information available');
+        }
+      } catch (error) {
+        console.error('Error loading product:', error);
+        toast.error('Failed to load product details');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProductData();
+  }, [productId, location.state?.product]);
 
   const handleAddToCart = async () => {
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user')); // Retrieve user from localStorage
+    const user = JSON.parse(localStorage.getItem('user'));
     const userId = user?._id;
 
     if (!token || !userId) {
@@ -53,6 +102,18 @@ const ProductDetail = () => {
     }
   };
 
+  // Show skeleton while loading
+  if (loading) {
+    return <ProductDetailSkeleton />;
+  }
+
+  // Show error message if product not found
+  if (!product) {
+    return (
+      <div className='text-center text-gray-600 pt-28'>Product not found.</div>
+    );
+  }
+
   return (
     <div className='max-w-full mx-auto p-4 pt-28'>
       <div className='container mx-auto lg:w-[1240px]'>
@@ -61,7 +122,7 @@ const ProductDetail = () => {
           <div className='w-full md:w-[40%]'>
             <img
               src={mainImage}
-              alt='Product'
+              alt={product.productName}
               className='w-full h-auto object-cover shadow'
             />
             <div className='flex mt-4 space-x-4'>
@@ -69,20 +130,21 @@ const ProductDetail = () => {
                 <img
                   key={index}
                   src={img}
-                  alt={`Thumbnail ${index}`}
+                  alt={`${product.productName} thumbnail ${index + 1}`}
                   className={`w-16 h-16 object-cover shadow cursor-pointer ${
                     mainImage === img ? 'ring-2 ring-button-primary' : ''
                   }`}
+                  onClick={() => setMainImage(img)}
                 />
               ))}
             </div>
           </div>
 
-          {/* Product Details */}
+          {/* Rest of your component remains the same */}
           <div className='w-full md:w-[60%]'>
             <h1 className='text-2xl mb-4 font-bold'>{product.productName}</h1>
             <p className='text-gray-700 mb-6'>{product.description}</p>
-            <p className='text-green-600 mb-4 text-lg font-semibold '>
+            <p className='text-green-600 mb-4 text-lg font-semibold'>
               ₹{product.price}
             </p>
 
