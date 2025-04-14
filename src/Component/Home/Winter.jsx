@@ -43,15 +43,15 @@ const Winter = () => {
 
   const calculateSlidesToShow = () => {
     const screenWidth = window.innerWidth;
-    const cardWidth = 300;
-    const spaceBetweenCards = 20;
-    const totalCardWidth = cardWidth + spaceBetweenCards;
 
     if (screenWidth >= 1440) {
       setSlidesToShow(4);
+    } else if (screenWidth >= 1024) {
+      setSlidesToShow(3);
+    } else if (screenWidth >= 768) {
+      setSlidesToShow(2);
     } else {
-      const calculatedSlides = Math.floor(screenWidth / totalCardWidth);
-      setSlidesToShow(calculatedSlides);
+      setSlidesToShow(1);
     }
   };
 
@@ -102,21 +102,23 @@ const Winter = () => {
             <Slider ref={sliderRef} {...settings}>
               {products.map((product) => (
                 <div
-                  className='cursor-pointer flex flex-wrap justify-center mx-auto gap-3'
                   key={product._id}
-                  style={{ padding: '0 10px' }}
                   onClick={() => handleProductClick(product)}
+                  className='cursor-pointer px-2' // Add horizontal padding for spacing
                 >
-                  <Card
-                    name={product.productName}
-                    price={`₹${product.price}`}
-                    image={`${API_URL.replace(
-                      '/api',
-                      ''
-                    )}/${product.image.replace(/\\/g, '/')}`}
-                    product={product}
-                    productId={product._id}
-                  />
+                  {/* Match the grid item structure from OurProducts */}
+                  <div className='w-full max-w-[280px] mx-auto transform transition duration-300'>
+                    <Card
+                      name={product.productName}
+                      price={`₹${product.price}`}
+                      image={`${API_URL.replace(
+                        '/api',
+                        ''
+                      )}/${product.image.replace(/\\/g, '/')}`}
+                      product={product}
+                      productId={product._id}
+                    />
+                  </div>
                 </div>
               ))}
             </Slider>
