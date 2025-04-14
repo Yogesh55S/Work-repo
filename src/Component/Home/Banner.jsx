@@ -2,17 +2,17 @@ import { useState, useEffect } from "react";
 import { FaLeaf } from "react-icons/fa";
 
 // Product images as backgrounds
-import saffronOilDesktop from "../../assets/Image/banner/20.png";
-import saffronOilMobile from "../../assets/Image/banner/20m.jpeg";
+import saffronOilDesktop from "../../assets/Image/banner/safronOilDesktop.png";
+import saffronOilMobile from "../../assets/Image/banner/safronOilMobile.png";
 
-import hairOilDesktop from "../../assets/Image/banner/22.png";
-import hairOilMobile from "../../assets/Image/banner/20.png";
+import hairOilDesktop from "../../assets/Image/banner/hairOilDesktop.png";
+import hairOilMobile from "../../assets/Image/banner/hairoilMobile.png";
 
-import camelMilkDesktop from "../../assets/Image/banner/25.png";
-import camelMilkMobile from "../../assets/Image/banner/20.png";
+import camelMilkDesktop from "../../assets/Image/banner/sopBarDesktop.png";
+import camelMilkMobile from "../../assets/Image/banner/sopBarMobile.png";
 
-import handCreamDesktop from "../../assets/Image/banner/25.png";
-import handCreamMobile from "../../assets/Image/banner/20.png";
+import handCreamDesktop from "../../assets/Image/banner/BodyOilDesktop.png";
+import handCreamMobile from "../../assets/Image/banner/BodyoilMobile.png";
 
 const products = [
 	{
