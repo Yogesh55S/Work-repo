@@ -31,8 +31,7 @@ const ProductDetail = () => {
         }
         // Otherwise fetch from API
         else if (productId) {
-          // Real API call + delay for testing
-          await new Promise((resolve) => setTimeout(resolve, 1500));
+          // API call
           const response = await fetch(
             `${import.meta.env.VITE_API_URL}/products/${productId}`
           );
