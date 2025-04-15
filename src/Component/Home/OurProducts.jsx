@@ -55,15 +55,12 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
     };
   }, [showAll]); // Re-run when showAll changes
 
-  // Fetch products from API with added delay
+  // Fetch products from API
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
       try {
-        // Add a 2-second delay to observe the skeleton
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
         const response = await fetch(`${API_URL}/products`);
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);

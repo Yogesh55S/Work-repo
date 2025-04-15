@@ -14,9 +14,6 @@ const GoogleAuthProvider = ({ children }) => {
     const token = response.credential; // Get Google JWT token
     const userData = parseJwt(token); // Parse the token to extract user data
 
-    console.log('Google Token received:', token);
-    console.log('Google User Data:', userData);
-
     // Save Google token and user data using AuthContext's login
     login(userData, token);
   };
