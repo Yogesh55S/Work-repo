@@ -109,7 +109,7 @@ const PaymentStatus = () => {
 
 						<div className="mt-8">
 							<Link
-								to="/orders"
+								to="/user-panel/orders"
 								className="block w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600 text-center"
 							>
 								View Your Orders
