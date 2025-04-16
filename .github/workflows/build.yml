@@ -1,0 +1,92 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main # Trigger workflow on pushes to the main branch
+
+permissions:
+  contents: write # Required to create and push branches
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20 # Specify your Node.js version
+
+      # Step 3: Cache dependencies
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Step 5: Set environment variables
+      - name: Set environment variables
+        run: |
+          echo "VITE_API_URL=${{ secrets.VITE_API_URL }}" >> $GITHUB_ENV
+          echo "VITE_IMAGE_BASE_URL=${{ secrets.VITE_IMAGE_BASE_URL }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "VITE_EMAILJS_SERVICE_ID=${{ secrets.VITE_EMAILJS_SERVICE_ID }}" >> $GITHUB_ENV
+          echo "VITE_EMAILJS_TEMPLATE_ID=${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}" >> $GITHUB_ENV
+          echo "VITE_EMAILJS_USER_ID=${{ secrets.VITE_EMAILJS_USER_ID }}" >> $GITHUB_ENV
+          echo "VITE_FRONTEND_URL=${{ secrets.VITE_FRONTEND_URL }}" >> $GITHUB_ENV
+
+      # Step 6: Build the project
+      - name: Build the project
+        run: npm run build
+
+      # Step 7: Deploy build contents to deploy branch
+      - name: Deploy build to deploy branch
+        env:
+          TEST_GITHUB_TOKEN: ${{ secrets.TEST_GITHUB_TOKEN }}
+        run: |
+          # Configure Git
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+          # Authenticate using TEST_GITHUB_TOKEN
+          git remote set-url origin https://x-access-token:${TEST_GITHUB_TOKEN}@github.com/${{ github.repository }}
+
+          # Create or switch to the deploy branch
+          git fetch origin
+          if git rev-parse --verify origin/deploy; then
+            git checkout deploy
+            git pull origin deploy
+          else
+            git checkout --orphan deploy
+          fi
+
+          # Clean the deploy branch
+          git rm -rf . > /dev/null 2>&1 || true
+
+          # Copy all contents from the build directory
+          cp -r dist/* .
+
+          # Clean the deploy branch
+          rm -rf dist node_modules
+
+          # Add changes and commit if there are any
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes detected, skipping commit"
+          else
+            BUILD_VERSION=$(date +'%Y.%m.%d.%H%M%S') # Timestamp for versioning
+            git commit -m "Deploy build version $BUILD_VERSION"
+            git push origin deploy --force
+          fi

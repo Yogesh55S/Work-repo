@@ -17,6 +17,7 @@ import Home from "./Pages/Home";
 
 // Lazy load all other components
 const WinterCollection = lazy(() => import("./Pages/WinterCollection"));
+const NotFound = lazy(() => import("./Pages/Notfound"));
 const Shop = lazy(() => import("./Pages/Shop"));
 const Contact = lazy(() => import("./Pages/Contact"));
 const Cart = lazy(() => import("./Pages/Cart"));
@@ -181,6 +182,14 @@ function App() {
 								</div>
 							)}
 							<Routes>
+								<Route
+									path="*"
+									element={
+										<Suspense fallback={<Loader />}>
+											<NotFound />
+										</Suspense>
+									}
+								/>
 								{/* Home route is not lazy loaded */}
 								<Route path="/" element={<Home />} />
 
