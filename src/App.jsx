@@ -15,7 +15,7 @@ import Loader from "./Component/gifloader";
 // Import Home component normally (not lazy-loaded)
 import Home from "./Pages/Home";
 
-// Lazy load all other components
+// Lazy load all components
 const WinterCollection = lazy(() => import("./Pages/WinterCollection"));
 const NotFound = lazy(() => import("./Pages/Notfound"));
 const Shop = lazy(() => import("./Pages/Shop"));
