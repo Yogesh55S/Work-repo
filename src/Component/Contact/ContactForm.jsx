@@ -58,25 +58,18 @@ const ContactForm = () => {
 
     if (!serviceID || !templateID || !userID) {
       setStatus('Missing environment variables for EmailJS.');
-      console.log(serviceID, templateID, userID); // Log for debugging
       return;
     }
 
     try {
       // Send email using EmailJS
-      const result = await emailjs.send(
-        serviceID,
-        templateID,
-        templateParams,
-        userID
-      );
+      await emailjs.send(serviceID, templateID, templateParams, userID);
       setStatus('Message sent successfully!');
       setName(''); // Reset name field
       setEmail(''); // Reset email field
       setPhone(''); // Reset phone field
       setMessage(''); // Reset message field
       setSubject(''); // Reset subject field
-      console.log(result.text); // You can also log the result for debugging
     } catch (error) {
       setStatus('Failed to send message.');
       console.error('Error sending message:', error); // Log error for debugging

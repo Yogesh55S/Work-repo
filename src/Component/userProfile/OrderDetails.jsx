@@ -27,11 +27,6 @@ const OrderDetails = () => {
           throw new Error('No order ID provided');
         }
 
-        // For development only: add a delay to see the skeleton
-        if (import.meta.env.DEV) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
         const data = await fetchWithAuth(`orders/details/${id}`, token);
 
         if (!data || !data.order) {
