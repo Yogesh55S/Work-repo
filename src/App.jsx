@@ -15,6 +15,8 @@ import Loader from "./Component/gifloader";
 // Import Home component normally (not lazy-loaded)
 import Home from "./Pages/Home";
 
+import PrivacyPolicy from "./Pages/privacyPolicy";
+
 // Lazy load all components
 const WinterCollection = lazy(() => import("./Pages/WinterCollection"));
 const NotFound = lazy(() => import("./Pages/Notfound"));
@@ -342,6 +344,8 @@ function App() {
 									/>
 									<Route path="help-support" element={<HelpSupport />} />
 								</Route>
+
+								<Route path="privacy-policy" element={<PrivacyPolicy />} />
 							</Routes>
 							<Footer />
 							<ToastContainer

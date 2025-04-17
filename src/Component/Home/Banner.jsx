@@ -31,7 +31,7 @@ const products = [
 		subtitle: "Transform Your Hair",
 		description:
 			"17-oil blend enriched with Vitamin E, Lavender, Fenugreek, Argan, and Almond oils",
-		buttonText: "Discover More",
+		buttonText: "Shop Now",
 		desktopImage: hairOilDesktop,
 		mobileImage: hairOilMobile,
 	},
@@ -41,7 +41,7 @@ const products = [
 		subtitle: "Embrace Winter Skincare",
 		description:
 			"Plant-based therapeutic blend with camel milk's natural lactic acid for deep hydration",
-		buttonText: "View Details",
+		buttonText: "Shop Now",
 		desktopImage: camelMilkDesktop,
 		mobileImage: camelMilkMobile,
 	},
@@ -51,7 +51,7 @@ const products = [
 		subtitle: "Pamper Your Hands",
 		description:
 			"Luxurious blend with rose absolute and helichrysum essential oils for deep nourishment",
-		buttonText: "Explore Now",
+		buttonText: "Shop Now",
 		desktopImage: handCreamDesktop,
 		mobileImage: handCreamMobile,
 	},

@@ -1,14 +1,31 @@
-import { FiInstagram } from "react-icons/fi"; // Import the email icon FiMail
+import { FiInstagram } from "react-icons/fi";
 import { FiFacebook } from "react-icons/fi";
-import smallrose from "../assets/svg/smallrose.svg"; // Import your SVG
-import locationIcon from "../assets/svg/location.svg"; // Location SVG
-import phoneIcon from "../assets/svg/phonenumber.svg"; // Phone number SVG
-import emailIcon from "../assets/svg/footeremail.svg"; // Email SVG
+import smallrose from "../assets/svg/smallrose.svg";
+import locationIcon from "../assets/svg/location.svg";
+import phoneIcon from "../assets/svg/phonenumber.svg";
+import emailIcon from "../assets/svg/footeremail.svg";
 
 const Footer = () => {
+	// URLs and paths
+	const shopCategoryLinks = {
+		skinCare: "/shop",
+		bodyCare: "/shop",
+		hairCare: "/shop",
+		soapBars: "/shop",
+	};
+
+	// Address for Google Maps
+	const addressForMap =
+		"41, RAJASTHALI APARTMENT, C-1 Rd, Block C-2, Pocket 2, Sector 16C, Pitampura, Delhi, 110034";
+	const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressForMap)}`;
+
+	// Contact information
+	const phoneNumber = "+91 96432 48874";
+	const emailAddress = "nidaspure2@gmail.com";
+
 	return (
 		<footer className="bg-white border-t border-[#5C3822] font-bold">
-			<div className="container max-w-[1240px] mx-auto px-6 lg:py-10  py-5">
+			<div className="container max-w-[1240px] mx-auto px-6 lg:py-10 py-5">
 				<div className="grid grid-cols-1 lg:grid-cols-3 gap-20 text-center lg:text-left md:grid-cols-3 lg:gap-10 md:gap-5 md:items-center">
 					{/* About Us Section with background image */}
 					<div
@@ -19,10 +36,10 @@ const Footer = () => {
 							backgroundSize: "contain",
 						}}
 					>
-						<div className="relative  md:text-left lg:pb-[40px] xl:pb-[70px]">
+						<div className="relative md:text-left lg:pb-[40px] xl:pb-[70px]">
 							<h3 className="text-lg font-bold text-gray-800">About Us</h3>
 							<p className="text-gray-600 mt-4">
-								Rooted in ancient Indian herbal wisdom, Nida’s Pure prepares
+								Rooted in ancient Indian herbal wisdom, Nida's Pure prepares
 								100% natural, handmade products designed to nourish your natural
 								beauty with a promise of purity and ayurveda.
 							</p>
@@ -31,27 +48,39 @@ const Footer = () => {
 
 					{/* Shop by Category Section */}
 					<div className="lg:mb-0 md:mb-5 w-[180px] md:mx-auto text-left">
-						<h3 className="text-lg font-bold text-gray-800  lg:px-0 text-left  md:text-left ">
+						<h3 className="text-lg font-bold text-gray-800 lg:px-0 text-left md:text-left">
 							Shop by category
 						</h3>
 						<ul className="text-gray-600 mt-3 space-y-1 text-[16px] text-left md:text-left">
 							<li>
-								<a href="#" className="hover:text-black">
+								<a
+									href={shopCategoryLinks.skinCare}
+									className="hover:text-black"
+								>
 									Skin Care
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-black">
+								<a
+									href={shopCategoryLinks.bodyCare}
+									className="hover:text-black"
+								>
 									Body care
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-black">
+								<a
+									href={shopCategoryLinks.hairCare}
+									className="hover:text-black"
+								>
 									Hair Care
 								</a>
 							</li>
 							<li>
-								<a href="#" className="hover:text-black">
+								<a
+									href={shopCategoryLinks.soapBars}
+									className="hover:text-black"
+								>
 									Soap Bars
 								</a>
 							</li>
@@ -72,10 +101,15 @@ const Footer = () => {
 										className="w-full h-full object-contain"
 									/>
 								</div>
-								<p className="text-gray-600">
+								<a
+									href={mapUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-gray-600 hover:text-black"
+								>
 									41, RAJASTHALI APARTMENT, C-1 Rd, Block C-2, Pocket 2, Sector
 									16C, Pitampura, Delhi, 110034
-								</p>
+								</a>
 							</li>
 							<li className="flex md:items-start space-x-4">
 								<div className="w-[38px] h-auto flex items-center justify-center">
@@ -85,7 +119,12 @@ const Footer = () => {
 										className="w-full h-full object-contain"
 									/>
 								</div>
-								<p className="text-gray-600">+91 96432 48874</p>
+								<a
+									href={`tel:${phoneNumber}`}
+									className="text-gray-600 hover:text-black"
+								>
+									{phoneNumber}
+								</a>
 							</li>
 							<li className="flex md:items-start space-x-4">
 								<div className="w-[40px] h-auto flex items-center justify-center">
@@ -95,7 +134,12 @@ const Footer = () => {
 										className="w-full h-full object-contain"
 									/>
 								</div>
-								<p className="text-gray-600">nidaspure2@gmail.com</p>
+								<a
+									href={`mailto:${emailAddress}`}
+									className="text-gray-600 hover:text-black"
+								>
+									{emailAddress}
+								</a>
 							</li>
 						</ul>
 					</div>
@@ -105,16 +149,34 @@ const Footer = () => {
 			{/* Bottom Section */}
 			<div className="w-full bg-button-primary h-20 flex justify-between items-center px-6 lg:px-40">
 				{/* Left Section */}
-				<p className="text-white md:text-[16px] text-[13px] text-left xl:ml-[-50px] lg:ml-[-150px] md:ml-[-15px]">
-					© 2024 YourCompany. All Rights Reserved.
-				</p>
+				<div className="text-white md:text-[16px] text-[13px] text-left xl:ml-[-50px] lg:ml-[-150px] md:ml-[-15px]">
+					<p>
+						© 2024 YourCompany. All Rights Reserved.
+						<a
+							href="/privacy-policy"
+							className="ml-2 underline hover:text-[#f8bdb9]"
+						>
+							Privacy Policy
+						</a>
+					</p>
+				</div>
 
 				{/* Right Section */}
 				<div className="flex space-x-4 xl:mr-[-30px] lg:mr-[-140px] md:mr-[-10px]">
-					<a href="#" className="text-white hover:text-[#f8bdb9]">
+					<a
+						href="https://www.facebook.com/nidaspure"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-white hover:text-[#f8bdb9]"
+					>
 						<FiFacebook size={20} />
 					</a>
-					<a href="#" className="text-white hover:text-[#f8bdb9]">
+					<a
+						href="https://www.instagram.com/nidaspure"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-white hover:text-[#f8bdb9]"
+					>
 						<FiInstagram size={20} />
 					</a>
 				</div>
