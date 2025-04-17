@@ -32,8 +32,8 @@
 
 // export default WinterBanner;
 
-import winterCollection from "../../assets/Image/SummerCollection.png";
-import winterCollectionmobile from "../../assets/Image/SummerCollectionmobile.png";
+import winterCollection from "../../assets/Image/banner/SummerCollection.png";
+import winterCollectionmobile from "../../assets/Image/banner/summercollectionmobile.png";
 
 const WinterBanner = () => {
 	return (
