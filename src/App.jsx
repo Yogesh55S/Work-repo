@@ -15,7 +15,7 @@ import Loader from "./Component/gifloader";
 // Import Home component normally (not lazy-loaded)
 import Home from "./Pages/Home";
 
-import PrivacyPolicy from "./Pages/privacyPolicy";
+import PrivacyPolicy from "./Pages/PrivicyPolicy";
 
 // Lazy load all components
 const WinterCollection = lazy(() => import("./Pages/WinterCollection"));
