@@ -197,7 +197,7 @@ function App() {
 
 								{/* All other routes are lazy loaded */}
 								<Route
-									path="/winter-collection"
+									path="/summer-collection"
 									element={
 										<Suspense fallback={<Loader />}>
 											<WinterCollection />

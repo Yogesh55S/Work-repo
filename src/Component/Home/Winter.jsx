@@ -87,11 +87,11 @@ const Winter = () => {
 		>
 			<div className="max-w-[1240px] h-[600px] mx-auto relative w-full">
 				<h2 className="text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center">
-					Our Winter Collection
+					Our Summer Collection
 				</h2>
 				<p className="text-sm md:text-base text-gray-600 mb-8 xs:text-center">
-					Discover our exclusive winter collection, designed to keep your skin
-					and body healthy and nourished during the cold months.
+					Discover our exclusive summer collection, designed to keep your skin
+					and body healthy and hydrated throughout the warm seasons.
 				</p>
 
 				{loading ? (

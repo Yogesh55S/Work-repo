@@ -56,6 +56,10 @@ const products = [
 		mobileImage: handCreamMobile,
 	},
 ];
+const redirectToShop = () => {
+	// Replace with your shop URL
+	window.location.href = "/shop";
+};
 
 const Banner = () => {
 	const [currentIndex, setCurrentIndex] = useState(0);
@@ -120,7 +124,10 @@ const Banner = () => {
 								</h1>
 
 								<div>
-									<button className="px-3 py-2 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4">
+									<button
+										className="px-3 py-2 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4"
+										onClick={redirectToShop}
+									>
 										{product.buttonText}
 									</button>
 								</div>
@@ -148,7 +155,10 @@ const Banner = () => {
 								</p>
 
 								<div>
-									<button className="px-6 py-3 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4">
+									<button
+										className="px-6 py-3 bg-button-primary text-white text-lg shadow-lg hover:bg-primary transition rounded-md mt-4"
+										onClick={redirectToShop}
+									>
 										{product.buttonText}
 									</button>
 								</div>
