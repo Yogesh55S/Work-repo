@@ -21,7 +21,7 @@ const ProductDetail = () => {
 
 				// If we have product from location state, we still simulate loading
 				if (location.state?.product) {
-					const baseUrl = import.meta.env.VITE_API_URL.replace("/api", "");
+					const baseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
 					const mainImg = `${baseUrl}/${location.state.product.image.replace(
 						/\\/g,
 						"/",
