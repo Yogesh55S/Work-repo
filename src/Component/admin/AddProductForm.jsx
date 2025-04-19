@@ -12,12 +12,14 @@ const AddProductForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     // Fetch fields dynamically from the backend
     const fetchFields = async () => {
       try {
         const response = await axios.get(
-          'http://localhost:8000/api/products/fields'
+          `${API_URL}/products/fields`,
         );
         const fetchedFields = response.data;
         setFields(fetchedFields);
