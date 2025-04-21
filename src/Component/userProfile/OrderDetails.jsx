@@ -44,13 +44,11 @@ const OrderDetails = () => {
 			return "bg-green-100  text-black border border-green-200";
 		} else if (
 			status === "pending" ||
-			status === "processing" ||
 			status === "shipped"
 		) {
 			return "bg-yellow-100  text-black border border-yellow-200";
 		} else if (
 			status === "cancelled" ||
-			status === "canceled" ||
 			status === "failed"
 		) {
 			return "bg-red-100  text-black border border-red-200";
