@@ -1,43 +1,38 @@
-import { createContext, useState, useContext, useEffect } from 'react';
-
-const AuthContext = createContext();
-
-// Custom hook to use the AuthContext
-// Warning: Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-// Added import for prop-validation here
+import React, { createContext, useState, useEffect } from 'react';
+import { useCart } from './CartContext';
+import GuestCartService from '../../services/GuestCartService';
 import PropTypes from 'prop-types';
 
+export const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
-  // State Management
-  const [cart, setCart] = useState(
-    JSON.parse(localStorage.getItem('cart')) || []
-  );
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem('authToken')
-  );
-  const [token, setToken] = useState(localStorage.getItem('authToken') || null);
-  const [userRole, setUserRole] = useState(
-    localStorage.getItem('userRole') || ''
-  );
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem('user')) || null
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
+  const [userRole, setUserRole] = useState('');
+  const [cart, setCart] = useState([]);
+
+  // Get cart context (note: this might cause a circular dependency issue -
+  // make sure useCart is imported correctly or alternatively pass cartContext as a prop)
+  const { transferGuestCartToUser } = useCart() || {};
 
   // Function to log in the user
-  const login = (userData, authToken) => {
+  const login = async (userData, authToken) => {
     setIsLoggedIn(true);
-    setToken(authToken); // Set the token in state
-    setUser(userData); // Set the user data
-    setUserRole(userData?.role || ''); // Set user role
+    setToken(authToken);
+    setUser(userData);
+    setUserRole(userData?.role || '');
 
-    // Store data in localStorage for persistence
-    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('token', authToken);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('userRole', userData?.role || '');
+
+    // Transfer guest cart to user account
+    if (GuestCartService.getCart().length > 0) {
+      setTimeout(() => {
+        transferGuestCartToUser && transferGuestCartToUser();
+      }, 1000);
+    }
   };
 
   // Function to log out the user
@@ -48,38 +43,25 @@ export const AuthProvider = ({ children }) => {
     setUserRole('');
     setCart([]);
 
-    // Clear localStorage data
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('userRole');
     localStorage.removeItem('cart');
   };
 
-  // Function to manage cart
-  const addToCart = (productId, quantity) => {
-    const updatedCart = [...cart, { productId, quantity }];
-    setCart(updatedCart);
-    localStorage.setItem('cart', JSON.stringify(updatedCart));
-  };
-
   // Ensure token and user data persist after a page refresh
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('user');
+    const storedToken = localStorage.getItem('token');
+    const storedUser = JSON.parse(localStorage.getItem('user') || 'null');
+    const storedUserRole = localStorage.getItem('userRole');
 
     if (storedToken && storedUser) {
       setToken(storedToken);
-      setUser(JSON.parse(storedUser));
+      setUser(storedUser);
+      setUserRole(storedUserRole);
       setIsLoggedIn(true);
     }
   }, []);
-
-  const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
-
-  // PropTypes validation for the AuthProvider component
-  AuthProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-  };
 
   return (
     <AuthContext.Provider
@@ -88,14 +70,21 @@ export const AuthProvider = ({ children }) => {
         token,
         user,
         userRole,
-        cart,
-        addToCart,
-        logout,
         login,
-        cartCount,
+        logout,
+        cart,
+        setCart,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
+};
+
+export const useAuth = () => {
+  const context = React.useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
