@@ -3,14 +3,17 @@ import { useLocation, useParams } from 'react-router-dom';
 import RelatedProducts from './RelatedProducts';
 import { toast } from 'react-toastify';
 import { useCart } from './providers/CartContext';
+import { useAuth } from './providers/AuthContext';
 import ProductDetailSkeleton from './skeletons/ProductDetailSkeleton';
 
 const ProductDetail = () => {
-  const { addToCart } = useCart();
+  const { addToCart, updateCartCount } = useCart();
+  const { isLoggedIn, user } = useAuth();
   const location = useLocation();
   const { productId } = useParams();
   const [product, setProduct] = useState(location.state?.product);
   const [loading, setLoading] = useState(true);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [mainImage, setMainImage] = useState('');
   const [images, setImages] = useState([]);
 
@@ -62,17 +65,66 @@ const ProductDetail = () => {
   }, [productId, location.state?.product]);
 
   const handleAddToCart = async () => {
-    try {
-      const success = await addToCart(product, 1);
+    if (isAddingToCart) return; // Prevent multiple clicks
 
-      if (success) {
-        toast.success('Product added to cart successfully!');
+    try {
+      setIsAddingToCart(true);
+
+      // Immediately show loading toast for better UX
+      const toastId = toast.loading('Adding to cart...');
+
+      // For logged in users, make direct API call to avoid double fetching
+      if (isLoggedIn && user?._id) {
+        const token = localStorage.getItem('token');
+        const userId = user._id;
+
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/cart/${userId}/add`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              productId: product._id,
+              quantity: 1,
+            }),
+          }
+        );
+
+        if (response.ok) {
+          // Update cart count without refetching all user data
+          updateCartCount(userId);
+          toast.update(toastId, {
+            render: 'Product added to cart successfully!',
+            type: 'success',
+            isLoading: false,
+            autoClose: 2000,
+          });
+        } else {
+          throw new Error('Failed to add product to cart');
+        }
       } else {
-        toast.error('Failed to add product to cart.');
+        // Use addToCart for guest users
+        const success = await addToCart(product, 1);
+
+        if (success) {
+          toast.update(toastId, {
+            render: 'Product added to cart successfully!',
+            type: 'success',
+            isLoading: false,
+            autoClose: 2000,
+          });
+        } else {
+          throw new Error('Failed to add product to cart');
+        }
       }
     } catch (error) {
       console.error('Error adding product to cart:', error);
       toast.error('An error occurred while adding the product to the cart.');
+    } finally {
+      setIsAddingToCart(false);
     }
   };
 
@@ -114,7 +166,7 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {/* Rest of your component remains the same */}
+          {/* Product details section */}
           <div className='w-full md:w-[60%]'>
             <h1 className='text-2xl mb-4 font-bold'>{product.productName}</h1>
             <p className='text-gray-700 mb-6'>{product.description}</p>
@@ -164,9 +216,12 @@ const ProductDetail = () => {
             {/* Add to Cart Button */}
             <button
               onClick={handleAddToCart}
-              className='mt-6 brown-deep-button'
+              disabled={isAddingToCart}
+              className={`mt-6 brown-deep-button ${
+                isAddingToCart ? 'opacity-75 cursor-not-allowed' : ''
+              }`}
             >
-              Add to Cart
+              {isAddingToCart ? 'Adding...' : 'Add to Cart'}
             </button>
           </div>
         </div>

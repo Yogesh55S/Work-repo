@@ -18,19 +18,35 @@ export const CartProvider = ({ children }) => {
       if (isLoggedIn && userId) {
         // For authenticated users - fetch from API
         const token = localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/users/${userId}`, {
+
+        // Optimization: Use a dedicated endpoint just for cart count if available
+        // If not, we can optimize by directly updating the count without refetching user data
+        const response = await fetch(`${API_URL}/cart/${userId}/count`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        });
+        }).catch(() => null); // Handle potential network issues gracefully
 
-        if (response.ok) {
+        if (response && response.ok) {
+          // If endpoint exists and responds successfully
           const data = await response.json();
-          const totalItems = data.cart.reduce(
-            (total, item) => total + item.quantity,
-            0
-          );
-          setCartCount(totalItems);
+          setCartCount(data.count);
+        } else {
+          // Fallback to previous behavior if endpoint doesn't exist
+          const response = await fetch(`${API_URL}/users/${userId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const totalItems = data.cart.reduce(
+              (total, item) => total + item.quantity,
+              0
+            );
+            setCartCount(totalItems);
+          }
         }
       } else {
         // For guest users - get from localStorage
