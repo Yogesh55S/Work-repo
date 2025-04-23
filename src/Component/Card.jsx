@@ -57,7 +57,7 @@ const Card = ({ name, price, image, productId, product }) => {
           _id: productId,
           productName: name,
           price: parseFloat(price.replace('₹', '')),
-          image: image.split('/').slice(-1)[0],
+          image: image, // Store the complete Cloudinary URL
         };
 
         const success = GuestCartService.addToCart(productToAdd, 1);

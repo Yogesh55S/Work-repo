@@ -34,8 +34,6 @@ const Cart = () => {
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
-  const IMAGE_BASE_URL =
-    import.meta.env.VITE_IMAGE_BASE_URL || API_URL.replace('/api', '');
 
   const { isLoggedIn, user } = useAuth();
   const userId = user?._id;
@@ -400,14 +398,7 @@ const Cart = () => {
                   className='flex items-start border-b-2 p-4 sm:p-2'
                 >
                   <img
-                    src={
-                      productImage
-                        ? `${IMAGE_BASE_URL}/${productImage.replace(
-                            /\\/g,
-                            '/'
-                          )}`
-                        : 'https://via.placeholder.com/100'
-                    }
+                    src={productImage || 'https://via.placeholder.com/100'}
                     alt={productName}
                     className='md:w-24 md:h-24 sm:w-32 sm:h-32 object-cover mr-4'
                   />

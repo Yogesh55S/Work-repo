@@ -23,14 +23,13 @@ const ProductDetail = () => {
         setLoading(true);
 
         if (location.state?.product) {
-          const baseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
           const product = location.state.product;
           setProduct(product);
 
+          // Direct use of Cloudinary URL
           if (product.image) {
-            const mainImg = `${baseUrl}/${product.image.replace(/\\/g, '/')}`;
-            setMainImage(mainImg);
-            setImages([mainImg]);
+            setMainImage(product.image);
+            setImages([product.image]);
           }
         } else {
           const baseUrl = import.meta.env.VITE_API_URL;
@@ -43,14 +42,10 @@ const ProductDetail = () => {
           const productData = await response.json();
           setProduct(productData);
 
-          const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL;
+          // Direct use of Cloudinary URL
           if (productData.image) {
-            const mainImg = `${imageBaseUrl}/${productData.image.replace(
-              /\\/g,
-              '/'
-            )}`;
-            setMainImage(mainImg);
-            setImages([mainImg]);
+            setMainImage(productData.image);
+            setImages([productData.image]);
           }
         }
       } catch (error) {

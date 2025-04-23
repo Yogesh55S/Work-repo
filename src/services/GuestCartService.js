@@ -57,7 +57,9 @@ class GuestCartService {
         cart.push({
           productId: product._id,
           quantity,
-          productDetails: product,
+          productDetails: {
+            ...product,
+          },
           addedAt: new Date().toISOString(),
         });
       }
@@ -65,7 +67,7 @@ class GuestCartService {
       localStorage.setItem(this.GUEST_CART_KEY, JSON.stringify(cart));
       return true;
     } catch (error) {
-      console.error('Failed to add product to guest cart:', error);
+      console.error('Error adding to guest cart:', error);
       return false;
     }
   }
