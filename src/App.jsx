@@ -13,6 +13,7 @@ import Navbar from "./Component/Navbar";
 import Footer from "./Component/Footer";
 import Loader from "./Component/gifloader";
 // Import Home component normally (not lazy-loaded)
+// test commit 
 import Home from "./Pages/Home";
 
 import PrivacyPolicy from "./Pages/PrivicyPolicy";
