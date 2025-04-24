@@ -11,9 +11,6 @@ const UserOrders = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480); // State to track screen size for responsive design
   const [loading, setLoading] = useState(true); // Add loading state
   const [dataFetched, setDataFetched] = useState(false); // Add a flag to track if data has been fetched
-  const IMAGE_BASE_URL =
-    import.meta.env.VITE_IMAGE_BASE_URL ||
-    import.meta.env.VITE_API_URL.replace('/api', ''); // Base URL for images
   const navigate = useNavigate();
 
   // Update the screen size state on window resize
@@ -103,12 +100,8 @@ const UserOrders = () => {
               <div className='order-row-mobile'>
                 <img
                   src={
-                    order.items[0]?.productDetails?.image
-                      ? `${IMAGE_BASE_URL}/${order.items[0].productDetails.image.replace(
-                          /\\/g,
-                          '/'
-                        )}`
-                      : 'https://via.placeholder.com/100'
+                    order.items[0]?.productDetails?.image ||
+                    'https://via.placeholder.com/100'
                   }
                   alt={
                     order.items[0]?.productDetails?.productName ||
@@ -181,12 +174,8 @@ const UserOrders = () => {
                     <div className='flex items-center mb-4'>
                       <img
                         src={
-                          order.items[0]?.productDetails?.image
-                            ? `${IMAGE_BASE_URL}/${order.items[0].productDetails.image.replace(
-                                /\\/g,
-                                '/'
-                              )}`
-                            : 'https://via.placeholder.com/100'
+                          order.items[0]?.productDetails?.image ||
+                          'https://via.placeholder.com/100'
                         }
                         alt={
                           order.items[0]?.productDetails?.productName ||
