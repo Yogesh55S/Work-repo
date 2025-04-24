@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import ProductFormSkeleton from './ProductFormSkeleton';
 
 const AddProductForm = () => {
   const location = useLocation();
@@ -14,6 +17,8 @@ const AddProductForm = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true); // New state for initial loading
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -37,6 +42,7 @@ const AddProductForm = () => {
   // Fetch fields and set form data
   useEffect(() => {
     const fetchFields = async () => {
+      setIsInitialLoading(true); // Start initial loading
       try {
         const response = await axios.get(`${API_URL}/products/fields`);
         const fetchedFields = response.data.filter(
@@ -55,6 +61,11 @@ const AddProductForm = () => {
       } catch (err) {
         console.error('Error fetching fields:', err);
         setError('Failed to fetch form fields');
+      } finally {
+        // Add a small delay to prevent flickering
+        setTimeout(() => {
+          setIsInitialLoading(false); // End initial loading
+        }, 300);
       }
     };
 
@@ -85,6 +96,7 @@ const AddProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true); // Start loading
 
     try {
       const form = new FormData();
@@ -93,8 +105,8 @@ const AddProductForm = () => {
       if (image) {
         form.append('image', image);
       } else if (!product) {
-        // If adding new product and no image selected
         setError('Please select an image for the product');
+        setIsLoading(false);
         return;
       }
 
@@ -121,6 +133,8 @@ const AddProductForm = () => {
         err.response?.data?.message ||
           'Failed to save product. Please try again.'
       );
+    } finally {
+      setIsLoading(false); // Stop loading
     }
   };
 
@@ -157,6 +171,11 @@ const AddProductForm = () => {
     };
   }, [previewUrl]);
 
+  // Show skeleton during initial loading
+  if (isInitialLoading) {
+    return <ProductFormSkeleton />;
+  }
+
   return (
     <div className='py-5'>
       {success && (
@@ -175,6 +194,20 @@ const AddProductForm = () => {
               {product ? 'View Products' : 'Add Another'}
             </button>
           </div>
+        </div>
+      )}
+
+      {/* Loading Overlay for form submission */}
+      {isLoading && (
+        <div className='fixed inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center z-50'>
+          <FontAwesomeIcon
+            icon={faSpinner}
+            spin
+            className='text-white text-4xl mb-3'
+          />
+          <p className='text-white font-medium text-lg'>
+            Processing. Please Do Not Refresh...
+          </p>
         </div>
       )}
 
@@ -286,6 +319,7 @@ const AddProductForm = () => {
               type='button'
               onClick={handleCancel}
               className='bg-gray-500 text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:bg-gray-600'
+              disabled={isLoading}
             >
               Cancel
             </button>
@@ -296,6 +330,7 @@ const AddProductForm = () => {
               } text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:${
                 product ? 'bg-green-600' : 'bg-blue-600'
               }`}
+              disabled={isLoading}
             >
               {product ? 'Update Product' : 'Add Product'}
             </button>
