@@ -19,20 +19,27 @@ export const CartProvider = ({ children }) => {
         // For authenticated users - fetch from API
         const token = localStorage.getItem('token');
 
-        // Optimization: Use a dedicated endpoint just for cart count if available
-        // If not, we can optimize by directly updating the count without refetching user data
-        const response = await fetch(`${API_URL}/cart/${userId}/count`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }).catch(() => null); // Handle potential network issues gracefully
+        // First try the dedicated cart count endpoint
+        try {
+          const response = await fetch(`${API_URL}/cart/${userId}/count`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
 
-        if (response && response.ok) {
-          // If endpoint exists and responds successfully
-          const data = await response.json();
-          setCartCount(data.count);
-        } else {
-          // Fallback to previous behavior if endpoint doesn't exist
+          if (response.ok) {
+            const data = await response.json();
+            setCartCount(data.count);
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          // Silently catch errors with the first approach and continue to fallback
+          console.log('Using fallback method for cart count', error);
+        }
+
+        // Fallback to fetching user data
+        try {
           const response = await fetch(`${API_URL}/users/${userId}`, {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -41,12 +48,24 @@ export const CartProvider = ({ children }) => {
 
           if (response.ok) {
             const data = await response.json();
-            const totalItems = data.cart.reduce(
-              (total, item) => total + item.quantity,
-              0
-            );
-            setCartCount(totalItems);
+            // Check if data.cart exists before trying to reduce
+            if (data.cart && Array.isArray(data.cart)) {
+              const totalItems = data.cart.reduce(
+                (total, item) => total + item.quantity,
+                0
+              );
+              setCartCount(totalItems);
+            } else {
+              // If cart property doesn't exist or isn't an array, set count to 0
+              setCartCount(0);
+            }
+          } else {
+            // If user fetch fails, set count to 0
+            setCartCount(0);
           }
+        } catch (error) {
+          console.error('Failed to fetch user data for cart count:', error);
+          setCartCount(0);
         }
       } else {
         // For guest users - get from localStorage
@@ -55,6 +74,10 @@ export const CartProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Failed to fetch cart count:', error);
+      // Don't leave the count in an inconsistent state
+      if (!isLoggedIn) {
+        setCartCount(GuestCartService.getCartCount());
+      }
     } finally {
       setLoading(false);
     }
