@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import goldOilImage from '../../assets/Image/goldoil.jpg'; // Update the path based on your structure
-import faceWashImage from '../../assets/Image/facewash.png'; // Update the path based on your structure
+import goldOilImage from '../../assets/Image/goldoil.jpg';
+import faceWashImage from '../../assets/Image/facewash.png';
+import soapbarImage from '../../assets/Image/soapbar.png';
+import shampooImage from '../../assets/Image/shampoo.png';
 
 const careData = [
   {
@@ -24,7 +26,7 @@ const careData = [
     title: 'Hair Care',
     description:
       'Homemade products designed to combat dandruff, minimize hair loss, reverse premature graying, and enhance hair texture',
-    image: goldOilImage,
+    image: shampooImage,
     type: 'Hair Care',
   },
   {
@@ -32,7 +34,7 @@ const careData = [
     title: 'Soap Bars',
     description:
       'Pamper your skin with our daily cleansing Ayurvedic soaps for nourished and revitalized skin',
-    image: faceWashImage,
+    image: soapbarImage,
     type: 'Soap Bars',
   },
 ];
