@@ -1,11 +1,5 @@
 import { Link, Outlet } from 'react-router-dom'; // Use Outlet to render nested routes
-import {
-  FiShoppingCart,
-  FiPlusCircle,
-  FiEye,
-  FiSettings,
-  FiLogOut,
-} from 'react-icons/fi';
+import { FiShoppingCart, FiPlusCircle, FiEye, FiLogOut } from 'react-icons/fi';
 import { useAuth } from '../Component/providers/AuthContext'; // Assuming you have a context to manage authentication
 import { useNavigate } from 'react-router-dom';
 
@@ -51,15 +45,6 @@ const AdminPanel = () => {
             >
               <FiShoppingCart />
               <span>View Orders</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to='settings'
-              className='flex items-center space-x-2 hover:text-[#D7C9C1]'
-            >
-              <FiSettings />
-              <span>Settings</span>
             </Link>
           </li>
         </ul>
