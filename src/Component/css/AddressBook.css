@@ -110,111 +110,6 @@
   color: #c9302c;
 }
 
-/* Modal Overlay */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-content {
-  background: white;
-  /* padding: 25px; */
-  width: 600px;
-  max-width: 90%;
-  /* border-radius: 8px; */
-}
-
-.modal-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-  text-align: center;
-  color: #6b4226;
-  margin-top: 10px;
-}
-
-.modal-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  padding: 0 10px;
-}
-
-.modal-grid .full-width {
-  grid-column: span 2;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  color: #6a6c69;
-  margin-bottom: 5px;
-}
-
-.form-group input,
-.form-group select {
-  border: none;
-  border-bottom: 1px solid #ddd;
-  outline: none;
-  padding: 5px;
-  font-size: 1rem;
-  color: #333;
-  background: transparent;
-  transition: border-bottom-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-  border-bottom: 1px solid #6b4226;
-}
-
-.form-group input::placeholder {
-  color: #aaa;
-}
-
-.modal-actions {
-  display: flex;
-  /* gap: 10px; */
-  margin-top: 20px;
-}
-
-.cancel-btn,
-.save-btn {
-  flex: 1;
-  text-align: center;
-  font-size: 1rem;
-  font-weight: bold;
-  border: none;
-  padding: 15px 0;
-  cursor: pointer;
-  text-transform: uppercase;
-}
-
-.cancel-btn {
-  background: #ddd;
-  color: #333;
-}
-
-.cancel-btn:hover {
-  background: #bbb;
-}
-
-.save-btn {
-  background: #6b4226;
-  color: #fff;
-}
-
-.save-btn:hover {
-  background: #55341a;
-}
-
 /* Responsive Styles */
 
 /* Large Screens (1440px and above) */
@@ -226,11 +121,7 @@
 
 /* Medium Screens (1024px to 1440px) */
 @media (max-width: 1440px) {
-  
-
-  .modal-content {
-    width: 500px;
-  }
+  /* No specific styles needed here after removing form styles */
 }
 
 /* Tablet Screens (768px to 1024px) */
@@ -238,12 +129,6 @@
   .address-book-container {
     padding: 20px;
   }
-
-  .modal-grid {
-    grid-template-columns: 1fr;
-  }
-
-  
 }
 
 /* Mobile Screens (480px to 768px) */
@@ -284,9 +169,6 @@
   }
 }
 
-
-/* Small Mobile Screens (below 480px) */
-/* Small Mobile Screens (below 480px) */
 /* Small Mobile Screens (below 480px) */
 @media (max-width: 480px) {
   /* Address Book Container */
@@ -296,43 +178,5 @@
 
   .title {
     font-size: 1rem;
-  }
-
-  /* Input Fields - Single Line Style */
-  .form-group input,
-  .form-group select {
-    width: 100%; /* Ensure input fields fit within the container */
-    box-sizing: border-box; /* Include padding and border in the width */
-    border: none; /* Remove the box design */
-    border-bottom: 1px solid #ddd; /* Add a single underline */
-    outline: none; /* Remove outline */
-    padding: 5px 0; /* Adjust padding to align text properly */
-    font-size: 1rem; /* Adjust font size for better readability */
-    background: transparent; /* Ensure a clean background */
-    transition: border-bottom-color 0.3s; /* Smooth transition on focus */
-  }
-
-  .form-group input:focus,
-  .form-group select:focus {
-    border-bottom: 1px solid #6b4226; /* Highlighted underline on focus */
-  }
-
-  .form-group input::placeholder {
-    color: #aaa; /* Light placeholder color */
-  }
-
-  /* Modal Grid - Adjust Layout for Small Screens */
-  .modal-grid {
-    grid-template-columns: 1fr; /* Stack fields vertically */
-    gap: 10px; /* Add space between fields */
-  }
-
-  
-
-  /* Modal Actions */
-  .cancel-btn,
-  .save-btn {
-    font-size: 0.85rem;
-    padding: 10px 0;
   }
 }

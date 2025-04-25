@@ -7,6 +7,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import '../Component/css/AddressBook.css';
 import emptyCart from '../assets/svg/empty-cart.svg';
 import CartSkeleton from '../Component/skeletons/Cartskeleton';
+import AddressForm from '../Component/AddressForm';
 
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
@@ -29,8 +30,6 @@ const Cart = () => {
     state: '',
     zip: '',
   };
-
-  const [newAddress, setNewAddress] = useState(newAddressInitialState);
 
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
@@ -244,16 +243,16 @@ const Cart = () => {
     }
   };
 
-  const handleAddAddress = async () => {
+  const handleAddAddress = async (formData) => {
     try {
       // Validate address fields
       if (
-        !newAddress.deliveryName ||
-        !newAddress.deliveryNumber ||
-        !newAddress.streetAddress ||
-        !newAddress.city ||
-        !newAddress.state ||
-        !newAddress.zip
+        !formData.deliveryName ||
+        !formData.deliveryNumber ||
+        !formData.streetAddress ||
+        !formData.city ||
+        !formData.state ||
+        !formData.zip
       ) {
         toast.error('Please fill in all required fields');
         return;
@@ -265,12 +264,11 @@ const Cart = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: JSON.stringify(newAddress),
+        body: JSON.stringify(formData),
       });
 
       if (response.ok) {
         await fetchAddresses();
-        setNewAddress(newAddressInitialState);
         setShowAddAddressForm(false);
         toast.success('Address added successfully');
       } else {
@@ -599,119 +597,11 @@ const Cart = () => {
 
       {/* Add Address Form */}
       {showAddAddressForm && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <h3 className='modal-title'>Add New Address</h3>
-            <div className='modal-grid'>
-              <div className='form-group full-width'>
-                <label>Name *</label>
-                <input
-                  type='text'
-                  name='deliveryName'
-                  value={newAddress.deliveryName}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      deliveryName: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group full-width'>
-                <label>Mobile Number *</label>
-                <input
-                  type='text'
-                  name='deliveryNumber'
-                  value={newAddress.deliveryNumber}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      deliveryNumber: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group full-width'>
-                <label>Street Address *</label>
-                <input
-                  type='text'
-                  name='streetAddress'
-                  value={newAddress.streetAddress}
-                  onChange={(e) =>
-                    setNewAddress({
-                      ...newAddress,
-                      streetAddress: e.target.value,
-                    })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label>City *</label>
-                <input
-                  type='text'
-                  name='city'
-                  value={newAddress.city}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, city: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label>State *</label>
-                <input
-                  type='text'
-                  name='state'
-                  value={newAddress.state}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, state: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label>ZIP *</label>
-                <input
-                  type='text'
-                  name='zip'
-                  value={newAddress.zip}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, zip: e.target.value })
-                  }
-                  required
-                />
-              </div>
-              <div className='form-group'>
-                <label>Tag *</label>
-                <select
-                  name='tag'
-                  value={newAddress.tag}
-                  onChange={(e) =>
-                    setNewAddress({ ...newAddress, tag: e.target.value })
-                  }
-                >
-                  <option value='home'>Home</option>
-                  <option value='work'>Work</option>
-                  <option value='other'>Other</option>
-                </select>
-              </div>
-            </div>
-            <div className='modal-actions'>
-              <button
-                onClick={() => setShowAddAddressForm(false)}
-                className='cancel-btn'
-              >
-                CANCEL
-              </button>
-              <button onClick={handleAddAddress} className='save-btn'>
-                SAVE
-              </button>
-            </div>
-          </div>
-        </div>
+        <AddressForm
+          initialData={newAddressInitialState}
+          onSave={handleAddAddress}
+          onCancel={() => setShowAddAddressForm(false)}
+        />
       )}
     </div>
   );

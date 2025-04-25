@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useAuth } from '../providers/AuthContext';
 import '../css/AddressBook.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+  faTrash,
+  faPencilAlt,
+  faSpinner,
+} from '@fortawesome/free-solid-svg-icons';
 import AddressBookSkeleton from '../skeletons/AddressBookSkeleton';
+import AddressForm from '../AddressForm';
+import { toast } from 'react-toastify';
 
 const AddressBook = () => {
   const { token, user } = useAuth();
@@ -11,6 +18,11 @@ const AddressBook = () => {
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deleteConfirmation, setDeleteConfirmation] = useState({
+    show: false,
+    id: null,
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
@@ -18,20 +30,21 @@ const AddressBook = () => {
     fetchAddresses();
   }, [token, user?._id]);
 
-  const fetchAddresses = () => {
+  const fetchAddresses = async () => {
     setLoading(true);
-    fetch(`${API_URL}/addresses/${user._id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setAddresses(data.addresses || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error fetching addresses:', error);
-        setLoading(false);
+    try {
+      const response = await fetch(`${API_URL}/addresses/${user._id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+
+      const data = await response.json();
+      setAddresses(data.addresses || []);
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      toast.error('Failed to load addresses');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEdit = (address) => {
@@ -39,36 +52,89 @@ const AddressBook = () => {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
-    fetch(`${API_URL}/addresses/${user._id}/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(() => fetchAddresses()) // Re-fetch addresses after deletion
-      .catch((error) => console.error('Error deleting address:', error));
+  // Show delete confirmation instead of deleting directly
+  const confirmDelete = (id) => {
+    setDeleteConfirmation({ show: true, id });
   };
 
-  const handleSave = (formData) => {
+  // Cancel delete
+  const cancelDelete = () => {
+    setDeleteConfirmation({ show: false, id: null });
+  };
+
+  // Actually delete the address after confirmation
+  const handleDelete = async (id) => {
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`${API_URL}/addresses/${user._id}/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete address');
+      }
+
+      // Update the addresses state directly instead of refetching
+      const updatedAddresses = addresses.filter(
+        (address) => address._id !== id
+      );
+      setAddresses(updatedAddresses);
+
+      toast.success('Address deleted successfully');
+    } catch (error) {
+      console.error('Error deleting address:', error);
+      toast.error('Failed to delete address');
+    } finally {
+      setIsDeleting(false);
+      setDeleteConfirmation({ show: false, id: null });
+    }
+  };
+
+  const handleSave = async (formData) => {
     const method = formData._id ? 'PUT' : 'POST';
     const url = formData._id
       ? `${API_URL}/addresses/${user._id}/${formData._id}`
       : `${API_URL}/addresses/${user._id}`;
 
-    fetch(url, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(formData),
-    })
-      .then((response) => response.json())
-      .then(() => {
-        fetchAddresses(); // Re-fetch addresses after saving
-        setShowModal(false);
-        setSelectedAddress(null);
-      })
-      .catch((error) => console.error('Error saving address:', error));
+    try {
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to save address');
+      }
+
+      // Instead of refetching, update the state directly
+      const responseData = await response.json();
+
+      if (method === 'POST') {
+        // Add new address
+        setAddresses([...addresses, responseData.address]);
+      } else {
+        // Update existing address
+        setAddresses(
+          addresses.map((addr) =>
+            addr._id === formData._id ? { ...addr, ...formData } : addr
+          )
+        );
+      }
+
+      setShowModal(false);
+      setSelectedAddress(null);
+
+      // Success will be shown by the form component
+    } catch (error) {
+      console.error('Error saving address:', error);
+      throw error; // Re-throw so the form can handle it
+    }
   };
 
   if (loading) {
@@ -88,7 +154,7 @@ const AddressBook = () => {
           curae maecenas dignissim volutpat hac quam.
         </p>
         <button
-          className='brown-deep-button mt-5  '
+          className='brown-deep-button mt-5'
           onClick={() => handleEdit(null)}
         >
           + Add New Address
@@ -102,7 +168,7 @@ const AddressBook = () => {
             <AddressDetails
               address={defaultAddress}
               onEdit={handleEdit}
-              onDelete={handleDelete}
+              onDelete={confirmDelete}
             />
           </div>
         )}
@@ -115,7 +181,7 @@ const AddressBook = () => {
                 key={address._id}
                 address={address}
                 onEdit={handleEdit}
-                onDelete={handleDelete}
+                onDelete={confirmDelete}
               />
             ))}
           </div>
@@ -123,11 +189,49 @@ const AddressBook = () => {
       </div>
 
       {showModal && (
-        <AddressModal
-          address={selectedAddress}
-          onClose={() => setShowModal(false)}
+        <AddressForm
+          initialData={selectedAddress}
           onSave={handleSave}
+          onCancel={() => setShowModal(false)}
         />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteConfirmation.show && (
+        <div className='fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4'>
+          <div className='bg-white p-6 rounded-lg w-full max-w-md'>
+            <h3 className='text-xl font-semibold text-[#6b4226] mb-4'>
+              Delete Address
+            </h3>
+            <p className='text-gray-700 mb-6'>
+              Are you sure you want to delete this address? This action cannot
+              be undone.
+            </p>
+            <div className='flex justify-end space-x-4'>
+              <button
+                onClick={cancelDelete}
+                className='py-2 px-4 text-gray-600 font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none'
+                disabled={isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirmation.id)}
+                className='py-2 px-4 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors focus:outline-none flex items-center justify-center'
+                disabled={isDeleting}
+              >
+                {isDeleting ? (
+                  <>
+                    <FontAwesomeIcon icon={faSpinner} spin className='mr-2' />
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -159,116 +263,20 @@ const AddressDetails = ({ address, onEdit, onDelete }) => (
   </div>
 );
 
-// Modal Component
-const AddressModal = ({ address, onClose, onSave }) => {
-  const [formData, setFormData] = useState({
-    deliveryName: address?.deliveryName || '',
-    deliveryNumber: address?.deliveryNumber || '',
-    streetAddress: address?.streetAddress || '',
-    city: address?.city || '',
-    state: address?.state || '',
-    zip: address?.zip || '',
-    tag: address?.tag || 'home',
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = () => {
-    onSave({ ...formData, _id: address?._id });
-  };
-
-  return (
-    <div className='modal-overlay'>
-      <div className='modal-content'>
-        <h3 className='modal-title'>
-          {address ? 'Edit Address' : 'Add New Address'}
-        </h3>
-
-        <div className='modal-grid'>
-          <div className='form-group full-width'>
-            <label>Name *</label>
-            <input
-              type='text'
-              name='deliveryName'
-              value={formData.deliveryName}
-              onChange={handleChange}
-            />
-          </div>
-          {/* <br /> */}
-          <div className='form-group full-width'>
-            <label>Mobile Number *</label>
-            <input
-              type='text'
-              name='deliveryNumber'
-              value={formData.deliveryNumber}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='form-group full-width'>
-            <label>Street Address *</label>
-            <input
-              type='text'
-              name='streetAddress'
-              value={formData.streetAddress}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='form-group'>
-            <label>City *</label>
-            <input
-              type='text'
-              name='city'
-              value={formData.city}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='form-group'>
-            <label>State *</label>
-            <input
-              type='text'
-              name='state'
-              value={formData.state}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='form-group'>
-            <label>ZIP *</label>
-            <input
-              type='text'
-              name='zip'
-              value={formData.zip}
-              onChange={handleChange}
-            />
-          </div>
-          <div className='form-group'>
-            <label>Tag *</label>
-            <select
-              name='tag'
-              value={formData.tag}
-              onChange={handleChange}
-              className='form-control'
-            >
-              <option value='home'>Home</option>
-              <option value='work'>Work</option>
-              <option value='other'>Other</option>
-            </select>
-          </div>
-        </div>
-
-        <div className='modal-actions'>
-          <button onClick={onClose} className='cancel-btn'>
-            CANCEL
-          </button>
-          <button onClick={handleSubmit} className='save-btn'>
-            SAVE
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+// Add PropTypes validation for the AddressDetails component
+AddressDetails.propTypes = {
+  address: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    deliveryName: PropTypes.string.isRequired,
+    deliveryNumber: PropTypes.string.isRequired,
+    streetAddress: PropTypes.string.isRequired,
+    city: PropTypes.string.isRequired,
+    state: PropTypes.string.isRequired,
+    zip: PropTypes.string.isRequired,
+    tag: PropTypes.string.isRequired,
+  }).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default AddressBook;
