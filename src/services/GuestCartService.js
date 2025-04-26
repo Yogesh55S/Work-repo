@@ -145,13 +145,20 @@ class GuestCartService {
    * Transfer guest cart to logged-in user
    * @param {string} userId - User ID to transfer cart to
    * @param {string} token - Authentication token
+   * @param {string} apiUrl - API URL
    * @returns {Promise<boolean>} Success status
    */
   static async transferCartToUser(userId, token, apiUrl) {
     try {
       const guestCart = this.getCart();
 
-      if (guestCart.length === 0) return true; // No items to transfer
+      if (!guestCart || guestCart.length === 0) return true; // No items to transfer
+
+      console.log(
+        'Transferring guest cart to user account:',
+        userId,
+        guestCart
+      );
 
       // Only send necessary data to the API
       const cartItems = guestCart.map((item) => ({
@@ -171,9 +178,11 @@ class GuestCartService {
       if (response.ok) {
         // Clear guest cart after successful transfer
         this.clearCart();
+        console.log('Guest cart transferred successfully');
         return true;
       }
 
+      console.error('Failed to transfer guest cart:', response.status);
       return false;
     } catch (error) {
       console.error('Failed to transfer guest cart:', error);

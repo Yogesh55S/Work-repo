@@ -1,7 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { useCart } from './CartContext';
 import GuestCartService from '../../services/GuestCartService';
-import PropTypes from 'prop-types';
 
 export const AuthContext = createContext();
 
@@ -27,11 +26,25 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('userRole', userData?.role || '');
 
-    // Transfer guest cart to user account
-    if (GuestCartService.getCart().length > 0) {
-      setTimeout(() => {
-        transferGuestCartToUser && transferGuestCartToUser();
-      }, 1000);
+    // Transfer guest cart to user account immediately
+    const guestCart = GuestCartService.getCart();
+    if (guestCart && guestCart.length > 0 && userData?._id) {
+      try {
+        const API_URL = import.meta.env.VITE_API_URL;
+        // Directly call the merge endpoint without setTimeout
+        await GuestCartService.transferCartToUser(
+          userData._id,
+          authToken,
+          API_URL
+        );
+
+        // If transferGuestCartToUser callback exists, call it to update UI
+        if (typeof transferGuestCartToUser === 'function') {
+          await transferGuestCartToUser();
+        }
+      } catch (error) {
+        console.error('Failed to transfer guest cart:', error);
+      }
     }
   };
 
