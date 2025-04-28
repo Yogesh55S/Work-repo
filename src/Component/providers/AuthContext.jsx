@@ -1,6 +1,7 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { useCart } from './CartContext';
-import GuestCartService from '../../services/GuestCartService';
+import React, { createContext, useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import { useCart } from "./CartContext";
+import GuestCartService from "../../services/GuestCartService";
 
 export const AuthContext = createContext();
 
@@ -41,27 +42,27 @@ export const AuthProvider = ({ children }) => {
 		// Store in localStorage using the same key as App.jsx
 		localStorage.setItem("authToken", authToken);
 
-    // Transfer guest cart to user account immediately
-    const guestCart = GuestCartService.getCart();
-    if (guestCart && guestCart.length > 0 && userData?._id) {
-      try {
-        const API_URL = import.meta.env.VITE_API_URL;
-        // Directly call the merge endpoint without setTimeout
-        await GuestCartService.transferCartToUser(
-          userData._id,
-          authToken,
-          API_URL
-        );
+		// Transfer guest cart to user account immediately
+		const guestCart = GuestCartService.getCart();
+		if (guestCart && guestCart.length > 0 && userData?._id) {
+			try {
+				const API_URL = import.meta.env.VITE_API_URL;
+				// Directly call the merge endpoint without setTimeout
+				await GuestCartService.transferCartToUser(
+					userData._id,
+					authToken,
+					API_URL,
+				);
 
-        // If transferGuestCartToUser callback exists, call it to update UI
-        if (typeof transferGuestCartToUser === 'function') {
-          await transferGuestCartToUser();
-        }
-      } catch (error) {
-        console.error('Failed to transfer guest cart:', error);
-      }
-    }
-  };
+				// If transferGuestCartToUser callback exists, call it to update UI
+				if (typeof transferGuestCartToUser === "function") {
+					await transferGuestCartToUser();
+				}
+			} catch (error) {
+				console.error("Failed to transfer guest cart:", error);
+			}
+		}
+	};
 
 	// Function to log out the user
 	const logout = () => {
