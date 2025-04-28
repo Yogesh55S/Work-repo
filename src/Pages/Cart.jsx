@@ -377,7 +377,7 @@ const Cart = () => {
           <p className='text-gray-500 mb-6'>
             Browse our collections and find something special.
           </p>
-          <Link to='/products' className='brown-deep-button'>
+          <Link to='/shop' className='brown-deep-button'>
             Continue Shopping
           </Link>
         </div>
