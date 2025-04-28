@@ -24,9 +24,16 @@ export default function Login() {
       );
 
       if (response.data.token && response.data.user) {
-        login(response.data.user, response.data.token);
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        const authToken = response.data.token;
+        const userData = response.data.user;
+
+        // First store in localStorage
+        localStorage.setItem('token', authToken);
+        localStorage.setItem('user', JSON.stringify(userData));
+
+        // Then login in context (this will trigger cart transfer)
+        await login(userData, authToken);
+
         console.log(
           'Token stored successfully from Email Login:',
           response.data.token
@@ -36,6 +43,9 @@ export default function Login() {
         setErrorMessage('Login failed. Please try again.');
       }
     } catch (error) {
+      console.error('Login error:', error);
+
+      // Error handling remains the same...
       if (error.response && error.response.status === 400) {
         setErrorMessage('Invalid email or password. Please try again.');
       } else if (error.response && error.response.status === 403) {
