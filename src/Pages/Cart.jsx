@@ -12,6 +12,7 @@ import AddressForm from '../Component/AddressForm';
 const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [totalAmount, setTotalAmount] = useState(0);
+  const [deliveryCharges, setDeliveryCharges] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [showAddressModal, setShowAddressModal] = useState(false);
@@ -37,6 +38,35 @@ const Cart = () => {
   const { isLoggedIn, user } = useAuth();
   const userId = user?._id;
   const { removeFromCart, updateCartItemQuantity } = useCart();
+
+  // Function to calculate delivery charges based on state
+  const calculateDeliveryCharges = (state) => {
+    if (!state) return 0;
+    
+    const nearDelhiStates = [
+      'delhi', 
+      'haryana',
+      'Chandigarh',
+    ];
+    
+    const normalizedState = state.toLowerCase().trim();
+    
+    if (nearDelhiStates.includes(normalizedState)) {
+      return 59;
+    } else {
+      return 99;
+    }
+  };
+
+  // Update delivery charges when address is selected
+  useEffect(() => {
+    if (selectedAddress && selectedAddress.state) {
+      const charges = calculateDeliveryCharges(selectedAddress.state, totalAmount);
+      setDeliveryCharges(charges);
+    } else {
+      setDeliveryCharges(0);
+    }
+  }, [selectedAddress, totalAmount]);
 
   // Check if user is logged in when trying to checkout
   useEffect(() => {
@@ -134,7 +164,7 @@ const Cart = () => {
         localStorage.setItem('currentOrderId', data.orderId);
 
         const cashfree = window.Cashfree({
-          mode: 'production', // or "sandbox" for testing
+          mode: 'sandbox', // or "sandbox" for testing
         });
 
         cashfree
@@ -363,93 +393,129 @@ const Cart = () => {
 
   return (
     <div className='container mx-auto p-4 pt-28'>
-      <h1 className='text-2xl font-bold mb-5'>Your Cart</h1>
+      <h1 className='text-3xl font-bold mb-6 text-center'>Your Cart</h1>
 
       {/* Show skeleton while loading */}
       {loading ? (
         <CartSkeleton />
       ) : cartItems.length === 0 ? (
-        <div className='flex flex-col items-center justify-center'>
-          <img src={emptyCart} alt='empty-cart' className='max-w-xs mb-4' />
-          <h4 className='text-xl font-medium mb-2'>Nothing Here Yet!</h4>
-          <p className='text-gray-500 mb-6'>
-            Browse our collections and find something special.
-          </p>
-          <Link to='/shop' className='brown-deep-button'>
-            Continue Shopping
-          </Link>
+        <div className='flex flex-col items-center justify-center py-12'>
+          <div className='bg-white p-8 rounded-lg shadow-md text-center max-w-md'>
+            <img src={emptyCart} alt='empty-cart' className='max-w-xs mb-6 mx-auto' />
+            <h4 className='text-xl font-semibold mb-3'>Your cart is empty</h4>
+            <p className='text-gray-600 mb-6'>
+              Browse our collections and find something special.
+            </p>
+            <Link to='/shop' className='brown-deep-button inline-block py-3 px-6 rounded-md'>
+              Continue Shopping
+            </Link>
+          </div>
         </div>
       ) : (
-        <div className='flex flex-col lg:flex-row items-start gap-5'>
+        <div className='flex flex-col lg:flex-row items-start gap-8'>
           {/* Cart Items */}
-          <div className='flex-1 space-y-4 w-full'>
-            {cartItems.map((item) => {
-              const productId = item.productDetails?._id || item.productId;
-              const productName =
-                item.productDetails?.productName || 'Unknown Product';
-              const productPrice = item.productDetails?.price || 0;
-              const productImage = item.productDetails?.image;
+          <div className='flex-1 space-y-6 w-full'>
+            <div className='bg-white rounded-lg shadow-md'>
+              <div className='p-4 border-b'>
+                <h2 className='text-xl font-semibold'>Cart Items ({cartItems.length})</h2>
+              </div>
+              
+              {cartItems.map((item) => {
+                const productId = item.productDetails?._id || item.productId;
+                const productName = item.productDetails?.productName || 'Unknown Product';
+                const productPrice = item.productDetails?.price || 0;
+                const productImage = item.productDetails?.image;
 
-              return (
-                <div
-                  key={productId}
-                  className='flex items-start border-b-2 p-4 sm:p-2'
-                >
-                  <img
-                    src={productImage || 'https://via.placeholder.com/100'}
-                    alt={productName}
-                    className='md:w-24 md:h-24 sm:w-32 sm:h-32 object-cover mr-4'
-                  />
-                  <div className='flex-1'>
-                    <div className='flex justify-between md:items-center'>
-                      <h3 className='font-semibold text-sm sm:text-base md:text-lg'>
-                        {productName}
-                      </h3>
-                      <p className='text-gray-700 font-medium text-base mt-10 md:mt-0'>
-                        ₹{productPrice}
-                      </p>
-                    </div>
-
-                    <div className='mt-2 flex items-center gap-2'>
-                      <label htmlFor='qty' className='text-sm text-gray-600'>
-                        Qty:
-                      </label>
-                      <select
-                        value={item.quantity}
-                        onChange={(e) =>
-                          updateQuantity(
-                            productId,
-                            parseInt(e.target.value, 10)
-                          )
-                        }
-                        className='border rounded px-2 py-1'
-                      >
-                        {[...Array(10)].map((_, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className='mt-2 text-sm text-red-600 flex gap-4'>
-                      <button onClick={() => handleRemoveItem(productId)}>
-                        Remove Item
-                      </button>
+                return (
+                  <div
+                    key={productId}
+                    className='flex items-center border-b p-6 hover:bg-gray-50'
+                  >
+                    <img
+                      src={productImage || 'https://via.placeholder.com/120'}
+                      alt={productName}
+                      className='w-24 h-24 md:w-28 md:h-28 object-cover rounded-md mr-4'
+                    />
+                    
+                    <div className='flex-1'>
+                      <div className='flex flex-col md:flex-row md:items-center md:justify-between'>
+                        <div className='mb-4 md:mb-0'>
+                          <h3 className='font-semibold text-lg mb-2'>{productName}</h3>
+                          <p className='text-xl font-bold text-amber-800'>₹{productPrice}</p>
+                        </div>
+                        
+                        <div className='flex items-center gap-4'>
+                          <div className='flex items-center gap-2'>
+                            <label className='text-sm font-medium'>Qty:</label>
+                            <select
+                              value={item.quantity}
+                              onChange={(e) => updateQuantity(productId, parseInt(e.target.value, 10))}
+                              className='border border-gray-300 rounded px-3 py-2 focus:border-amber-500 focus:ring-1 focus:ring-amber-500'
+                            >
+                              {[...Array(10)].map((_, i) => (
+                                <option key={i + 1} value={i + 1}>
+                                  {i + 1}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          
+                          <div className='text-right'>
+                            <p className='font-bold text-lg'>₹{(productPrice * item.quantity).toLocaleString()}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className='mt-3'>
+                        <button
+                          onClick={() => handleRemoveItem(productId)}
+                          className='text-red-600 hover:text-red-800 text-sm font-medium'
+                        >
+                          Remove Item
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           {/* Order Summary */}
-          <div className='w-full lg:w-[350px] bg-gray-100 p-4 rounded-lg sticky top-6 lg:self-start'>
-            <div className='text-xl font-semibold flex justify-between'>
-              <span>Subtotal ({cartItems.length} items):</span>
-              <span className='text-black font-bold'>₹{totalAmount}</span>
-            </div>
-            <div className='flex justify-center mt-6'>
+          <div className='w-full lg:w-[350px]'>
+            <div className='bg-white rounded-lg shadow-md p-6 sticky top-6'>
+              <h2 className='text-xl font-semibold mb-4'>Order Summary</h2>
+              
+              <div className='space-y-3 mb-6'>
+                <div className='flex justify-between'>
+                  <span>Subtotal ({cartItems.length} items):</span>
+                  <span className='font-semibold'>₹{totalAmount.toLocaleString()}</span>
+                </div>
+                <div className='flex justify-between'>
+                  <span>Delivery Charges:</span>
+                  {!selectedAddress ? (
+                    <span className='text-gray-500'>Select address to calculate</span>
+                  ) : totalAmount >= 499 ? (
+                    <span className='text-green-600 font-semibold'>FREE</span>
+                  ) : (
+                    <span className='font-semibold'>₹{deliveryCharges}</span>
+                  )}
+                </div>
+                {totalAmount < 499 && totalAmount > 0 && (
+                  <div className='text-sm text-amber-600 bg-amber-50 p-2 rounded'>
+                    Add ₹{(499 - totalAmount).toLocaleString()} more for FREE delivery!
+                  </div>
+                )}
+                <div className='border-t pt-3'>
+                  <div className='flex justify-between text-lg font-bold'>
+                    <span>Total:</span>
+                    <span className='text-amber-800'>
+                      ₹{(totalAmount >= 499 ? totalAmount : totalAmount + deliveryCharges).toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              
               <button
                 onClick={() => {
                   if (isLoggedIn) {
@@ -459,8 +525,7 @@ const Cart = () => {
                     setLoginPromptVisible(true);
                   }
                 }}
-                className='brown-deep-button'
-                style={{ width: '100%' }}
+                className='brown-deep-button w-full py-3 rounded-md font-semibold'
                 disabled={isProcessing}
               >
                 {isProcessing ? 'Processing...' : 'Proceed to Buy'}
@@ -472,23 +537,26 @@ const Cart = () => {
 
       {/* Login Prompt Modal */}
       {loginPromptVisible && (
-        <div className='fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center'>
-          <div className='bg-white p-6 rounded-lg max-w-md w-full relative'>
-            <button
-              onClick={() => setLoginPromptVisible(false)}
-              className='absolute top-3 right-3 text-xl'
-            >
-              &times;
-            </button>
-            <h2 className='text-xl font-bold mb-4'>Sign in to continue</h2>
-            <p className='mb-4'>
-              Please sign in to continue with your purchase. Your cart items
-              will be saved.
-            </p>
-            <div className='flex gap-4 justify-end'>
+        <div className='fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4'>
+          <div className='bg-white p-6 rounded-lg max-w-md w-full'>
+            <div className='flex justify-between items-center mb-4'>
+              <h2 className='text-xl font-bold'>Sign in to continue</h2>
               <button
                 onClick={() => setLoginPromptVisible(false)}
-                className='px-4 py-2 border rounded'
+                className='text-gray-500 hover:text-gray-700 text-xl'
+              >
+                ×
+              </button>
+            </div>
+            
+            <p className='mb-6 text-gray-600'>
+              Please sign in to continue with your purchase. Your cart items will be saved.
+            </p>
+            
+            <div className='flex gap-4'>
+              <button
+                onClick={() => setLoginPromptVisible(false)}
+                className='flex-1 py-2 px-4 border border-gray-300 rounded-md hover:bg-gray-50'
               >
                 Cancel
               </button>
@@ -497,7 +565,7 @@ const Cart = () => {
                   setLoginPromptVisible(false);
                   navigate('/login', { state: { returnUrl: '/cart' } });
                 }}
-                className='brown-deep-button'
+                className='flex-1 brown-deep-button py-2 px-4 rounded-md font-semibold'
               >
                 Sign In
               </button>
@@ -508,23 +576,24 @@ const Cart = () => {
 
       {/* Address Modal */}
       {showAddressModal && (
-        <div className='fixed inset-0 z-10 bg-black bg-opacity-50 flex items-center justify-center'>
-          <div className='bg-white p-6 rounded-lg max-w-lg w-full relative'>
-            <button
-              onClick={() => setShowAddressModal(false)}
-              className='absolute top-3 right-3 text-xl'
-            >
-              &times;
-            </button>
-            <h2 className='text-xl font-bold mb-4'>Select an Address</h2>
+        <div className='fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4'>
+          <div className='bg-white p-6 rounded-lg max-w-2xl w-full max-h-[80vh] overflow-y-auto'>
+            <div className='flex justify-between items-center mb-6'>
+              <h2 className='text-xl font-bold'>Select an Address</h2>
+              <button
+                onClick={() => setShowAddressModal(false)}
+                className='text-gray-500 hover:text-gray-700 text-xl'
+              >
+                ×
+              </button>
+            </div>
 
             {addressesLoading ? (
-              // Skeleton loader for addresses
               <div className='space-y-4'>
                 {[1, 2].map((item) => (
                   <div
                     key={item}
-                    className='border p-4 rounded flex items-center gap-4'
+                    className='border p-4 rounded-lg flex items-center gap-4'
                   >
                     <div className='w-4 h-4 bg-gray-200 rounded-full animate-pulse'></div>
                     <div className='flex-1'>
@@ -536,57 +605,67 @@ const Cart = () => {
                 ))}
               </div>
             ) : addresses.length > 0 ? (
-              <div className='space-y-4'>
+              <div className='space-y-4 mb-6'>
                 {addresses.map((address) => (
                   <div
                     key={address._id}
-                    className={`border p-4 rounded flex items-center gap-4 ${
+                    className={`border p-4 rounded-lg flex items-start gap-4 cursor-pointer hover:bg-gray-50 ${
                       selectedAddress?._id === address._id
-                        ? 'border-blue-500 bg-blue-50'
-                        : ''
+                        ? 'border-amber-500 bg-amber-50'
+                        : 'border-gray-200'
                     }`}
+                    onClick={() => setSelectedAddress(address)}
                   >
                     <input
                       type='radio'
                       name='address'
-                      id={`address-${address._id}`}
                       value={address._id}
                       checked={selectedAddress?._id === address._id}
                       onChange={() => setSelectedAddress(address)}
+                      className='mt-1'
                     />
-                    <label
-                      htmlFor={`address-${address._id}`}
-                      className='flex-1 cursor-pointer'
-                    >
-                      <p className='font-bold'>{address.deliveryName}</p>
-                      <p className='text-sm'>
-                        {address.streetAddress}, {address.city}, {address.state}{' '}
-                        - {address.zip}
-                      </p>
-                      <p className='text-sm'>{address.deliveryNumber}</p>
-                    </label>
+                  <div className='flex-1'>
+                    <div className='flex items-center gap-2 mb-2'>
+                      <p className='font-semibold mb-1'>{address.deliveryName}</p>
+                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                        totalAmount >= 499 
+                          ? 'bg-green-100 text-green-800' 
+                          : calculateDeliveryCharges(address.state, totalAmount) === 59 
+                            ? 'bg-orange-100 text-orange-800' 
+                            : 'bg-red-100 text-red-800'
+                      }`}>
+                        {totalAmount >= 499 
+                          ? 'FREE delivery' 
+                          : `₹${calculateDeliveryCharges(address.state, totalAmount)} delivery`}
+                      </span>
+                    </div>
+                    <p className='text-sm text-gray-600 mb-1'>
+                      {address.streetAddress}, {address.city}, {address.state} - {address.zip}
+                    </p>
+                    <p className='text-sm text-gray-600'>{address.deliveryNumber}</p>
+                  </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <p>No saved addresses. Please add one.</p>
+              <p className='text-center py-8 text-gray-600'>No saved addresses. Please add one.</p>
             )}
 
-            <div className='flex gap-4 mt-4 justify-center'>
+            <div className='flex gap-4 justify-center'>
               <button
                 onClick={() => setShowAddAddressForm(true)}
-                className='brown-deep-button bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600'
+                className='py-2 px-4 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300'
               >
                 Add Address
               </button>
               <button
                 onClick={handleCheckout}
                 disabled={!selectedAddress || isProcessing}
-                className={`brown-deep-button ${
+                className={`py-2 px-6 rounded-md font-semibold ${
                   selectedAddress && !isProcessing
-                    ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                    ? 'brown-deep-button'
                     : 'bg-gray-300 cursor-not-allowed text-gray-600'
-                } px-4 py-2 rounded`}
+                }`}
               >
                 {isProcessing ? 'Processing...' : 'Proceed to Payment'}
               </button>

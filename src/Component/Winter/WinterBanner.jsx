@@ -32,8 +32,8 @@
 
 // export default WinterBanner;
 
-import winterCollection from "../../assets/Image/banner/SummerCollection.png";
-import winterCollectionmobile from "../../assets/Image/banner/summercollectionmobile.png";
+import winterCollection from "../../assets/Image/banner/raincollection.png";
+import winterCollectionmobile from "../../assets/Image/banner/phonesize.png";
 
 const WinterBanner = () => {
 	return (
@@ -42,13 +42,13 @@ const WinterBanner = () => {
 			<img
 				src={winterCollection}
 				alt="Winter Collection"
-				className=" hidden  md:block absolute inset-0 w-full h-[600px] object-cover"
+				className=" hidden  md:block absolute inset-0 w-full h-[1000px] object-cover"
 			/>
 
 			<img
 				src={winterCollectionmobile}
 				alt="Winter Collection"
-				className=" block md:hidden absolute inset-0 w-full h-[400px] object-cover"
+				className=" block md:hidden absolute inset-0 w-full h-[450px] object-cover"
 			/>
 
 			{/* Overlay */}
