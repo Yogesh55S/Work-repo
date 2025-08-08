@@ -164,7 +164,7 @@ const Cart = () => {
         localStorage.setItem('currentOrderId', data.orderId);
 
         const cashfree = window.Cashfree({
-          mode: 'sandbox', // or "sandbox" for testing
+          mode: 'production', // or "sandbox" for testing
         });
 
         cashfree
