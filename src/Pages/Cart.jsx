@@ -131,20 +131,18 @@ const handleCheckout = async () => {
     return;
   }
 
-  // Check if Cashfree SDK is available
   if (!window.Cashfree) {
-    console.error('Cashfree SDK is not available at checkout time');
-    alert('Payment system is not ready. Please try again in a moment.');
+    console.error('Cashfree SDK is not available');
+    toast.error('Payment system is not ready. Please try again.');
     return;
   }
 
   try {
     setIsProcessing(true);
 
-    // ✅ Calculate delivery charges based on selected address and total amount
     const finalDeliveryCharges = totalAmount >= 499 ? 0 : calculateDeliveryCharges(selectedAddress.state);
 
-    // Step 1: Create order on your backend with delivery charges
+    // Step 1: Create order on backend
     const response = await fetch(`${API_URL}/orders/checkout`, {
       method: 'POST',
       headers: {
@@ -153,7 +151,7 @@ const handleCheckout = async () => {
       },
       body: JSON.stringify({
         addressId: selectedAddress._id,
-        deliveryCharges: finalDeliveryCharges, // ✅ Pass delivery charges to backend
+        deliveryCharges: finalDeliveryCharges,
       }),
     });
 
@@ -163,38 +161,36 @@ const handleCheckout = async () => {
     }
 
     const data = await response.json();
-    console.log('Checkout response data:', data);
+    console.log('Backend response:', data);
 
-    // Process with Cashfree
-    if (window.Cashfree && data.paymentSessionId) {
+    // ✅ FIX: Use the correct Cashfree SDK method
+    if (data.paymentSessionId) {
       localStorage.setItem('currentOrderId', data.orderId);
 
+      // Initialize Cashfree properly
       const cashfree = window.Cashfree({
-        mode: 'production', // or "sandbox" for testing
+        mode: 'sandbox' // Use 'production' when you have production credentials
       });
 
-      cashfree
-        .checkout({
-          paymentSessionId: data.paymentSessionId,
-          redirectTarget: '_self',
-        })
-        .then(() => {
-          console.log('Cashfree checkout completed');
-        })
-        .catch((error) => {
-          console.error('Error during Cashfree checkout:', error);
-          throw new Error('Failed to complete payment');
-        });
+      // ✅ Use checkout method correctly
+      const result = await cashfree.checkout({
+        paymentSessionId: data.paymentSessionId,
+        redirectTarget: '_self'
+      });
+  
+      console.log('Payment result:', result);
     } else {
-      throw new Error('Invalid payment data received from server');
+      throw new Error('Payment session not created');
     }
+
   } catch (error) {
-    console.error('Error during checkout:', error.message);
-    alert(`Checkout failed: ${error.message}`);
+    console.error('Checkout error:', error);
+    toast.error(`Payment failed: ${error.message}`);
   } finally {
     setIsProcessing(false);
   }
 };
+
   const fetchCartItems = async () => {
     setLoading(true);
     try {
