@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { useAuth } from './providers/AuthContext';
 
 const AddressForm = ({
   initialData,
@@ -11,6 +12,7 @@ const AddressForm = ({
   title = 'Add New Address',
   showModalWrapper = true,
 }) => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     deliveryName: initialData?.deliveryName || '',
     deliveryNumber: initialData?.deliveryNumber || '',
@@ -34,8 +36,15 @@ const AddressForm = ({
         zip: initialData.zip || '',
         tag: initialData.tag || 'home',
       });
+    } else {
+      // For new addresses, pre-fill with user data if available
+      setFormData(prev => ({
+        ...prev,
+        deliveryName: user?.fullName || '',
+        deliveryNumber: user?.phone || '',
+      }));
     }
-  }, [initialData]);
+  }, [initialData, user]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -79,7 +88,12 @@ const AddressForm = ({
 
     try {
       // Pass the ID from initialData if it exists (for edit mode)
-      await onSave({ ...formData, _id: initialData?._id });
+      await onSave({ 
+        ...formData, 
+        _id: initialData?._id,
+        // Flag to indicate if we should update user profile with this phone number
+        shouldUpdateUserPhone: !user?.phone || user.phone !== formData.deliveryNumber
+      });
 
       // Show success toast - onSave will handle closing the modal
       toast.success(

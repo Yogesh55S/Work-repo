@@ -20,10 +20,12 @@ const PaymentStatus = () => {
 			}
 
 			try {
-				// Verify payment status from backend
+				// ✅ Fixed: Use 'token' instead of 'authToken' to match your Cart component
+				const token = localStorage.getItem("token");
+				
 				const response = await fetch(`${API_URL}/orders/status/${orderId}`, {
 					headers: {
-						Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+						...(token && { Authorization: `Bearer ${token}` }), // Only add auth header if token exists
 					},
 				});
 
@@ -35,13 +37,19 @@ const PaymentStatus = () => {
 				const data = await response.json();
 				setOrderDetails(data);
 
-				// Map Cashfree status to our display status
-				if (data.status === "PAID") {
+				// ✅ Map Cashfree status to our display status
+				if (data.status === "PAID" || data.paymentStatus === "paid") {
 					setPaymentStatus("success");
-				} else if (["FAILED", "EXPIRED", "CANCELLED"].includes(data.status)) {
+				} else if (["FAILED", "EXPIRED", "CANCELLED"].includes(data.status) || data.paymentStatus === "failed") {
 					setPaymentStatus("failed");
 				} else {
 					setPaymentStatus("pending");
+					// ✅ If still pending, check again in 3 seconds
+					setTimeout(() => {
+						if (paymentStatus === "pending") {
+							verifyPayment();
+						}
+					}, 3000);
 				}
 			} catch (error) {
 				console.error("Error verifying payment:", error);
@@ -50,7 +58,7 @@ const PaymentStatus = () => {
 			}
 		};
 
-		// Give the backend a moment to process the webhook if it was sent
+		// Give the backend a moment to process
 		const timer = setTimeout(() => {
 			verifyPayment();
 		}, 1500);
@@ -62,8 +70,44 @@ const PaymentStatus = () => {
 	const handleRetryVerification = () => {
 		setPaymentStatus("loading");
 		setError(null);
-		// This will trigger the useEffect again
-		navigate(`/payment-status?order_id=${orderId}`, { replace: true });
+		
+		// Trigger verification again
+		const timer = setTimeout(() => {
+			const verifyPayment = async () => {
+				if (!orderId) return;
+
+				try {
+					const token = localStorage.getItem("token");
+					const response = await fetch(`${API_URL}/orders/status/${orderId}`, {
+						headers: {
+							...(token && { Authorization: `Bearer ${token}` }),
+						},
+					});
+
+					if (!response.ok) {
+						throw new Error("Payment verification failed");
+					}
+
+					const data = await response.json();
+					setOrderDetails(data);
+
+					if (data.status === "PAID" || data.paymentStatus === "paid") {
+						setPaymentStatus("success");
+					} else if (["FAILED", "EXPIRED", "CANCELLED"].includes(data.status) || data.paymentStatus === "failed") {
+						setPaymentStatus("failed");
+					} else {
+						setPaymentStatus("pending");
+					}
+				} catch (error) {
+					setPaymentStatus("error");
+					setError(error.message);
+				}
+			};
+			
+			verifyPayment();
+		}, 1000);
+
+		return () => clearTimeout(timer);
 	};
 
 	return (
@@ -100,19 +144,30 @@ const PaymentStatus = () => {
 							Payment Successful!
 						</h2>
 						<p className="text-gray-600">Thank you for your purchase.</p>
-						<p className="text-sm text-gray-500">Order ID: {orderId}</p>
+						
+						{/* ✅ Show the actual database order ID if available */}
+						<p className="text-sm text-gray-500">
+							Order ID: {orderDetails?.order?.dbOrderId || orderDetails?.order?.id || orderId}
+						</p>
+						
 						{orderDetails?.order?.amount && (
 							<p className="text-md font-semibold">
 								Amount Paid: ₹{orderDetails.order.amount}
 							</p>
 						)}
 
-						<div className="mt-8">
+						<div className="mt-8 space-y-3">
 							<Link
 								to="/user-panel/orders"
 								className="block w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600 text-center"
 							>
 								View Your Orders
+							</Link>
+							<Link
+								to="/shop"
+								className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md font-medium hover:bg-gray-300 text-center"
+							>
+								Continue Shopping
 							</Link>
 						</div>
 					</div>
@@ -149,16 +204,16 @@ const PaymentStatus = () => {
 
 						<div className="mt-8 flex flex-col space-y-3">
 							<Link
-								to="/checkout"
+								to="/cart"
 								className="block w-full bg-blue-500 text-white py-2 rounded-md font-bold hover:bg-blue-600 text-center"
 							>
 								Try Again
 							</Link>
 							<Link
-								to="/cart"
+								to="/shop"
 								className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md font-medium hover:bg-gray-300 text-center"
 							>
-								Return to Cart
+								Continue Shopping
 							</Link>
 						</div>
 					</div>
@@ -246,10 +301,10 @@ const PaymentStatus = () => {
 								Try Again
 							</button>
 							<Link
-								to="/help"
+								to="/cart"
 								className="block w-full bg-gray-200 text-gray-800 py-2 rounded-md font-medium hover:bg-gray-300 text-center"
 							>
-								Contact Support
+								Return to Cart
 							</Link>
 							<Link
 								to="/"

@@ -9,7 +9,7 @@ import { faPencilAlt } from '@fortawesome/free-solid-svg-icons';
 import PersonalInformationSkeleton from '../skeletons/PersonalInformationSkeleton';
 
 const PersonalInformation = () => {
-  const { token } = useAuth();
+  const { token, user, updateUser } = useAuth();
   const [formData, setFormData] = useState(null);
   const [editableFields, setEditableFields] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -28,16 +28,61 @@ const PersonalInformation = () => {
       if (!response.ok) throw new Error('Failed to fetch user profile');
 
       const data = await response.json();
-      const user = data.user || {};
+      const userData = data.user || {};
+      
+      // If user doesn't have a phone number, try to get it from their first address
+      let phoneNumber = userData.phone;
+      if (!phoneNumber) {
+        try {
+          const addressResponse = await fetch(`${API_URL}/addresses/${userData._id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const addressData = await addressResponse.json();
+          if (addressData.addresses && addressData.addresses.length > 0) {
+            phoneNumber = addressData.addresses[0].deliveryNumber;
+            
+            // Update user profile with the phone number from address
+            if (phoneNumber) {
+              await updateUserProfileWithPhone(phoneNumber);
+            }
+          }
+        } catch (addressError) {
+          console.error('Error fetching addresses for phone:', addressError);
+        }
+      }
+
       setFormData({
-        fullName: user.fullName || '',
-        phone: user.phone || '',
-        email: user.email || '',
+        fullName: userData.fullName || '',
+        phone: phoneNumber || '',
+        email: userData.email || '',
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
+      toast.error('Failed to load profile data');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const updateUserProfileWithPhone = async (phoneNumber) => {
+    try {
+      const response = await fetch(`${API_URL}/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ phone: phoneNumber }),
+      });
+
+      if (response.ok) {
+        const updatedData = await response.json();
+        if (updateUser) {
+          updateUser(updatedData.user);
+        }
+      }
+    } catch (error) {
+      console.error('Error updating user profile with phone:', error);
     }
   };
 
@@ -59,8 +104,32 @@ const PersonalInformation = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const validatePhoneNumber = (phone) => {
+    if (!phone) return true; // Allow empty phone number
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length === 10;
+  };
+
+  const validateEmail = (email) => {
+    if (!email) return true; // Allow empty email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const handleSaveChanges = async () => {
     try {
+      // Validate phone number
+      if (editableFields.phone && !validatePhoneNumber(formData.phone)) {
+        toast.error('Please enter a valid 10-digit phone number');
+        return;
+      }
+
+      // Validate email
+      if (editableFields.email && !validateEmail(formData.email)) {
+        toast.error('Please enter a valid email address');
+        return;
+      }
+
       const response = await fetch(`${API_URL}/profile`, {
         method: 'PUT',
         headers: {
@@ -73,13 +142,18 @@ const PersonalInformation = () => {
       if (!response.ok) throw new Error('Failed to update user profile');
 
       const updatedData = await response.json();
-      const user = updatedData.user || updatedData;
+      const userData = updatedData.user || updatedData;
 
       setFormData({
-        fullName: user.fullName || '',
-        phone: user.phone || '',
-        email: user.email || '',
+        fullName: userData.fullName || '',
+        phone: userData.phone || '',
+        email: userData.email || '',
       });
+
+      // Update the user context
+      if (updateUser) {
+        updateUser(userData);
+      }
 
       setEditableFields({});
       toast.success('Changes saved successfully!');
@@ -105,8 +179,8 @@ const PersonalInformation = () => {
         <img src={leftArrow} alt='Left Arrow' className='left-arrow' />
       </div>
       <p className='description'>
-        Lorem ipsum odor amet, consectetuer adipiscing elit. Sed faucibus morbi
-        curae maecenas dignissim volutpat hac quam.
+       I seem to have loved you in numberless forms, numberless times,
+In life after life, in age after age, forever...
       </p>
 
       <form className='personal-info-form'>

@@ -118,78 +118,83 @@ const Cart = () => {
     };
   }, []);
 
-  const handleCheckout = async () => {
-    if (!isLoggedIn) {
-      setLoginPromptVisible(true);
-      return;
+  // Replace your handleCheckout function with this updated version:
+
+const handleCheckout = async () => {
+  if (!isLoggedIn) {
+    setLoginPromptVisible(true);
+    return;
+  }
+
+  if (!selectedAddress) {
+    toast.info('Please select an address first!');
+    return;
+  }
+
+  // Check if Cashfree SDK is available
+  if (!window.Cashfree) {
+    console.error('Cashfree SDK is not available at checkout time');
+    alert('Payment system is not ready. Please try again in a moment.');
+    return;
+  }
+
+  try {
+    setIsProcessing(true);
+
+    // ✅ Calculate delivery charges based on selected address and total amount
+    const finalDeliveryCharges = totalAmount >= 499 ? 0 : calculateDeliveryCharges(selectedAddress.state);
+
+    // Step 1: Create order on your backend with delivery charges
+    const response = await fetch(`${API_URL}/orders/checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({
+        addressId: selectedAddress._id,
+        deliveryCharges: finalDeliveryCharges, // ✅ Pass delivery charges to backend
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Checkout failed');
     }
 
-    if (!selectedAddress) {
-      toast.info('Please select an address first!');
-      return;
-    }
+    const data = await response.json();
+    console.log('Checkout response data:', data);
 
-    // Check if Cashfree SDK is available
-    if (!window.Cashfree) {
-      console.error('Cashfree SDK is not available at checkout time');
-      alert('Payment system is not ready. Please try again in a moment.');
-      return;
-    }
+    // Process with Cashfree
+    if (window.Cashfree && data.paymentSessionId) {
+      localStorage.setItem('currentOrderId', data.orderId);
 
-    try {
-      setIsProcessing(true);
-
-      // Step 1: Create order on your backend
-      const response = await fetch(`${API_URL}/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          addressId: selectedAddress._id,
-        }),
+      const cashfree = window.Cashfree({
+        mode: 'production', // or "sandbox" for testing
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Checkout failed');
-      }
-
-      const data = await response.json();
-      console.log('Checkout response data:', data);
-
-      // Process with Cashfree
-      if (window.Cashfree && data.paymentSessionId) {
-        localStorage.setItem('currentOrderId', data.orderId);
-
-        const cashfree = window.Cashfree({
-          mode: 'production', // or "sandbox" for testing
+      cashfree
+        .checkout({
+          paymentSessionId: data.paymentSessionId,
+          redirectTarget: '_self',
+        })
+        .then(() => {
+          console.log('Cashfree checkout completed');
+        })
+        .catch((error) => {
+          console.error('Error during Cashfree checkout:', error);
+          throw new Error('Failed to complete payment');
         });
-
-        cashfree
-          .checkout({
-            paymentSessionId: data.paymentSessionId,
-            redirectTarget: '_self',
-          })
-          .then(() => {
-            console.log('Cashfree checkout completed');
-          })
-          .catch((error) => {
-            console.error('Error during Cashfree checkout:', error);
-            throw new Error('Failed to complete payment');
-          });
-      } else {
-        throw new Error('Invalid payment data received from server');
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error.message);
-      alert(`Checkout failed: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
+    } else {
+      throw new Error('Invalid payment data received from server');
     }
-  };
-
+  } catch (error) {
+    console.error('Error during checkout:', error.message);
+    alert(`Checkout failed: ${error.message}`);
+  } finally {
+    setIsProcessing(false);
+  }
+};
   const fetchCartItems = async () => {
     setLoading(true);
     try {
