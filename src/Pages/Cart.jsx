@@ -169,7 +169,7 @@ const handleCheckout = async () => {
 
       // Initialize Cashfree properly
       const cashfree = window.Cashfree({
-        mode: 'sandbox' // Use 'production' when you have production credentials
+        mode: 'production' // Use 'production' when you have production credentials
       });
 
       // ✅ Use checkout method correctly
