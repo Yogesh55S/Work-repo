@@ -5,7 +5,7 @@ import loadingGif from "../assets/loader/loader.png";
 export default function SimpleGifLoader() {
 	const [showLoader, setShowLoader] = useState(true);
 
-	useEffect(() => {
+	useEffect(() => { 
 		// Handle the hiding of the loader once your page is loaded
 		const handlePageLoad = () => {
 			// Add a small delay to make the transition smoother

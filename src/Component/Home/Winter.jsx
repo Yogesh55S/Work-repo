@@ -7,6 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import CardSkeleton from '../skeletons/Cardskeleton';
+// Import your loader
+import loadingGif from "../../assets/loader/loader.png";
 
 const Winter = () => {
   const sliderRef = useRef(null);
@@ -15,6 +17,7 @@ const Winter = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showLoader, setShowLoader] = useState(true);
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
@@ -41,6 +44,36 @@ const Winter = () => {
     fetchProducts();
   }, [API_URL]);
 
+  // Handle page loader
+  useEffect(() => {
+    const handlePageLoad = () => {
+      // Add a small delay to make the transition smoother
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 500);
+    };
+
+    // Listen for the window load event
+    window.addEventListener("load", handlePageLoad);
+
+    // For cases where the page might already be loaded
+    if (document.readyState === "complete") {
+      handlePageLoad();
+    }
+
+    // Also hide loader when data loading is complete
+    if (!loading) {
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 300);
+    }
+
+    // Cleanup
+    return () => {
+      window.removeEventListener("load", handlePageLoad);
+    };
+  }, [loading]);
+
   const calculateSlidesToShow = () => {
     const screenWidth = window.innerWidth;
 
@@ -57,7 +90,7 @@ const Winter = () => {
 
   useEffect(() => {
     calculateSlidesToShow();
-    window.addEventListener('resize', calculateSlidesToShow);
+    window.addEventListener('resize', calculateSlidesToShow); 
     return () => {
       window.removeEventListener('resize', calculateSlidesToShow);
     };
@@ -79,6 +112,18 @@ const Winter = () => {
     navigate(`/product/${product._id}`, { state: { product } });
   };
 
+  // Show loader while page is loading
+  if (showLoader) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="text-center">
+          <img src={loadingGif} alt="Loading..." className="w-32 h-32 mx-auto" />
+          <p className="mt-4 text-gray-700 font-medium">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       id='winter-carousel'
@@ -89,7 +134,7 @@ const Winter = () => {
           Our Monsoon Collection
         </h2>
         <p className='text-sm md:text-base text-gray-600 mb-8 xs:text-center'>
-          Discover our exclusive monsoon collection, crafted for Nidaspur’s lush season—formulated to keep your skin fresh, healthy,
+          Discover our exclusive monsoon collection, crafted for Nidaspur's lush season—formulated to keep your skin fresh, healthy,
           <br/> and protected from humidity and rain.
         </p>
 
