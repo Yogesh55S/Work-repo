@@ -46,7 +46,7 @@ const Cart = () => {
     const nearDelhiStates = [
       'delhi', 
       'haryana',
-      'Chandigarh',
+      'chandigarh', // Fixed: made lowercase consistent
     ];
     
     const normalizedState = state.toLowerCase().trim();
@@ -58,10 +58,16 @@ const Cart = () => {
     }
   };
 
+  // Calculate final delivery charges (considering free delivery threshold)
+  const getFinalDeliveryCharges = (state, subtotal) => {
+    if (subtotal >= 499) return 0;
+    return calculateDeliveryCharges(state);
+  };
+
   // Update delivery charges when address is selected
   useEffect(() => {
-    if (selectedAddress && selectedAddress.state) {
-      const charges = calculateDeliveryCharges(selectedAddress.state, totalAmount);
+    if (selectedAddress?.state && totalAmount > 0) {
+      const charges = getFinalDeliveryCharges(selectedAddress.state, totalAmount);
       setDeliveryCharges(charges);
     } else {
       setDeliveryCharges(0);
@@ -76,8 +82,8 @@ const Cart = () => {
     }
   }, [showAddressModal, isLoggedIn]);
 
+  // Cashfree SDK loading
   useEffect(() => {
-    // Simple function to check if Cashfree SDK is available
     const checkCashfreeSDK = () => {
       if (window.Cashfree) {
         console.log('Cashfree SDK is available');
@@ -86,12 +92,10 @@ const Cart = () => {
       return false;
     };
 
-    // Check if SDK is already loaded
     if (checkCashfreeSDK()) {
       return;
     }
 
-    // If not loaded, try to load it
     const script = document.createElement('script');
     script.src = 'https://sdk.cashfree.com/js/v3/cashfree.js';
     script.async = true;
@@ -104,9 +108,7 @@ const Cart = () => {
     };
     document.body.appendChild(script);
 
-    // Cleanup function
     return () => {
-      // Remove any script elements we added
       const scripts = document.querySelectorAll(
         'script[src="https://sdk.cashfree.com/js/v3/cashfree.js"]'
       );
@@ -118,78 +120,73 @@ const Cart = () => {
     };
   }, []);
 
-  // Replace your handleCheckout function with this updated version:
-
-const handleCheckout = async () => {
-  if (!isLoggedIn) {
-    setLoginPromptVisible(true);
-    return;
-  }
-
-  if (!selectedAddress) {
-    toast.info('Please select an address first!');
-    return;
-  }
-
-  if (!window.Cashfree) {
-    console.error('Cashfree SDK is not available');
-    toast.error('Payment system is not ready. Please try again.');
-    return;
-  }
-
-  try {
-    setIsProcessing(true);
-
-    const finalDeliveryCharges = totalAmount >= 499 ? 0 : calculateDeliveryCharges(selectedAddress.state);
-
-    // Step 1: Create order on backend
-    const response = await fetch(`${API_URL}/orders/checkout`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
-      },
-      body: JSON.stringify({
-        addressId: selectedAddress._id,
-        deliveryCharges: finalDeliveryCharges,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Checkout failed');
+  const handleCheckout = async () => {
+    if (!isLoggedIn) {
+      setLoginPromptVisible(true);
+      return;
     }
 
-    const data = await response.json();
-    console.log('Backend response:', data);
-
-    // ✅ FIX: Use the correct Cashfree SDK method
-    if (data.paymentSessionId) {
-      localStorage.setItem('currentOrderId', data.orderId);
-
-      // Initialize Cashfree properly
-      const cashfree = window.Cashfree({
-        mode: 'production' // Use 'production' when you have production credentials
-      });
-
-      // ✅ Use checkout method correctly
-      const result = await cashfree.checkout({
-        paymentSessionId: data.paymentSessionId,
-        redirectTarget: '_self'
-      });
-  
-      console.log('Payment result:', result);
-    } else {
-      throw new Error('Payment session not created');
+    if (!selectedAddress) {
+      toast.info('Please select an address first!');
+      return;
     }
 
-  } catch (error) {
-    console.error('Checkout error:', error);
-    toast.error(`Payment failed: ${error.message}`);
-  } finally {
-    setIsProcessing(false);
-  }
-};
+    if (!window.Cashfree) {
+      console.error('Cashfree SDK is not available');
+      toast.error('Payment system is not ready. Please try again.');
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+
+      // Calculate final delivery charges at checkout
+      const finalDeliveryCharges = getFinalDeliveryCharges(selectedAddress.state, totalAmount);
+
+      const response = await fetch(`${API_URL}/orders/checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          addressId: selectedAddress._id,
+          deliveryCharges: finalDeliveryCharges,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Checkout failed');
+      }
+
+      const data = await response.json();
+      console.log('Backend response:', data);
+
+      if (data.paymentSessionId) {
+        localStorage.setItem('currentOrderId', data.orderId);
+
+        const cashfree = window.Cashfree({
+          mode: 'production'
+        });
+
+        const result = await cashfree.checkout({
+          paymentSessionId: data.paymentSessionId,
+          redirectTarget: '_self'
+        });
+    
+        console.log('Payment result:', result);
+      } else {
+        throw new Error('Payment session not created');
+      }
+
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error(`Payment failed: ${error.message}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   const fetchCartItems = async () => {
     setLoading(true);
@@ -197,7 +194,6 @@ const handleCheckout = async () => {
       let cartData = [];
 
       if (isLoggedIn && userId) {
-        // Fetch authenticated user's cart
         const response = await fetch(`${API_URL}/users/${userId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -207,7 +203,6 @@ const handleCheckout = async () => {
         if (response.ok) {
           const userData = await response.json();
 
-          // Get full product details for each cart item
           cartData = await Promise.all(
             userData.cart.map(async (item) => {
               try {
@@ -234,9 +229,7 @@ const handleCheckout = async () => {
           );
         }
       } else {
-        // Get guest cart from localStorage
         const guestCart = GuestCartService.getCart();
-        // For guest cart, we already have product details stored
         cartData = guestCart;
       }
       setCartItems(cartData);
@@ -276,7 +269,6 @@ const handleCheckout = async () => {
 
   const handleAddAddress = async (formData) => {
     try {
-      // Validate address fields
       if (
         !formData.deliveryName ||
         !formData.deliveryNumber ||
@@ -314,7 +306,6 @@ const handleCheckout = async () => {
 
   const updateQuantity = async (productId, newQuantity) => {
     try {
-      // First update local state for immediate feedback
       const updatedCart = cartItems.map((item) => {
         if (
           item.productId === productId ||
@@ -326,7 +317,6 @@ const handleCheckout = async () => {
       });
       setCartItems(updatedCart);
 
-      // Then update cart in backend/localStorage
       let success = false;
 
       if (isLoggedIn && userId) {
@@ -343,8 +333,6 @@ const handleCheckout = async () => {
     } catch (error) {
       console.error('Error updating cart quantity:', error.message);
       toast.error('Failed to update quantity');
-
-      // Revert to previous state on error by re-fetching cart
       fetchCartItems();
     }
   };
@@ -392,11 +380,13 @@ const handleCheckout = async () => {
     calculateTotal();
   }, [cartItems]);
 
+  // Calculate final total with delivery charges
+  const finalTotal = totalAmount + deliveryCharges;
+
   return (
     <div className='container mx-auto p-4 pt-28'>
       <h1 className='text-3xl font-bold mb-6 text-center'>Your Cart</h1>
 
-      {/* Show skeleton while loading */}
       {loading ? (
         <CartSkeleton />
       ) : cartItems.length === 0 ? (
@@ -496,7 +486,7 @@ const handleCheckout = async () => {
                   <span>Delivery Charges:</span>
                   {!selectedAddress ? (
                     <span className='text-gray-500'>Select address to calculate</span>
-                  ) : totalAmount >= 499 ? (
+                  ) : deliveryCharges === 0 ? (
                     <span className='text-green-600 font-semibold'>FREE</span>
                   ) : (
                     <span className='font-semibold'>₹{deliveryCharges}</span>
@@ -511,7 +501,7 @@ const handleCheckout = async () => {
                   <div className='flex justify-between text-lg font-bold'>
                     <span>Total:</span>
                     <span className='text-amber-800'>
-                      ₹{(totalAmount >= 499 ? totalAmount : totalAmount + deliveryCharges).toLocaleString()}
+                      ₹{finalTotal.toLocaleString()}
                     </span>
                   </div>
                 </div>
@@ -607,46 +597,50 @@ const handleCheckout = async () => {
               </div>
             ) : addresses.length > 0 ? (
               <div className='space-y-4 mb-6'>
-                {addresses.map((address) => (
-                  <div
-                    key={address._id}
-                    className={`border p-4 rounded-lg flex items-start gap-4 cursor-pointer hover:bg-gray-50 ${
-                      selectedAddress?._id === address._id
-                        ? 'border-amber-500 bg-amber-50'
-                        : 'border-gray-200'
-                    }`}
-                    onClick={() => setSelectedAddress(address)}
-                  >
-                    <input
-                      type='radio'
-                      name='address'
-                      value={address._id}
-                      checked={selectedAddress?._id === address._id}
-                      onChange={() => setSelectedAddress(address)}
-                      className='mt-1'
-                    />
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2 mb-2'>
-                      <p className='font-semibold mb-1'>{address.deliveryName}</p>
-                      <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                        totalAmount >= 499 
-                          ? 'bg-green-100 text-green-800' 
-                          : calculateDeliveryCharges(address.state, totalAmount) === 59 
-                            ? 'bg-orange-100 text-orange-800' 
-                            : 'bg-red-100 text-red-800'
-                      }`}>
-                        {totalAmount >= 499 
-                          ? 'FREE delivery' 
-                          : `₹${calculateDeliveryCharges(address.state, totalAmount)} delivery`}
-                      </span>
+                {addresses.map((address) => {
+                  const addressDeliveryCharge = getFinalDeliveryCharges(address.state, totalAmount);
+                  
+                  return (
+                    <div
+                      key={address._id}
+                      className={`border p-4 rounded-lg flex items-start gap-4 cursor-pointer hover:bg-gray-50 ${
+                        selectedAddress?._id === address._id
+                          ? 'border-amber-500 bg-amber-50'
+                          : 'border-gray-200'
+                      }`}
+                      onClick={() => setSelectedAddress(address)}
+                    >
+                      <input
+                        type='radio'
+                        name='address'
+                        value={address._id}
+                        checked={selectedAddress?._id === address._id}
+                        onChange={() => setSelectedAddress(address)}
+                        className='mt-1'
+                      />
+                      <div className='flex-1'>
+                        <div className='flex items-center gap-2 mb-2'>
+                          <p className='font-semibold mb-1'>{address.deliveryName}</p>
+                          <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                            addressDeliveryCharge === 0
+                              ? 'bg-green-100 text-green-800' 
+                              : addressDeliveryCharge === 59 
+                                ? 'bg-orange-100 text-orange-800' 
+                                : 'bg-red-100 text-red-800'
+                          }`}>
+                            {addressDeliveryCharge === 0
+                              ? 'FREE delivery' 
+                              : `₹${addressDeliveryCharge} delivery`}
+                          </span>
+                        </div>
+                        <p className='text-sm text-gray-600 mb-1'>
+                          {address.streetAddress}, {address.city}, {address.state} - {address.zip}
+                        </p>
+                        <p className='text-sm text-gray-600'>{address.deliveryNumber}</p>
+                      </div>
                     </div>
-                    <p className='text-sm text-gray-600 mb-1'>
-                      {address.streetAddress}, {address.city}, {address.state} - {address.zip}
-                    </p>
-                    <p className='text-sm text-gray-600'>{address.deliveryNumber}</p>
-                  </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className='text-center py-8 text-gray-600'>No saved addresses. Please add one.</p>

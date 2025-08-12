@@ -15,7 +15,7 @@ const GoogleSignInButton = ({ onGoogleSuccess }) => {
 
     console.log('Google Token received:', credential); // Debug Google token
 
-    try {
+    try { 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/auth/google/callback`,
         {

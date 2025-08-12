@@ -80,7 +80,7 @@ const Navbar = () => {
 					<ul className="hidden lg:flex space-x-8 text-base font-medium">
 						{[
 							{ name: "Home", path: "/" },
-							{ name: "Monsoon Collection", path: "/Summer-collection" },
+							{ name: "Monsoon Collection", path: "/monsoon-collection" },
 							{ name: "Shop", path: "/shop" },
 							{ name: "Contact Us", path: "/contact" },
 						].map((navItem) => (
@@ -158,7 +158,7 @@ const Navbar = () => {
 					>
 						{[
 							{ name: "Home", path: "/" },
-							{ name: "Monsoon Collection", path: "/Summer-collection" },
+							{ name: "Monsoon Collection", path: "/monsoon-collection" },
 							{ name: "Shop", path: "/shop" },
 							{ name: "Contact Us", path: "/contact" },
 						].map((navItem) => (
