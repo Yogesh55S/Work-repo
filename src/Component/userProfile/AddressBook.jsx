@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
 import { useAuth } from '../providers/AuthContext';
-import '../css/AddressBook.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faTrash,
   faPencilAlt,
   faSpinner,
+  faPlus,
+  faHome,
+  faBuilding,
+  faMapMarkerAlt,
 } from '@fortawesome/free-solid-svg-icons';
 import AddressBookSkeleton from '../skeletons/AddressBookSkeleton';
 import AddressForm from '../AddressForm';
@@ -26,16 +28,20 @@ const AddressBook = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    if (!user?._id) return;
+    if (!user?.id) return;
     fetchAddresses();
-  }, [token, user?._id]);
+  }, [token, user?.id]);
 
   const fetchAddresses = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_URL}/addresses/${user._id}`, {
+      const response = await fetch(`${API_URL}/addresses`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch addresses');
+      }
 
       const data = await response.json();
       setAddresses(data.addresses || []);
@@ -52,21 +58,18 @@ const AddressBook = () => {
     setShowModal(true);
   };
 
-  // Show delete confirmation instead of deleting directly
   const confirmDelete = (id) => {
     setDeleteConfirmation({ show: true, id });
   };
 
-  // Cancel delete
   const cancelDelete = () => {
     setDeleteConfirmation({ show: false, id: null });
   };
 
-  // Actually delete the address after confirmation
   const handleDelete = async (id) => {
     setIsDeleting(true);
     try {
-      const response = await fetch(`${API_URL}/addresses/${user._id}/${id}`, {
+      const response = await fetch(`${API_URL}/addresses/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -75,12 +78,10 @@ const AddressBook = () => {
         throw new Error('Failed to delete address');
       }
 
-      // Update the addresses state directly instead of refetching
       const updatedAddresses = addresses.filter(
-        (address) => address._id !== id
+        (address) => address._id !== id && address.id !== id
       );
       setAddresses(updatedAddresses);
-
       toast.success('Address deleted successfully');
     } catch (error) {
       console.error('Error deleting address:', error);
@@ -92,10 +93,11 @@ const AddressBook = () => {
   };
 
   const handleSave = async (formData) => {
-    const method = formData._id ? 'PUT' : 'POST';
-    const url = formData._id
-      ? `${API_URL}/addresses/${user._id}/${formData._id}`
-      : `${API_URL}/addresses/${user._id}`;
+    const method = formData._id || formData.id ? 'PUT' : 'POST';
+    const addressId = formData._id || formData.id;
+    const url = method === 'PUT' 
+      ? `${API_URL}/addresses/${addressId}`
+      : `${API_URL}/addresses`;
 
     try {
       const response = await fetch(url, {
@@ -109,31 +111,53 @@ const AddressBook = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save address');
+        throw new Error(errorData.error || 'Failed to save address');
       }
 
-      // Instead of refetching, update the state directly
       const responseData = await response.json();
-
       if (method === 'POST') {
-        // Add new address
         setAddresses([...addresses, responseData.address]);
+        toast.success('Address added successfully');
       } else {
-        // Update existing address
         setAddresses(
           addresses.map((addr) =>
-            addr._id === formData._id ? { ...addr, ...formData } : addr
+            (addr._id === addressId || addr.id === addressId) 
+              ? { ...addr, ...responseData.address } 
+              : addr
           )
         );
+        toast.success('Address updated successfully');
       }
 
       setShowModal(false);
       setSelectedAddress(null);
-
-      // Success will be shown by the form component
     } catch (error) {
       console.error('Error saving address:', error);
-      throw error; // Re-throw so the form can handle it
+      throw error;
+    }
+  };
+
+  const getTagIcon = (tag) => {
+    switch (tag.toLowerCase()) {
+      case 'home':
+        return faHome;
+      case 'office':
+      case 'work':
+        return faBuilding;
+      default:
+        return faMapMarkerAlt;
+    }
+  };
+
+  const getTagColor = (tag) => {
+    switch (tag.toLowerCase()) {
+      case 'home':
+        return 'bg-blue-500';
+      case 'office':
+      case 'work':
+        return 'bg-gray-600';
+      default:
+        return 'bg-green-500';
     }
   };
 
@@ -141,142 +165,168 @@ const AddressBook = () => {
     return <AddressBookSkeleton />;
   }
 
-  const defaultAddress = addresses[0]; // Assume the first address as default
-  const otherAddresses = addresses.slice(1);
-
   return (
-    <div className='address-book-container'>
-      <h2 className='title'>Saved Addresses</h2>
-
-      <div className='button-para'>
-        <p>
-          Lorem ipsum odor amet, consectetuer adipiscing elit.Sed faucibus morbi
-          curae maecenas dignissim volutpat hac quam.
-        </p>
+    <div className="max-w-4xl mx-auto p-6 bg-white">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
+        <div className="mb-4 sm:mb-0">
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Address Book</h2>
+          <p className="text-gray-600 text-sm">
+            Lorem ipsum odor amet, consectetuer adipiscing elit. Sed faucibus morbi curae maecenas dignissim volutpat hac quam.
+          </p>
+        </div>
+        
         <button
-          className='brown-deep-button mt-5'
-          onClick={() => handleEdit(null)}
+          onClick={() => {
+            setSelectedAddress(null);
+            setShowModal(true);
+          }}
+          className="bg-amber-800 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 flex items-center gap-2 whitespace-nowrap"
         >
-          + Add New Address
+          <FontAwesomeIcon icon={faPlus} className="text-sm" />
+          Add New Address
         </button>
       </div>
 
-      <div className='address-section'>
-        {defaultAddress && (
-          <div className='address-card-box default-address'>
-            <h3 className='address-section-title'>Default Address</h3>
-            <AddressDetails
-              address={defaultAddress}
-              onEdit={handleEdit}
-              onDelete={confirmDelete}
-            />
+      {/* Addresses */}
+      {addresses.length === 0 ? (
+        <div className="text-center py-16">
+          <div className="mx-auto w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+            <FontAwesomeIcon icon={faMapMarkerAlt} className="text-2xl text-gray-400" />
           </div>
-        )}
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No addresses yet</h3>
+          <p className="text-gray-500 mb-6">Add your first address to get started</p>
+          <button
+            onClick={() => {
+              setSelectedAddress(null);
+              setShowModal(true);
+            }}
+            className="bg-amber-800 hover:bg-amber-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+          >
+            Add Your First Address
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {addresses.map((address) => (
+            <div 
+              key={address._id || address.id} 
+              className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-lg hover:border-amber-200 transition-all duration-200"
+            >
+              {/* Card Header */}
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg ${getTagColor(address.tag)} text-white`}>
+                    <FontAwesomeIcon 
+                      icon={getTagIcon(address.tag)} 
+                      className="text-sm"
+                    />
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-semibold text-white ${getTagColor(address.tag)}`}>
+                    {address.tag}
+                  </span>
+                </div>
 
-        {otherAddresses.length > 0 && (
-          <div>
-            <h3 className='address-section-title'>Other Addresses</h3>
-            {otherAddresses.map((address) => (
-              <AddressDetails
-                key={address._id}
-                address={address}
-                onEdit={handleEdit}
-                onDelete={confirmDelete}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleEdit(address)}
+                    className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors duration-200"
+                    title="Edit Address"
+                  >
+                    <FontAwesomeIcon icon={faPencilAlt} className="text-sm" />
+                  </button>
+                  <button
+                    onClick={() => confirmDelete(address._id || address.id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                    title="Delete Address"
+                  >
+                    <FontAwesomeIcon icon={faTrash} className="text-sm" />
+                  </button>
+                </div>
+              </div>
 
+              {/* Card Content */}
+              <div className="space-y-2">
+                <h3 className="font-semibold text-gray-900 text-lg">
+                  {address.deliveryName}
+                </h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  {address.streetAddress}
+                </p>
+                <p className="text-gray-600 text-sm">
+                  {address.city}, {address.state} {address.zip}
+                </p>
+                
+                <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-gray-700 text-sm font-medium">
+                    {address.deliveryNumber}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Address Form Modal */}
       {showModal && (
         <AddressForm
-          initialData={selectedAddress}
+          address={selectedAddress}
           onSave={handleSave}
-          onCancel={() => setShowModal(false)}
+          onCancel={() => {
+            setShowModal(false);
+            setSelectedAddress(null);
+          }}
+          onClose={() => {
+            setShowModal(false);
+            setSelectedAddress(null);
+          }}
         />
       )}
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Confirmation Modal */}
       {deleteConfirmation.show && (
-        <div className='fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4'>
-          <div className='bg-white p-6 rounded-lg w-full max-w-md'>
-            <h3 className='text-xl font-semibold text-[#6b4226] mb-4'>
-              Delete Address
-            </h3>
-            <p className='text-gray-700 mb-6'>
-              Are you sure you want to delete this address? This action cannot
-              be undone.
-            </p>
-            <div className='flex justify-end space-x-4'>
-              <button
-                onClick={cancelDelete}
-                className='py-2 px-4 text-gray-600 font-medium border border-gray-300 rounded-md hover:bg-gray-50 transition-colors focus:outline-none'
-                disabled={isDeleting}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleDelete(deleteConfirmation.id)}
-                className='py-2 px-4 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition-colors focus:outline-none flex items-center justify-center'
-                disabled={isDeleting}
-              >
-                {isDeleting ? (
-                  <>
-                    <FontAwesomeIcon icon={faSpinner} spin className='mr-2' />
-                    Deleting...
-                  </>
-                ) : (
-                  'Delete'
-                )}
-              </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full">
+            <div className="text-center">
+              <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <FontAwesomeIcon icon={faTrash} className="text-2xl text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Address</h3>
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to delete this address? This action cannot be undone.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={cancelDelete}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition-colors duration-200 disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => handleDelete(deleteConfirmation.id)}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <FontAwesomeIcon icon={faSpinner} spin className="text-sm" />
+                      Deleting...
+                    </>
+                  ) : (
+                    'Delete'
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
-
-// Component for displaying a single address card
-const AddressDetails = ({ address, onEdit, onDelete }) => (
-  <div className='address-card'>
-    <div className='address-details'>
-      <p className='address-title'>
-        {address.deliveryName} -{' '}
-        <span className='address-tag'>{address.tag}</span>
-      </p>
-      <p>
-        {address.streetAddress}, {address.city}, {address.state} - {address.zip}
-      </p>
-      <p>
-        <strong>Mobile:</strong> {address.deliveryNumber}
-      </p>
-    </div>
-    <div className='address-actions'>
-      <button onClick={() => onEdit(address)} className='edit-btn'>
-        <FontAwesomeIcon icon={faPencilAlt} />
-      </button>
-      <button onClick={() => onDelete(address._id)} className='delete-btn'>
-        <FontAwesomeIcon icon={faTrash} />
-      </button>
-    </div>
-  </div>
-);
-
-// Add PropTypes validation for the AddressDetails component
-AddressDetails.propTypes = {
-  address: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
-    deliveryName: PropTypes.string.isRequired,
-    deliveryNumber: PropTypes.string.isRequired,
-    streetAddress: PropTypes.string.isRequired,
-    city: PropTypes.string.isRequired,
-    state: PropTypes.string.isRequired,
-    zip: PropTypes.string.isRequired,
-    tag: PropTypes.string.isRequired,
-  }).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
 };
 
 export default AddressBook;

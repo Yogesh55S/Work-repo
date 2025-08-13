@@ -35,7 +35,7 @@ const UserPanel = () => {
 
       setLoading(true); // Start loading
       try {
-        const response = await fetchWithAuth('profile', token);
+        const response = await fetchWithAuth('user/profile', token);
         // Check if response has user property
         const data = response.user || response;
         setUserData(data);

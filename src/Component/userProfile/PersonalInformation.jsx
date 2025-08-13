@@ -19,7 +19,9 @@ const PersonalInformation = () => {
   const fetchUserData = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${API_URL}/profile`, {
+      
+      // ONLY CHANGE: Updated endpoint to match your user controller
+      const response = await fetch(`${API_URL}/user/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -30,11 +32,14 @@ const PersonalInformation = () => {
       const data = await response.json();
       const userData = data.user || {};
       
+      // Map Supabase database fields (snake_case) to your form fields
+      let phoneNumber = userData.phone || userData.phone;
+      
       // If user doesn't have a phone number, try to get it from their first address
-      let phoneNumber = userData.phone;
       if (!phoneNumber) {
         try {
-          const addressResponse = await fetch(`${API_URL}/addresses/${userData._id}`, {
+          // Updated to use correct user ID field
+          const addressResponse = await fetch(`${API_URL}/addresses/${userData.id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           const addressData = await addressResponse.json();
@@ -52,7 +57,8 @@ const PersonalInformation = () => {
       }
 
       setFormData({
-        fullName: userData.fullName || '',
+        // Map Supabase fields to your form structure
+        fullName: userData.full_name || userData.fullName || '',
         phone: phoneNumber || '',
         email: userData.email || '',
       });
@@ -66,7 +72,8 @@ const PersonalInformation = () => {
 
   const updateUserProfileWithPhone = async (phoneNumber) => {
     try {
-      const response = await fetch(`${API_URL}/profile`, {
+      // ONLY CHANGE: Updated endpoint to match your user controller
+      const response = await fetch(`${API_URL}/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +85,19 @@ const PersonalInformation = () => {
       if (response.ok) {
         const updatedData = await response.json();
         if (updateUser) {
-          updateUser(updatedData.user);
+          // Map the response fields properly
+          const mappedUser = {
+            id: updatedData.user.id,
+            fullName: updatedData.user.full_name || updatedData.user.fullName,
+            email: updatedData.user.email,
+            phone: updatedData.user.phone,
+            role: updatedData.user.role,
+            profileImg: updatedData.user.profile_img || updatedData.user.profileImg,
+            isVerified: updatedData.user.is_verified || updatedData.user.isVerified,
+            createdAt: updatedData.user.created_at || updatedData.user.createdAt,
+            updatedAt: updatedData.user.updated_at || updatedData.user.updatedAt,
+          };
+          updateUser(mappedUser);
         }
       }
     } catch (error) {
@@ -130,13 +149,18 @@ const PersonalInformation = () => {
         return;
       }
 
-      const response = await fetch(`${API_URL}/profile`, {
+      // ONLY CHANGE: Updated endpoint and payload to match your user controller
+      const response = await fetch(`${API_URL}/user/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          phone: formData.phone,
+          // Email updates might not be allowed in your backend
+        }),
       });
 
       if (!response.ok) throw new Error('Failed to update user profile');
@@ -145,14 +169,26 @@ const PersonalInformation = () => {
       const userData = updatedData.user || updatedData;
 
       setFormData({
-        fullName: userData.fullName || '',
+        // Map response fields properly
+        fullName: userData.full_name || userData.fullName || '',
         phone: userData.phone || '',
         email: userData.email || '',
       });
 
-      // Update the user context
+      // Update the user context with proper field mapping
       if (updateUser) {
-        updateUser(userData);
+        const mappedUser = {
+          id: userData.id,
+          fullName: userData.full_name || userData.fullName,
+          email: userData.email,
+          phone: userData.phone,
+          role: userData.role,
+          profileImg: userData.profile_img || userData.profileImg,
+          isVerified: userData.is_verified || userData.isVerified,
+          createdAt: userData.created_at || userData.createdAt,
+          updatedAt: userData.updated_at || userData.updatedAt,
+        };
+        updateUser(mappedUser);
       }
 
       setEditableFields({});

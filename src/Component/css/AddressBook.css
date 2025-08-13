@@ -1,7 +1,5 @@
 /* Address Book Container */
 .address-book-container {
-  /* padding: 20px; */
-  /* margin-top: 40px; */
   background: #fff;
   max-width: 900px;
   margin-left: auto;
@@ -9,15 +7,20 @@
   position: relative;
 }
 
-.title {
+/* Address Book Header */
+.address-book-header {
+  margin-bottom: 30px;
+}
+
+.address-book-header h2 {
   font-size: 1.2rem;
   margin-bottom: 10px;
   color: #6a6c69;
   font-weight: bold;
-  text-align: left; /* Center align title for better appearance */
+  text-align: left;
 }
 
-.subtitle {
+.address-book-header .description {
   color: #555;
   margin-bottom: 20px;
 }
@@ -39,16 +42,18 @@
   background-color: #55341a;
 }
 
-/* Address Section */
-.address-section {
+/* Addresses Grid */
+.addresses-grid {
+  clear: both;
   margin: 20px 0;
 }
 
-.address-section-title {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #6a6c69;
-  font-weight: bold;
+/* No Addresses Message */
+.no-addresses {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+  font-style: italic;
 }
 
 /* Address Card */
@@ -66,23 +71,46 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.address-details p {
+/* Address Header */
+.address-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.address-tag {
+  background-color: #6b4226;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Address Content */
+.address-content h3 {
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+  margin: 8px 0;
+}
+
+.address-content .address-text {
   margin: 5px 0;
   font-size: 0.95rem;
   color: #555;
 }
 
-.address-title {
-  font-weight: bold;
-  font-size: 1rem;
-  color: #333;
+.address-content .phone-number {
+  margin: 5px 0;
+  font-size: 0.95rem;
+  color: #555;
 }
 
 /* Actions (Edit & Delete Buttons) */
 .address-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   display: flex;
   gap: 10px;
 }
@@ -92,6 +120,7 @@
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
+  padding: 4px;
 }
 
 .edit-btn {
@@ -110,6 +139,76 @@
   color: #c9302c;
 }
 
+/* Delete Confirmation Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.delete-confirmation-modal {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+}
+
+.delete-confirmation-modal h3 {
+  color: #d9534f;
+  margin-bottom: 15px;
+}
+
+.delete-confirmation-modal p {
+  color: #555;
+  margin-bottom: 25px;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+.confirm-delete-btn {
+  background-color: #d9534f;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.confirm-delete-btn:hover {
+  background-color: #c9302c;
+}
+
+.confirm-delete-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* Responsive Styles */
 
 /* Large Screens (1440px and above) */
@@ -117,11 +216,6 @@
   .address-book-container {
     max-width: 1200px;
   }
-}
-
-/* Medium Screens (1024px to 1440px) */
-@media (max-width: 1440px) {
-  /* No specific styles needed here after removing form styles */
 }
 
 /* Tablet Screens (768px to 1024px) */
@@ -138,7 +232,7 @@
     padding: 10px;
   }
 
-  .title {
+  .address-book-header h2 {
     font-size: 1rem;
   }
 
@@ -147,36 +241,58 @@
     font-size: 0.9rem;
     width: 100%;
     text-align: center;
-    margin-top: 20px; /* Add spacing above the button */
-    float: none; /* Remove float */
+    margin-top: 20px;
+    float: none;
   }
 
-  /* Ensure the button appears after "Other Addresses" */
-  .address-section {
-    display: flex;
-    flex-direction: column; /* Ensure content flows naturally */
+  /* Address Header */
+  .address-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
   }
 
-  /* Place "Add New Address" button specifically after other addresses */
-  .add-address-btn {
-    order: 2; /* Ensures the button is below the "Other Addresses" */
+  .address-actions {
+    align-self: flex-end;
   }
 
-  /* Ensure "Other Addresses" section appears before the button */
-  .address-section-title,
-  .address-card {
-    order: 1; /* Ensure they appear above the button */
+  /* Address Content */
+  .address-content .address-text {
+    font-size: 0.9rem;
+  }
+
+  .address-content .phone-number {
+    font-size: 0.9rem;
   }
 }
 
 /* Small Mobile Screens (below 480px) */
 @media (max-width: 480px) {
-  /* Address Book Container */
   .address-book-container {
     padding: 10px;
   }
 
-  .title {
+  .address-book-header h2 {
     font-size: 1rem;
+  }
+
+  .address-card {
+    padding: 12px;
+  }
+
+  .address-actions button {
+    font-size: 1rem;
+  }
+
+  .delete-confirmation-modal {
+    padding: 20px;
+  }
+
+  .confirmation-buttons {
+    flex-direction: column;
+  }
+
+  .cancel-btn, .confirm-delete-btn {
+    width: 100%;
   }
 }
