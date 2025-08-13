@@ -14,23 +14,47 @@ export default function ForgotPassword() {
     e.preventDefault();
     setError('');
     setMessage('');
+
+    // Validation
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       // Call the backend forgot-password endpoint
       const response = await axios.post(
         `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
-        { email }
+        { email },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
       );
-      setMessage(response.data.message);
-      // Optionally redirect to the reset password page (passing email via query parameter)
-      navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+
+      if (response.data.success) {
+        setMessage('Reset code sent to your email!');
+        // Redirect to OTP verification page instead of directly to reset password
+        setTimeout(() => {
+          navigate(`/verify-reset-otp?email=${encodeURIComponent(email)}`);
+        }, 2000);
+      } else {
+        setError('Failed to send reset email. Please try again.');
+      }
     } catch (err) {
-      console.error('Error sending OTP', err);
-      setError(
-        (err.response && err.response.data && err.response.data.message) ||
-          'An error occurred.'
-      );
+      console.error('Error sending reset OTP', err);
+      if (err.response?.data?.error) {
+        setError(err.response.data.error);
+      } else if (err.response?.status === 404) {
+        setError('No account found with this email address.');
+      } else if (err.response?.status === 500) {
+        setError('Server error. Please try again later.');
+      } else {
+        setError('An error occurred. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -39,13 +63,19 @@ export default function ForgotPassword() {
   return (
     <div className='flex items-center justify-center h-screen bg-primary'>
       <div className='w-full max-w-md bg-hover shadow-lg rounded-lg p-6 md:p-8'>
+        {/* Title */}
         <h1 className='text-3xl font-bold text-center text-button-primary mb-6'>
           Forgot Password
         </h1>
+        <p className='text-center text-text text-sm mb-8'>
+          Enter your email address and well send you a reset code.
+        </p>
+
         <form onSubmit={handleSubmit}>
-          <div className='mb-4'>
+          {/* Email Input */}
+          <div className='mb-6'>
             <label className='block text-sm font-medium text-text mb-1'>
-              Email
+              Email Address
             </label>
             <input
               type='email'
@@ -53,15 +83,26 @@ export default function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className='w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary'
+              disabled={isLoading}
               required
             />
           </div>
-          {error && (
-            <p className='text-center text-red-600 text-sm mb-4'>{error}</p>
-          )}
+
+          {/* Success Message */}
           {message && (
-            <p className='text-center text-green-600 text-sm mb-4'>{message}</p>
+            <div className='text-center text-green-600 text-sm mb-4 p-3 bg-green-50 rounded-lg'>
+              {message}
+            </div>
           )}
+
+          {/* Error Message */}
+          {error && (
+            <div className='text-center text-red-600 text-sm mb-4 p-3 bg-red-50 rounded-lg'>
+              {error}
+            </div>
+          )}
+
+          {/* Submit Button */}
           <button
             type='submit'
             className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
@@ -71,9 +112,20 @@ export default function ForgotPassword() {
             }`}
             disabled={isLoading}
           >
-            {isLoading ? 'Sending OTP...' : 'Send OTP'}
+            {isLoading ? 'Sending Reset Code...' : 'Send Reset Code'}
           </button>
         </form>
+
+        {/* Back to Login Link */}
+        <p className='text-center text-sm text-text mt-6'>
+          Remember your password?{' '}
+          <span
+            onClick={() => navigate('/login')}
+            className='text-button-primary hover:underline cursor-pointer'
+          >
+            Back to Login
+          </span>
+        </p>
       </div>
     </div>
   );

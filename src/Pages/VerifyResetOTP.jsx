@@ -1,67 +1,50 @@
-// src/pages/ResetPassword.js
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+// src/pages/VerifyResetOTP.js
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 
-export default function ResetPassword() {
+export default function VerifyResetOTP() {
   const [otp, setOtp] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Get email from URL params
   const params = new URLSearchParams(location.search);
   const email = params.get('email');
-  const verifiedOTP = location.state?.verifiedOTP;
-
-  useEffect(() => {
-    if (verifiedOTP) {
-      setOtp(verifiedOTP);
-    }
-  }, [verifiedOTP]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setMessage('');
 
+    // Validation
     if (!email) {
       setError('Email is missing. Please try the forgot password process again.');
       return;
     }
 
     if (!otp) {
-      setError('Please enter the reset code');
+      setError('Please enter the verification code');
       return;
     }
 
-    if (!newPassword) {
-      setError('Please enter a new password');
-      return;
-    }
-
-    if (newPassword.length < 6) {
-      setError('Password must be at least 6 characters long');
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+    if (otp.length !== 6) {
+      setError('Please enter a valid 6-digit code');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      // Call the verify reset OTP endpoint
       const response = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/reset-password`,
+        `${import.meta.env.VITE_API_URL}/auth/verify-reset-otp`,
         {
           email,
-          otp,
-          newPassword
+          otp
         },
         {
           headers: {
@@ -69,21 +52,21 @@ export default function ResetPassword() {
           },
         }
       );
-
-      if (response.data.success) {
-        setMessage(response.data.message);
-        setTimeout(() => {
-          navigate('/login');
-        }, 3000);
-      } else {
-        setError('Failed to reset password. Please try again.');
-      }
+if (response.data.success) {
+  setMessage('Code verified! Redirecting...');
+  setTimeout(() => {
+    navigate(`/reset-password?email=${encodeURIComponent(email)}`, {
+      state: { verifiedOTP: otp } // Pass OTP through state
+    });
+  }, 1500);
+}
     } catch (err) {
-      console.error('Error resetting password', err);
+      console.error('OTP verification error:', err);
+      
       if (err.response?.data?.error) {
         setError(err.response.data.error);
       } else if (err.response?.status === 400) {
-        setError('Invalid reset code or expired. Please try again.');
+        setError('Invalid or expired verification code');
       } else if (err.response?.status === 500) {
         setError('Server error. Please try again later.');
       } else {
@@ -94,17 +77,51 @@ export default function ResetPassword() {
     }
   };
 
+  const handleResendOTP = async () => {
+    if (!email) {
+      setError('Email is missing. Please try the forgot password process again.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError('');
+      
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/forgot-password`,
+        { email },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (response.data.success) {
+        setMessage('New verification code sent to your email');
+        setOtp(''); // Clear the current OTP input
+      }
+    } catch (error) {
+      console.error('Error resending OTP:', error);
+      setError('Failed to resend code. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className='flex items-center justify-center h-screen bg-primary'>
       <div className='w-full max-w-md bg-hover shadow-lg rounded-lg p-6 md:p-8'>
+        {/* Title */}
         <h1 className='text-3xl font-bold text-center text-button-primary mb-6'>
-          Reset Password
+          Verify Reset Code
         </h1>
         <p className='text-center text-text text-sm mb-8'>
-          Enter the verification code and create your new password.
+          Enter the 6-digit verification code sent to your email.
         </p>
 
         <form onSubmit={handleSubmit}>
+          {/* Email Display */}
           <div className='mb-4'>
             <label className='block text-sm font-medium text-text mb-1'>
               Email
@@ -117,9 +134,10 @@ export default function ResetPassword() {
             />
           </div>
 
-          <div className='mb-4'>
+          {/* OTP Input */}
+          <div className='mb-6'>
             <label className='block text-sm font-medium text-text mb-1'>
-              Reset Code
+              Verification Code
             </label>
             <input
               type='text'
@@ -133,63 +151,45 @@ export default function ResetPassword() {
             />
           </div>
 
-          <div className='mb-4'>
-            <label className='block text-sm font-medium text-text mb-1'>
-              New Password
-            </label>
-            <input
-              type='password'
-              placeholder='Enter new password'
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              className='w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary'
-              disabled={isLoading}
-              minLength={6}
-              required
-            />
-          </div>
-
-          <div className='mb-6'>
-            <label className='block text-sm font-medium text-text mb-1'>
-              Confirm New Password
-            </label>
-            <input
-              type='password'
-              placeholder='Confirm new password'
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className='w-full px-4 py-2 border rounded-lg bg-white text-button-primary focus:outline-none focus:ring focus:ring-button-primary'
-              disabled={isLoading}
-              minLength={6}
-              required
-            />
-          </div>
-
+          {/* Success Message */}
           {message && (
             <div className='text-center text-green-600 text-sm mb-4 p-3 bg-green-50 rounded-lg'>
               {message}
             </div>
           )}
 
+          {/* Error Message */}
           {error && (
             <div className='text-center text-red-600 text-sm mb-4 p-3 bg-red-50 rounded-lg'>
               {error}
             </div>
           )}
 
+          {/* Verify Button */}
           <button
             type='submit'
-            className={`w-full py-2 rounded-lg text-white font-semibold transition-all ${
+            className={`w-full py-2 rounded-lg text-white font-semibold transition-all mb-4 ${
               isLoading
                 ? 'bg-opacity-70 cursor-not-allowed'
                 : 'bg-button-primary hover:bg-hover'
             }`}
             disabled={isLoading}
           >
-            {isLoading ? 'Resetting Password...' : 'Reset Password'}
+            {isLoading ? 'Verifying...' : 'Verify Code'}
+          </button>
+
+          {/* Resend Code Button */}
+          <button
+            type='button'
+            onClick={handleResendOTP}
+            className='w-full py-2 rounded-lg border border-button-primary text-button-primary font-semibold hover:bg-button-primary hover:text-white transition-all'
+            disabled={isLoading}
+          >
+            Resend Code
           </button>
         </form>
 
+        {/* Back to Login Link */}
         <p className='text-center text-sm text-text mt-6'>
           Remember your password?{' '}
           <span

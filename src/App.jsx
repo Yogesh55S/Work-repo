@@ -32,7 +32,7 @@ const ForgotPassword = lazy(() => import('./Pages/Forgotpassword'));
 const ResetPassword = lazy(() => import('./Pages/ResetPassword'));
 const PaymentStatus = lazy(() => import('./Pages/PaymentStatus'));
 const ProductDetail = lazy(() => import('./Component/ProductDetail'));
-
+const VerifyResetOTP = lazy(() => import('./Pages/VerifyResetOTP'));
 // Admin Panel Components
 const AdminPanel = lazy(() => import('./Pages/AdminPanel'));
 const AddProductForm = lazy(() => import('./Component/admin/AddProductForm'));
@@ -285,6 +285,11 @@ function App() {
                     </Suspense>
                   }
                 />
+                <Route path="/verify-reset-otp"  element={
+                    <Suspense fallback={<Loader />}>
+                    <VerifyResetOTP />
+                    </Suspense>
+                  } />
                 <Route
                   path='/payment-status'
                   element={
