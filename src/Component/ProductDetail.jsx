@@ -59,69 +59,66 @@ const ProductDetail = () => {
     fetchProductData();
   }, [productId, location.state?.product]);
 
-  const handleAddToCart = async () => {
-    if (isAddingToCart) return; // Prevent multiple clicks
+  // In ProductDetail.jsx, fix the user ID reference
+const handleAddToCart = async () => {
+  if (isAddingToCart) return;
 
-    try {
-      setIsAddingToCart(true);
+  try {
+    setIsAddingToCart(true);
+    const toastId = toast.loading('Adding to cart...');
 
-      // Immediately show loading toast for better UX
-      const toastId = toast.loading('Adding to cart...');
+    if (isLoggedIn && user?.id) { // FIXED: use user.id instead of user._id
+      const token = localStorage.getItem('token');
+      const userId = user.id; // FIXED: use user.id
 
-      // For logged in users, make direct API call to avoid double fetching
-      if (isLoggedIn && user?._id) {
-        const token = localStorage.getItem('token');
-        const userId = user._id;
-
-        const response = await fetch(
-          `${import.meta.env.VITE_API_URL}/cart/${userId}/add`,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              productId: product._id,
-              quantity: 1,
-            }),
-          }
-        );
-
-        if (response.ok) {
-          // Update cart count without refetching all user data
-          updateCartCount(userId);
-          toast.update(toastId, {
-            render: 'Product added to cart successfully!',
-            type: 'success',
-            isLoading: false,
-            autoClose: 2000,
-          });
-        } else {
-          throw new Error('Failed to add product to cart');
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/cart/${userId}/add`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId: product._id || product.id,
+            quantity: 1,
+          }),
         }
+      );
+
+      if (response.ok) {
+        updateCartCount(userId);
+        toast.update(toastId, {
+          render: 'Product added to cart successfully!',
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000,
+        });
       } else {
-        // Use addToCart for guest users
-        const success = await addToCart(product, 1);
-
-        if (success) {
-          toast.update(toastId, {
-            render: 'Product added to cart successfully!',
-            type: 'success',
-            isLoading: false,
-            autoClose: 2000,
-          });
-        } else {
-          throw new Error('Failed to add product to cart');
-        }
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add product to cart');
       }
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-      toast.error('An error occurred while adding the product to the cart.');
-    } finally {
-      setIsAddingToCart(false);
+    } else {
+      const success = await addToCart(product, 1);
+      if (success) {
+        toast.update(toastId, {
+          render: 'Product added to cart successfully!',
+          type: 'success',
+          isLoading: false,
+          autoClose: 2000,
+        });
+      } else {
+        throw new Error('Failed to add product to cart');
+      }
     }
-  };
+  } catch (error) {
+    console.error('Error adding product to cart:', error);
+    toast.error('An error occurred while adding the product to the cart.');
+  } finally {
+    setIsAddingToCart(false);
+  }
+};
+
 
   // Show skeleton while loading
   if (loading) {

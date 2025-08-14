@@ -27,8 +27,8 @@ const Navbar = () => {
 
 	useEffect(() => {
 		// Update cart count on location change or when logged in state changes
-		if (isLoggedIn && user?._id) {
-			updateCartCount(user._id);
+		if (isLoggedIn && user?.id) {
+			updateCartCount(user.id);
 		} else if (!isLoggedIn) {
 			// For guest users, update cart count from localStorage
 			const count = GuestCartService.getCartCount();

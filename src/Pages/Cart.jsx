@@ -35,8 +35,10 @@ const Cart = () => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
+  // FIXED: Use consistent user.id throughout (Supabase uses 'id', not '_id')
   const { isLoggedIn, user } = useAuth();
-  const userId = user?._id;
+  const userId = user?.id; // FIXED: Changed from user?._id to user?.id
+
   const { removeFromCart, updateCartItemQuantity } = useCart();
 
   // Function to calculate delivery charges based on state
@@ -46,7 +48,7 @@ const Cart = () => {
     const nearDelhiStates = [
       'delhi', 
       'haryana',
-      'chandigarh', // Fixed: made lowercase consistent
+      'chandigarh',
     ];
     
     const normalizedState = state.toLowerCase().trim();
@@ -119,122 +121,148 @@ const Cart = () => {
       });
     };
   }, []);
+const handleCheckout = async () => {
+  if (!isLoggedIn) {
+    setLoginPromptVisible(true);
+    return;
+  }
 
-  const handleCheckout = async () => {
-    if (!isLoggedIn) {
-      setLoginPromptVisible(true);
-      return;
-    }
+  if (!selectedAddress) {
+    toast.info('Please select an address first!');
+    return;
+  }
 
-    if (!selectedAddress) {
-      toast.info('Please select an address first!');
-      return;
-    }
+  if (!window.Cashfree) {
+    console.error('Cashfree SDK is not available');
+    toast.error('Payment system is not ready. Please try again.');
+    return;
+  }
 
-    if (!window.Cashfree) {
-      console.error('Cashfree SDK is not available');
-      toast.error('Payment system is not ready. Please try again.');
-      return;
-    }
-
-    try {
-      setIsProcessing(true);
-
-      // Calculate final delivery charges at checkout
-      const finalDeliveryCharges = getFinalDeliveryCharges(selectedAddress.state, totalAmount);
-
-      const response = await fetch(`${API_URL}/orders/checkout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify({
-          addressId: selectedAddress._id,
-          deliveryCharges: finalDeliveryCharges,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Checkout failed');
-      }
-
-      const data = await response.json();
-      console.log('Backend response:', data);
-
-      if (data.paymentSessionId) {
-        localStorage.setItem('currentOrderId', data.orderId);
-
-        const cashfree = window.Cashfree({
-          mode: 'production'
-        });
-
-        const result = await cashfree.checkout({
-          paymentSessionId: data.paymentSessionId,
-          redirectTarget: '_self'
-        });
+  try {
+    setIsProcessing(true);
     
-        console.log('Payment result:', result);
-      } else {
-        throw new Error('Payment session not created');
-      }
+    // Calculate final delivery charges
+    const finalDeliveryCharges = getFinalDeliveryCharges(selectedAddress.state, totalAmount);
+    const finalTotal = totalAmount + finalDeliveryCharges;
 
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error(`Payment failed: ${error.message}`);
-    } finally {
-      setIsProcessing(false);
+    // Prepare order data (DON'T save to database yet)
+    const orderData = {
+      userId: user.id,
+      totalAmount: finalTotal,
+      shippingAddress: {
+        tag: selectedAddress.tag,
+        deliveryName: selectedAddress.deliveryName,
+        deliveryNumber: selectedAddress.deliveryNumber,
+        streetAddress: selectedAddress.streetAddress,
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        zip: selectedAddress.zip
+      },
+      deliveryCharges: finalDeliveryCharges,
+      cartItems: cartItems.map(item => ({
+        productId: item.productDetails.id,
+        productName: item.productDetails.productName,
+        price: item.productDetails.price,
+        quantity: item.quantity
+      }))
+    };
+
+    // Store order data in localStorage for after payment
+    localStorage.setItem('pendingOrderData', JSON.stringify(orderData));
+
+    console.log('Creating payment session only...');
+
+    // Create payment session (without saving order)
+    const response = await fetch(`${API_URL}/orders/create-payment-session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Payment session creation failed');
     }
-  };
 
+    const data = await response.json();
+    console.log('Payment session response:', data);
+
+    if (data.paymentSessionId && data.tempOrderId) {
+      // Store temp order ID and Cashfree order ID for payment verification
+      localStorage.setItem('tempOrderId', data.tempOrderId);
+      localStorage.setItem('cashfreeOrderId', data.cashfreeOrderId);
+      
+      const cashfree = window.Cashfree({ mode: 'sandbox' });
+      const result = await cashfree.checkout({
+        paymentSessionId: data.paymentSessionId,
+        redirectTarget: '_self'
+      });
+      
+      console.log('Payment result:', result);
+    } else {
+      throw new Error('Payment session not created');
+    }
+  } catch (error) {
+    console.error('Checkout error:', error);
+    toast.error(`Payment session creation failed: ${error.message}`);
+  } finally {
+    setIsProcessing(false);
+  }
+};
+
+  // FIXED: Updated fetchCartItems to properly handle database integration
   const fetchCartItems = async () => {
     setLoading(true);
     try {
       let cartData = [];
-
-      if (isLoggedIn && userId) {
-        const response = await fetch(`${API_URL}/users/${userId}`, {
+      
+      if (isLoggedIn && userId) { // FIXED: Use userId consistently
+        const response = await fetch(`${API_URL}/cart/${userId}`, { // FIXED: Use userId
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
-
+        
         if (response.ok) {
-          const userData = await response.json();
-
-          cartData = await Promise.all(
-            userData.cart.map(async (item) => {
-              try {
-                const productResponse = await fetch(
-                  `${API_URL}/products/${item.productId}`
-                );
-
-                if (productResponse.ok) {
-                  const productData = await productResponse.json();
-                  return {
-                    ...item,
-                    productDetails: productData,
-                  };
-                }
-                return item;
-              } catch (error) {
-                console.error(
-                  `Error fetching product ${item.productId}:`,
-                  error
-                );
-                return item;
-              }
-            })
-          );
+          const data = await response.json();
+          console.log('Cart data from API:', data); // Debug log
+          
+          // Map the cart items with product details from the database join
+          cartData = data.cartItems.map(item => ({
+            productId: item.product_id,
+            quantity: item.quantity,
+            productDetails: {
+              _id: item.products.id,
+              id: item.products.id,
+              productName: item.products.product_name,
+              price: parseFloat(item.products.price),
+              image: item.products.image,
+              netQuantity: item.products.net_quantity,
+              type: item.products.type,
+              season: item.products.season,
+              description: item.products.description,
+            }
+          }));
+        } else {
+          console.error('Failed to fetch cart from database');
+          toast.error('Failed to load cart items from database');
         }
       } else {
+        // For guest users, get from localStorage
         const guestCart = GuestCartService.getCart();
-        cartData = guestCart;
+        cartData = guestCart.map(item => ({
+          productId: item._id || item.id || item.productId,
+          quantity: item.quantity || 1,
+          productDetails: item.productDetails || item // For guest cart compatibility
+        }));
       }
+      
       setCartItems(cartData);
     } catch (error) {
-      console.error('Error fetching cart items:', error.message);
+      console.error('Error fetching cart items:', error);
       toast.error('Failed to load your cart items');
     } finally {
       setLoading(false);
@@ -304,13 +332,12 @@ const Cart = () => {
     }
   };
 
+  // FIXED: Updated updateQuantity function with proper database integration
   const updateQuantity = async (productId, newQuantity) => {
     try {
+      // Optimistically update UI first
       const updatedCart = cartItems.map((item) => {
-        if (
-          item.productId === productId ||
-          (item.productDetails && item.productDetails._id === productId)
-        ) {
+        if (item.productId === productId || item.productDetails?._id === productId) {
           return { ...item, quantity: newQuantity };
         }
         return item;
@@ -320,12 +347,31 @@ const Cart = () => {
       let success = false;
 
       if (isLoggedIn && userId) {
-        success = await updateCartItemQuantity(userId, productId, newQuantity);
+        // For logged-in users: Update in database
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/cart/${userId}/update`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId, quantity: newQuantity }),
+        });
+
+        success = response.ok;
+        
+        if (success) {
+          // Refresh cart after successful update
+          await fetchCartItems();
+        }
       } else {
+        // For guest users: Update in localStorage
         success = GuestCartService.updateQuantity(productId, newQuantity);
       }
 
       if (!success) {
+        // Revert on failure
+        await fetchCartItems();
         throw new Error('Failed to update cart');
       }
 
@@ -333,7 +379,8 @@ const Cart = () => {
     } catch (error) {
       console.error('Error updating cart quantity:', error.message);
       toast.error('Failed to update quantity');
-      fetchCartItems();
+      // Refresh cart on error
+      await fetchCartItems();
     }
   };
 
@@ -345,26 +392,45 @@ const Cart = () => {
     setTotalAmount(total);
   };
 
+  // FIXED: Updated handleRemoveItem function with proper database integration
   const handleRemoveItem = async (productId) => {
     try {
-      let success = false;
-
       if (isLoggedIn && userId) {
-        success = await removeFromCart(userId, productId);
-      } else {
-        success = GuestCartService.removeFromCart(productId);
-      }
+        // For logged-in users: Remove from database
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${API_URL}/cart/${userId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ productId }),
+        });
 
-      if (success) {
-        setCartItems(
-          cartItems.filter((item) => {
-            const itemId = item.productDetails?._id || item.productId;
-            return itemId !== productId;
-          })
-        );
-        toast.success('Item removed from cart');
+        if (response.ok) {
+          // Refresh cart after successful removal
+          await fetchCartItems();
+          toast.success('Item removed from cart');
+        } else {
+          const errorData = await response.json();
+          console.error('Failed to remove from database:', errorData);
+          toast.error('Failed to remove item from cart');
+        }
       } else {
-        toast.error('Failed to remove item from cart');
+        // For guest users: Remove from localStorage
+        const success = GuestCartService.removeFromCart(productId);
+        if (success) {
+          // Update local state immediately
+          setCartItems(prevItems => 
+            prevItems.filter(item => {
+              const itemId = item.productDetails?._id || item.productId;
+              return itemId !== productId;
+            })
+          );
+          toast.success('Item removed from cart');
+        } else {
+          toast.error('Failed to remove item from cart');
+        }
       }
     } catch (error) {
       console.error('Error removing item:', error);

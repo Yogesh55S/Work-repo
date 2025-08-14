@@ -22,6 +22,7 @@
     "dotenv": "^16.4.5",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^11.11.17",
+    "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "nidas-pure": "file:",
     "nidaspure": "file:",
