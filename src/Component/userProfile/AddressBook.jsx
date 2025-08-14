@@ -53,8 +53,24 @@ const AddressBook = () => {
     }
   };
 
+  // FIXED: Properly format address data for editing
   const handleEdit = (address) => {
-    setSelectedAddress(address);
+    // Ensure all fields are properly mapped for the form
+    const formattedAddress = {
+      _id: address._id || address.id,
+      id: address.id || address._id,
+      tag: address.tag || '',
+      deliveryName: address.deliveryName || '',
+      deliveryNumber: address.deliveryNumber || '',
+      streetAddress: address.streetAddress || '',
+      city: address.city || '',
+      state: address.state || '',
+      zip: address.zip || '',
+      createdAt: address.createdAt,
+      updatedAt: address.updatedAt,
+    };
+    
+    setSelectedAddress(formattedAddress);
     setShowModal(true);
   };
 
@@ -92,21 +108,26 @@ const AddressBook = () => {
     }
   };
 
+  // FIXED: This is the main fix for the duplicate card issue
   const handleSave = async (formData) => {
-    const method = formData._id || formData.id ? 'PUT' : 'POST';
+    const isUpdate = !!(formData._id || formData.id);
+    const method = isUpdate ? 'PUT' : 'POST';
     const addressId = formData._id || formData.id;
     const url = method === 'PUT' 
       ? `${API_URL}/addresses/${addressId}`
       : `${API_URL}/addresses`;
 
     try {
+      // Remove ID fields from the request body
+      const { _id, id, createdAt, updatedAt, ...requestBody } = formData;
+      
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok) {
@@ -115,16 +136,30 @@ const AddressBook = () => {
       }
 
       const responseData = await response.json();
+      
       if (method === 'POST') {
-        setAddresses([...addresses, responseData.address]);
+        // Add new address to the beginning
+        setAddresses(prevAddresses => [responseData.address, ...prevAddresses]);
         toast.success('Address added successfully');
       } else {
-        setAddresses(
-          addresses.map((addr) =>
-            (addr._id === addressId || addr.id === addressId) 
-              ? { ...addr, ...responseData.address } 
-              : addr
-          )
+        // FIXED: Properly update existing address without creating duplicates
+        setAddresses(prevAddresses => 
+          prevAddresses.map(addr => {
+            const currentId = addr._id || addr.id;
+            const updateId = addressId;
+            
+            if (currentId === updateId) {
+              // Return the complete updated address from server response
+              // This ensures we get the fresh data and maintain the same object reference pattern
+              return {
+                ...responseData.address,
+                // Ensure both ID formats are preserved for compatibility
+                _id: responseData.address._id || responseData.address.id,
+                id: responseData.address.id || responseData.address._id,
+              };
+            }
+            return addr;
+          })
         );
         toast.success('Address updated successfully');
       }
@@ -138,7 +173,7 @@ const AddressBook = () => {
   };
 
   const getTagIcon = (tag) => {
-    switch (tag.toLowerCase()) {
+    switch (tag?.toLowerCase()) {
       case 'home':
         return faHome;
       case 'office':
@@ -150,7 +185,7 @@ const AddressBook = () => {
   };
 
   const getTagColor = (tag) => {
-    switch (tag.toLowerCase()) {
+    switch (tag?.toLowerCase()) {
       case 'home':
         return 'bg-blue-500';
       case 'office':
@@ -172,7 +207,7 @@ const AddressBook = () => {
         <div className="mb-4 sm:mb-0">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Address Book</h2>
           <p className="text-gray-600 text-sm">
-            Lorem ipsum odor amet, consectetuer adipiscing elit. Sed faucibus morbi curae maecenas dignissim volutpat hac quam.
+           Life is available only in the present. That is why we should walk in such a way that <br/>every step can bring us to the here and the now.
           </p>
         </div>
         
@@ -273,16 +308,13 @@ const AddressBook = () => {
       {/* Address Form Modal */}
       {showModal && (
         <AddressForm
-          address={selectedAddress}
+          initialData={selectedAddress}
           onSave={handleSave}
           onCancel={() => {
             setShowModal(false);
             setSelectedAddress(null);
           }}
-          onClose={() => {
-            setShowModal(false);
-            setSelectedAddress(null);
-          }}
+          title={selectedAddress ? 'Edit Address' : 'Add New Address'}
         />
       )}
 

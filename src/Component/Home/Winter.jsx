@@ -7,10 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import CardSkeleton from '../skeletons/Cardskeleton';
-// Import your loader
 import loadingGif from "../../assets/loader/loader.png";
 
-const Winter = () => {
+const Winter = ({ collectionName = "Monsoon Collection" }) => {
   const sliderRef = useRef(null);
   const [slidesToShow, setSlidesToShow] = useState(4);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -21,18 +20,45 @@ const Winter = () => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
+  // Extract season from collection name
+  const extractSeasonFromCollection = (collectionName) => {
+    if (collectionName.toLowerCase().includes('monsoon')) return 'Monsoon';
+    if (collectionName.toLowerCase().includes('winter')) return 'Winter';
+    if (collectionName.toLowerCase().includes('summer')) return 'Summer';
+    if (collectionName.toLowerCase().includes('spring')) return 'Spring';
+    return null; // Return null if no season found
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/products`);
+        
+        // Get season from collection name
+        const season = extractSeasonFromCollection(collectionName);
+        
+        // Build API URL with season filter
+        let apiUrl = `${API_URL}/products`;
+        if (season) {
+          apiUrl += `?season=${season}`;
+        }
+        
+        const response = await fetch(apiUrl);
+        
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
+        
         const data = await response.json();
-        const filteredProducts = data.filter(
-          (product) => product.subType === 'Winter Collection'
-        );
+        
+        // If no season filter, fallback to subType filtering (backward compatibility)
+        let filteredProducts = data;
+        if (!season) {
+          filteredProducts = data.filter(
+            (product) => product.subType === collectionName
+          );
+        }
+        
         setProducts(filteredProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -41,34 +67,30 @@ const Winter = () => {
         setLoading(false);
       }
     };
+
     fetchProducts();
-  }, [API_URL]);
+  }, [API_URL, collectionName]);
 
   // Handle page loader
   useEffect(() => {
     const handlePageLoad = () => {
-      // Add a small delay to make the transition smoother
       setTimeout(() => {
         setShowLoader(false);
       }, 500);
     };
 
-    // Listen for the window load event
     window.addEventListener("load", handlePageLoad);
 
-    // For cases where the page might already be loaded
     if (document.readyState === "complete") {
       handlePageLoad();
     }
 
-    // Also hide loader when data loading is complete
     if (!loading) {
       setTimeout(() => {
         setShowLoader(false);
       }, 300);
     }
 
-    // Cleanup
     return () => {
       window.removeEventListener("load", handlePageLoad);
     };
@@ -76,7 +98,6 @@ const Winter = () => {
 
   const calculateSlidesToShow = () => {
     const screenWidth = window.innerWidth;
-
     if (screenWidth >= 1440) {
       setSlidesToShow(4);
     } else if (screenWidth >= 1024) {
@@ -90,7 +111,7 @@ const Winter = () => {
 
   useEffect(() => {
     calculateSlidesToShow();
-    window.addEventListener('resize', calculateSlidesToShow); 
+    window.addEventListener('resize', calculateSlidesToShow);
     return () => {
       window.removeEventListener('resize', calculateSlidesToShow);
     };
@@ -109,94 +130,103 @@ const Winter = () => {
   const isNextDisabled = currentSlide + slidesToShow >= products.length;
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product._id}`, { state: { product } });
+    navigate(`/product/${product._id || product.id}`, { state: { product } });
   };
 
   // Show loader while page is loading
   if (showLoader) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+      <div className="loader-container bg-white flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <img src={loadingGif} alt="Loading..." className="w-32 h-32 mx-auto" />
-          <p className="mt-4 text-gray-700 font-medium">Loading...</p>
+          <img 
+            src={loadingGif} 
+            alt="Loading..." 
+            className="mx-auto mb-4 w-16 h-16 animate-spin"
+          />
+          <p className="text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      id='winter-carousel'
-      className='p-4 md:p-8 bg-gray-50 text-center relative overflow-hidden'
-    >
-      <div className='max-w-[1240px] h-[600px] mx-auto relative w-full'>
-        <h2 className='text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center'>
-          Our Monsoon Collection
-        </h2>
-        <p className='text-sm md:text-base text-gray-600 mb-8 xs:text-center'>
-          Discover our exclusive monsoon collection, crafted for Nidaspur's lush season—formulated to keep your skin fresh, healthy,
-          <br/> and protected from humidity and rain.
-        </p>
+    <section className="py-16 bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      <div className="container mx-auto px-4">
+        {/* Dynamic heading based on collection name */}
+        <div className="text-center mb-12">
+          <h2 className='text-2xl md:text-4xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center'>
+            Our {collectionName}
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto leading-relaxed">
+            {collectionName.toLowerCase().includes('monsoon') 
+              ? "Discover our exclusive monsoon collection, crafted for Nidaspur's lush season—formulated to keep your skin fresh, healthy, and protected from humidity and rain."
+              : collectionName.toLowerCase().includes('winter')
+              ? "Embrace the winter season with our nourishing collection, specially formulated to protect and heal your skin during the cold, dry months."
+              : `Explore our ${collectionName.toLowerCase()} specially curated for the season.`
+            }
+          </p>
+        </div>
 
         {loading ? (
           <CardSkeleton />
         ) : error ? (
-          <p className='text-red-600'>Error: {error}</p>
+          <div className="text-center py-8">
+            <p className="text-red-600">Error: {error}</p>
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">No products available for {collectionName} at the moment.</p>
+          </div>
         ) : (
-          <div className='relative w-full'>
+          <div className="relative">
+            {/* Slider */}
             <Slider ref={sliderRef} {...settings}>
               {products.map((product) => (
-                <div
-                  key={product._id}
-                  onClick={() => handleProductClick(product)}
-                  className='cursor-pointer px-2' // Add horizontal padding for spacing
-                >
-                  {/* Match the grid item structure from OurProducts */}
-                  <div className='w-full max-w-[280px] mx-auto transform transition duration-300'>
-                    <Card
-                      name={product.productName}
-                      price={`₹${product.price}`}
-                      image={product.image}
-                      product={product}
-                      productId={product._id}
-                    />
-                  </div>
+                <div key={product._id || product.id} className="px-2">
+                  <Card
+                    name={product.productName || product.name}
+                    price={`₹${product.price}`}
+                    image={product.image}
+                    productId={product._id || product.id}
+                    product={product}
+                    onClick={() => handleProductClick(product)}
+                  />
                 </div>
               ))}
             </Slider>
+
+            {/* Navigation buttons */}
+            {products.length > slidesToShow && (
+              <>
+                <button
+                  className={`absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full shadow-lg transition-all duration-300 ${
+                    isPrevDisabled 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                      : 'bg-white text-[#5C3822] hover:bg-[#5C3822] hover:text-white'
+                  }`}
+                  onClick={() => sliderRef.current?.slickPrev()}
+                  disabled={isPrevDisabled}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+
+                <button
+                  className={`absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-3 rounded-full shadow-lg transition-all duration-300 ${
+                    isNextDisabled 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                      : 'bg-white text-[#5C3822] hover:bg-[#5C3822] hover:text-white'
+                  }`}
+                  onClick={() => sliderRef.current?.slickNext()}
+                  disabled={isNextDisabled}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </>
+            )}
           </div>
         )}
-
-        <button
-          onClick={() => sliderRef.current.slickPrev()}
-          className={`winter-carousel-button-2 top-[95%] md:top-[100%] text-2xl ${
-            isPrevDisabled ? 'disabled' : 'active'
-          }`}
-          style={{
-            position: 'absolute',
-            left: '10px',
-            transform: 'translateY(-50%)',
-          }}
-          disabled={isPrevDisabled}
-        >
-          <FontAwesomeIcon icon={faArrowLeft} />
-        </button>
-        <button
-          onClick={() => sliderRef.current.slickNext()}
-          className={`winter-carousel-button-2 text-2xl top-[95%] md:top-[100%] ${
-            isNextDisabled ? 'disabled' : 'active'
-          }`}
-          style={{
-            position: 'absolute',
-            right: '10px',
-            transform: 'translateY(-50%)',
-          }}
-          disabled={isNextDisabled}
-        >
-          <FontAwesomeIcon icon={faArrowRight} />
-        </button>
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -28,43 +28,51 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   // Calculate number of cards to show based on screen width and current page
   const calculateCardsToShow = () => {
     const screenWidth = window.innerWidth;
-
-    // Home page layout: specific number of cards based on screen size
+    
     if (!showAll) {
       if (screenWidth >= 1440) {
-        setCardsToShow(4); // 4 products in 1 row for XL screens
+        setCardsToShow(4);
       } else if (screenWidth >= 1024) {
-        setCardsToShow(3); // 3 products in 1 row for large screens
+        setCardsToShow(3);
       } else if (screenWidth >= 768) {
-        setCardsToShow(4); // 4 products in 2 rows for medium screens (2x2)
+        setCardsToShow(4);
       } else {
-        setCardsToShow(4); // 4 products in 4 rows for small screens
+        setCardsToShow(4);
       }
     } else {
-      // Shop page - always show all products
       setCardsToShow(Infinity);
     }
   };
 
-  // Set up resize listener
   useEffect(() => {
     calculateCardsToShow();
     window.addEventListener('resize', calculateCardsToShow);
+    
     return () => {
       window.removeEventListener('resize', calculateCardsToShow);
     };
-  }, [showAll]); // Re-run when showAll changes
+  }, [showAll]);
 
-  // Fetch products from API
+  // UPDATED: Fetch products from your Node.js + Supabase API
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
+      
       try {
-        const response = await fetch(`${API_URL}/products`);
+        // Build query parameters
+        const params = new URLSearchParams();
+        if (activeCategory !== 'All') {
+          params.append('category', activeCategory);
+        }
+        
+        const url = `${API_URL}/products${params.toString() ? `?${params.toString()}` : ''}`;
+        const response = await fetch(url);
+        
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
+        
         const data = await response.json();
         setProducts(data);
       } catch (err) {
@@ -74,120 +82,113 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
         setLoading(false);
       }
     };
+
     fetchProducts();
-  }, []);
+  }, [activeCategory]); // Re-fetch when category changes
 
-  // Filter products based on the active category
-  const filteredProducts =
-    activeCategory === 'All'
-      ? products
-      : products.filter(
-          (product) =>
-            product.type?.trim().toLowerCase() ===
-            activeCategory.trim().toLowerCase()
-        );
+  // Filter products based on the active category (backup client-side filtering)
+  const filteredProducts = activeCategory === 'All' 
+    ? products 
+    : products.filter(
+        (product) => product.type?.trim().toLowerCase() === activeCategory.trim().toLowerCase()
+      );
 
-  const displayedProducts = showAll
-    ? filteredProducts
+  const displayedProducts = showAll 
+    ? filteredProducts 
     : filteredProducts.slice(0, cardsToShow);
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product._id}`, { state: { product } });
+    navigate(`/product/${product._id || product.id}`, { state: { product } });
   };
 
   const handleViewAllClick = () => {
     navigate('/shop');
   };
 
-  // Handle category button clicks
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
   };
 
-  // Generate dynamic grid classes based on the page type
   const getGridClasses = () => {
     if (showAll) {
-      // Shop page - standard responsive grid
       return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center';
     } else {
-      // Home page - specific layout requirements
       return 'grid gap-4 justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
     }
   };
 
   return (
-    <div id='our-products-section' className='p-4 bg-gray-50'>
-      <div className='max-w-[1240px] mx-auto text-center'>
-        <h2 className='text-3xl md:text-5xl tracking-wider text-[#5C3822] font-medium mb-4 xs:text-center'>
-          Our Products
-        </h2>
-        <p className='text-sm sm:text-base text-gray-600 mb-8 xs:text-center'>
-          Nurture your skin naturally with our herbal and homemade skincare
-          essentials
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold mb-4">Our Products</h2>
+        <p className="text-gray-600 mb-6">
+          Nurture your skin naturally with our herbal and homemade skincare essentials
         </p>
 
         {/* Category Buttons */}
-        <div className='flex flex-wrap justify-center space-x-2 sm:space-x-4 mb-8'>
-          {['All', 'Body Care', 'Skin Care', 'Hair Care', 'Soap Bars'].map(
-            (category) => (
-              <button
-                key={category}
-                onClick={() => handleCategoryClick(category)}
-                className={`product-button ${
-                  activeCategory === category ? 'active' : ''
-                }`}
-              >
-                <span>{category}</span>
-              </button>
-            )
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {['All', 'Body Care', 'Skin Care', 'Hair Care', 'Soap Bars'].map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryClick(category)}
+              className={`px-4 py-2 rounded-full border transition-colors duration-300 ${
+                activeCategory === category
+                  ? 'bg-amber-800 text-white border-amber-800'
+                  : 'bg-white text-amber-800 border-amber-800 hover:bg-amber-50'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Loading State */}
+      {loading && <CardSkeleton />}
+
+      {/* Error State */}
+      {error && (
+        <div className="text-center py-8">
+          <p className="text-red-600">Error: {error}</p>
+        </div>
+      )}
+
+      {/* Products Grid */}
+      {!loading && !error && (
+        <div className={getGridClasses()}>
+          {displayedProducts.length === 0 ? (
+            <div className="col-span-full text-center py-8">
+              <p className="text-gray-600">No products found for this category.</p>
+            </div>
+          ) : (
+            displayedProducts.map((product) => {
+              return (
+                <Card
+                  key={product._id || product.id}
+                  name={product.productName || product.name}
+                  price={`₹${product.price}`}
+                  image={product.image}
+                  productId={product._id || product.id}
+                  product={product}
+                  onClick={() => handleProductClick(product)}
+                />
+              );
+            })
           )}
         </div>
+      )}
 
-        {/* Loading and Error Handling */}
-        {loading && <CardSkeleton isHomePage={!showAll} />}
-        {error && <p className='text-red-600'>Error: {error}</p>}
-
-        {/* Products Grid */}
-        {!loading && !error && (
-          <div className='w-full max-w-[1240px] mx-auto'>
-            <div className={getGridClasses()}>
-              {displayedProducts.length === 0 ? (
-                <p className='text-gray-600 col-span-full text-center'>
-                  No products found for this category.
-                </p>
-              ) : (
-                displayedProducts.map((product) => {
-                  return (
-                    <div
-                      key={product._id}
-                      className='cursor-pointer group transform transition duration-300 w-full max-w-[280px]'
-                      onClick={() => handleProductClick(product)}
-                    >
-                      <Card
-                        name={product.productName}
-                        price={`₹${product.price}`}
-                        image={product.image} // Direct Cloudinary URL
-                        description={product.description}
-                        productId={product._id}
-                        product={product}
-                      />
-                    </div>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* View All Button */}
-        {!hideViewAllButton && (
-          <div className='mt-8 xs:text-center'>
-            <button onClick={handleViewAllClick} className='brown-deep-button'>
-              View All
-            </button>
-          </div>
-        )}
-      </div>
+      {/* View All Button */}
+      {!showAll && !hideViewAllButton && displayedProducts.length > 0 && (
+        <div className="text-center mt-8">
+          <button
+            onClick={handleViewAllClick}
+            className="bg-amber-800 text-white px-6 py-2 rounded-md hover:bg-amber-700 transition-colors duration-300"
+          >
+            View All Products
+          </button>
+        </div>
+      )}
     </div>
   );
 };
