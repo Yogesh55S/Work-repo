@@ -9,7 +9,6 @@ const AddProductForm = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { id } = useParams();
-
   const [product, setProduct] = useState(location.state?.product || null);
   const [fields, setFields] = useState([]);
   const [formData, setFormData] = useState({});
@@ -18,7 +17,7 @@ const AddProductForm = () => {
   const [success, setSuccess] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true); // New state for initial loading
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -27,7 +26,11 @@ const AddProductForm = () => {
     const fetchProduct = async () => {
       if (id && !location.state?.product) {
         try {
-          const response = await axios.get(`${API_URL}/products/${id}`);
+          const response = await axios.get(`${API_URL}/products/${id}`, {
+            headers: {
+              'X-Admin-Request': 'true' // Add admin header for proper response format
+            }
+          });
           setProduct(response.data);
         } catch (err) {
           console.error('Error fetching product:', err);
@@ -35,14 +38,13 @@ const AddProductForm = () => {
         }
       }
     };
-
     fetchProduct();
   }, [id, location.state, API_URL]);
 
   // Fetch fields and set form data
   useEffect(() => {
     const fetchFields = async () => {
-      setIsInitialLoading(true); // Start initial loading
+      setIsInitialLoading(true);
       try {
         const response = await axios.get(`${API_URL}/products/fields`);
         const fetchedFields = response.data.filter(
@@ -56,15 +58,13 @@ const AddProductForm = () => {
           initialFormData[field.name] =
             product?.[field.name] || (field.type === 'number' ? 0 : '');
         });
-
         setFormData(initialFormData);
       } catch (err) {
         console.error('Error fetching fields:', err);
         setError('Failed to fetch form fields');
       } finally {
-        // Add a small delay to prevent flickering
         setTimeout(() => {
-          setIsInitialLoading(false); // End initial loading
+          setIsInitialLoading(false);
         }, 300);
       }
     };
@@ -81,12 +81,10 @@ const AddProductForm = () => {
     const file = e.target.files[0];
     if (file) {
       setImage(file);
-
       // Clean up previous preview
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
-
       // Create preview URL for the selected image
       const objectUrl = URL.createObjectURL(file);
       setPreviewUrl(objectUrl);
@@ -96,7 +94,7 @@ const AddProductForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       const form = new FormData();
@@ -110,13 +108,16 @@ const AddProductForm = () => {
         return;
       }
 
-      const token = localStorage.getItem('token');
+      // CHANGED: Use 'authToken' instead of 'token'
+      const token = localStorage.getItem('authToken');
+      
+      // CHANGED: Handle both id formats for product updates
       const url = product
-        ? `${API_URL}/products/${product._id}`
+        ? `${API_URL}/products/${product.id || product._id}`
         : `${API_URL}/products/add`;
       const method = product ? 'put' : 'post';
 
-      await axios({
+      const response = await axios({
         method,
         url,
         data: form,
@@ -126,15 +127,17 @@ const AddProductForm = () => {
         },
       });
 
+      console.log('Product saved successfully:', response.data);
       setSuccess(true);
     } catch (err) {
       console.error('Error saving product:', err);
       setError(
-        err.response?.data?.message ||
-          'Failed to save product. Please try again.'
+        err.response?.data?.message || 
+        err.response?.data?.error ||
+        'Failed to save product. Please try again.'
       );
     } finally {
-      setIsLoading(false); // Stop loading
+      setIsLoading(false);
     }
   };
 
@@ -177,162 +180,161 @@ const AddProductForm = () => {
   }
 
   return (
-    <div className='py-5'>
+    <div className="container mx-auto p-6 max-w-4xl">
+      {/* Success Modal */}
       {success && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white p-6 rounded-lg shadow-lg text-center'>
-            <h2 className='text-2xl font-bold mb-4 text-green-600'>Success</h2>
-            <p className='mb-6'>
-              {product
-                ? 'Product updated successfully! Returning to product list.'
-                : 'Product added successfully! You can add another product.'}
-            </p>
-            <button
-              onClick={handleSuccessOkay}
-              className='bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition'
-            >
-              {product ? 'View Products' : 'Add Another'}
-            </button>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full mx-4">
+            <div className="text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-green-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-green-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Success!
+              </h3>
+              <p className="text-gray-600 mb-4">
+                {product
+                  ? 'Product updated successfully! Returning to product list.'
+                  : 'Product added successfully! You can add another product.'}
+              </p>
+              <button
+                onClick={handleSuccessOkay}
+                className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors"
+              >
+                OK
+              </button>
+            </div>
           </div>
         </div>
       )}
 
-      {/* Loading Overlay for form submission */}
+      {/* Loading Overlay */}
       {isLoading && (
-        <div className='fixed inset-0 bg-black bg-opacity-30 flex flex-col items-center justify-center z-50'>
-          <FontAwesomeIcon
-            icon={faSpinner}
-            spin
-            className='text-white text-4xl mb-3'
-          />
-          <p className='text-white font-medium text-lg'>
-            Processing. Please Do Not Refresh...
-          </p>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="flex items-center space-x-3">
+              <FontAwesomeIcon icon={faSpinner} spin className="text-blue-600" />
+              <span className="text-gray-700">
+                Processing. Please Do Not Refresh...
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
-      <div
-        className={`max-w-5xl mx-auto p-6 bg-gray-100 shadow-lg rounded-lg ${
-          success ? 'opacity-25' : 'opacity-100'
-        }`}
-      >
-        <h1 className='text-3xl font-bold text-center mb-6'>
-          {product ? 'Edit Product' : 'Add New Product'}
-        </h1>
+      {/* Main Form */}
+      <div className="bg-white rounded-lg shadow-sm border">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-900">
+            {product ? 'Edit Product' : 'Add New Product'}
+          </h2>
+        </div>
 
-        {error && <p className='text-red-500 text-center mb-4'>{error}</p>}
-
-        <form
-          onSubmit={handleSubmit}
-          className='grid grid-cols-1 md:grid-cols-2 gap-6'
-        >
-          {fields.map((field) => (
-            <div key={field.name} className='col-span-1'>
-              <label
-                htmlFor={field.name}
-                className='block text-sm font-medium text-gray-700 mb-1'
-              >
-                {field.label}{' '}
-                {field.name === 'netQuantity' && (
-                  <span className='text-sm text-gray-500'>
-                    (e.g., g, pcs, ml)
-                  </span>
-                )}
-              </label>
-              {field.type === 'textarea' ? (
-                <textarea
-                  id={field.name}
-                  name={field.name}
-                  placeholder={field.placeholder}
-                  value={formData[field.name] || ''}
-                  onChange={handleInputChange}
-                  className='w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500'
-                  required={field.required}
-                />
-              ) : (
-                <input
-                  id={field.name}
-                  type={field.type}
-                  name={field.name}
-                  placeholder={field.placeholder}
-                  value={formData[field.name] || ''}
-                  onChange={handleInputChange}
-                  className='w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500'
-                  required={field.required}
-                />
-              )}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Error Display */}
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+              {error}
             </div>
-          ))}
+          )}
 
-          <div className='col-span-2'>
-            <label
-              htmlFor='image'
-              className='block text-sm font-medium text-gray-700 mb-1'
-            >
-              Product Image
+          {/* Image Upload Section */}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              Product Image *
             </label>
-
-            {/* Show preview of newly selected image */}
-            {previewUrl ? (
-              <div className='mb-2'>
-                <p className='text-sm text-green-500 mb-1'>
-                  New image preview:
-                </p>
-                <img
-                  src={previewUrl}
-                  alt='Image preview'
-                  className='h-40 object-contain border border-gray-200 rounded p-1 mb-2'
+            <div className="flex items-center space-x-4">
+              <div className="flex-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </div>
-            ) : (
-              // Only show current image if no new image is selected
-              product &&
-              product.image && (
-                <div className='mb-2'>
-                  <p className='text-sm text-gray-500 mb-1'>Current image:</p>
+              {(previewUrl || product?.image) && (
+                <div className="flex-shrink-0">
                   <img
-                    src={product.image}
-                    alt={product.productName}
-                    className='h-40 object-contain border border-gray-200 rounded p-1 mb-2'
+                    src={previewUrl || product?.image}
+                    alt="Preview"
+                    className="w-20 h-20 object-cover rounded-md border"
                   />
                 </div>
-              )
-            )}
-
-            <input
-              id='image'
-              type='file'
-              accept='image/*'
-              onChange={handleImageChange}
-              className='w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-blue-300 focus:border-blue-500'
-              required={!product} // Required for new products, optional for edits
-            />
-            {image && (
-              <p className='text-sm text-green-500 mt-1'>
-                New image selected: {image.name}
-              </p>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className='col-span-2 flex justify-between'>
+          {/* Dynamic Form Fields */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {fields.map((field) => (
+              <div
+                key={field.name}
+                className={field.type === 'textarea' ? 'md:col-span-2' : ''}
+              >
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {field.label || field.name} {field.required && '*'}
+                </label>
+                {field.type === 'textarea' ? (
+                  <textarea
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleInputChange}
+                    required={field.required}
+                    rows={3}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    placeholder={`Enter ${field.label || field.name}`}
+                  />
+                ) : (
+                  <input
+                    type={field.type}
+                    name={field.name}
+                    value={formData[field.name] || ''}
+                    onChange={handleInputChange}
+                    required={field.required}
+                    step={field.type === 'number' ? '0.01' : undefined}
+                    min={field.type === 'number' ? '0' : undefined}
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    placeholder={`Enter ${field.label || field.name}`}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Form Actions */}
+          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
             <button
-              type='button'
+              type="button"
               onClick={handleCancel}
-              className='bg-gray-500 text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:bg-gray-600'
-              disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Cancel
             </button>
             <button
-              type='submit'
-              className={`${
-                product ? 'bg-green-500' : 'bg-blue-500'
-              } text-white font-medium py-2 px-4 rounded-md shadow-md transition hover:${
-                product ? 'bg-green-600' : 'bg-blue-600'
-              }`}
+              type="submit"
               disabled={isLoading}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {product ? 'Update Product' : 'Add Product'}
+              {isLoading ? (
+                <>
+                  <FontAwesomeIcon icon={faSpinner} spin className="mr-2" />
+                  {product ? 'Updating...' : 'Adding...'}
+                </>
+              ) : (
+                product ? 'Update Product' : 'Add Product'
+              )}
             </button>
           </div>
         </form>

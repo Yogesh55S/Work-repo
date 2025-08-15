@@ -1,51 +1,70 @@
 /* Container for orders with scrolling */
 .user-orders-scroll-container {
-    max-height: 500px; /* Matches sidebar height */
+  max-height: 500px; /* Matches sidebar height */
+  overflow-y: auto;
+  padding-right: 10px; /* Adds padding for scrollbar */
+  margin-top: 8px;
+}
+
+/* Custom scrollbar for desktop */
+.user-orders-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.user-orders-scroll-container::-webkit-scrollbar-thumb {
+  background-color: #b09383;
+  border-radius: 4px;
+}
+
+/* Ensure scroll effect is only applied for larger screens */
+@media (min-width: 1024px) {
+  .user-orders-scroll-container {
+    max-height: 500px; /* Adjust to sidebar height */
     overflow-y: auto;
-    padding-right: 10px; /* Adds padding for scrollbar */
-    margin-top: 8px;
   }
-  
-  /* Custom scrollbar for desktop */
-  .user-orders-scroll-container::-webkit-scrollbar {
-    width: 8px;
-  }
-  
-  .user-orders-scroll-container::-webkit-scrollbar-thumb {
-    background-color: #b09383;
-    border-radius: 4px;
-  }
+}
 
-  
-  
-  /* Ensure scroll effect is only applied for larger screens */
-  @media (min-width: 1024px) {
-    .user-orders-scroll-container {
-      max-height: 500px; /* Adjust to sidebar height */
-      overflow-y: auto;
-    }
+/* Disable scrollable effect for smaller screens */
+@media (max-width: 768px) {
+  .user-orders-scroll-container {
+    max-height: unset;
+    overflow-y: unset;
   }
-  
-  /* Disable scrollable effect for smaller screens */
-  @media (max-width: 768px) {
-    .user-orders-scroll-container {
-      max-height: unset;
-      overflow-y: unset;
-    }
-  }
+}
 
+/* Cancel Order Button Additional Styles */
+.cancel-order-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
 
-  /* Default Order Styles - No changes here */
+.cancel-order-btn:hover:not(:disabled) {
+  background-color: #dc2626;
+  transform: translateY(-1px);
+}
+
+.cancel-order-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
 
 /* Responsive Styles ONLY for 480px */
-/* Responsive Styles ONLY for 480px */
-/* Styles for 480px Frame */
 @media (max-width: 480px) {
   .order-row-mobile {
     display: flex;
     align-items: center;
     padding: 12px;
     border-bottom: 1px solid #ddd;
+    position: relative;
   }
 
   .order-row-mobile:last-child {
@@ -85,11 +104,20 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    /* font-weight: bold; */
   }
 
   .order-arrow img {
     width: 100%;
     height: 100%;
+  }
+
+  /* Mobile Cancel Button - Show as floating action if needed */
+  .cancel-order-btn-mobile {
+    position: absolute;
+    bottom: 8px;
+    right: 50px;
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 4px;
   }
 }

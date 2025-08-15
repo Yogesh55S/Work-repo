@@ -36,7 +36,7 @@ const Cart = () => {
   const API_URL = import.meta.env.VITE_API_URL;
 
   // FIXED: Use consistent user.id throughout (Supabase uses 'id', not '_id')
-  const { isLoggedIn, user } = useAuth();
+ const { isLoggedIn, user, token } = useAuth();
   const userId = user?.id; // FIXED: Changed from user?._id to user?.id
 
   const { removeFromCart, updateCartItemQuantity } = useCart();
@@ -269,69 +269,88 @@ const handleCheckout = async () => {
     }
   };
 
-  const fetchAddresses = async () => {
-    if (!isLoggedIn || !userId) {
-      setAddressesLoading(false);
+const fetchAddresses = async () => {
+  setAddressesLoading(true); // Use proper loading state
+  try {
+    console.log('Fetching addresses from:', `${API_URL}/addresses`);
+    
+    // Fixed: Now token is properly defined
+    const response = await fetch(`${API_URL}/addresses`, {
+      headers: {
+        Authorization: `Bearer ${token}` // Now token is available
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('Fetched addresses:', data);
+    
+    setAddresses(data.addresses || []);
+  } catch (error) {
+    console.error('Error fetching addresses:', error);
+    toast.error('Failed to load addresses');
+  } finally {
+    setAddressesLoading(false);
+  }
+};
+const handleAddAddress = async (formData) => {
+  try {
+    if (
+      !formData.deliveryName ||
+      !formData.deliveryNumber ||
+      !formData.streetAddress ||
+      !formData.city ||
+      !formData.state ||
+      !formData.zip
+    ) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
-    try {
-      setAddressesLoading(true);
+    console.log('Making request to:', `${API_URL}/addresses`);
 
-      const response = await fetch(`${API_URL}/addresses/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
+    const response = await fetch(`${API_URL}/addresses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`, // Now token is properly defined
+      },
+      body: JSON.stringify(formData),
+    });
 
-      if (response.ok) {
-        const data = await response.json();
-        setAddresses(data.addresses || []);
+    if (response.ok) {
+      const responseData = await response.json();
+      console.log('Address added successfully:', responseData);
+      
+      // Refresh the addresses list
+      await fetchAddresses();
+      setShowAddAddressForm(false);
+      toast.success('Address added successfully');
+    } else {
+      // Better error handling
+      let errorData;
+      try {
+        errorData = await response.json();
+        toast.error(errorData.error || 'Failed to add address');
+      } catch (jsonError) {
+        const textResponse = await response.text();
+        console.error('Non-JSON response received:', textResponse);
+        
+        if (response.status === 404) {
+          toast.error('API endpoint not found. Please check your backend configuration.');
+        } else {
+          toast.error(`Server error: ${response.status} ${response.statusText}`);
+        }
       }
-    } catch (error) {
-      console.error('Error fetching addresses:', error.message);
-    } finally {
-      setAddressesLoading(false);
     }
-  };
-
-  const handleAddAddress = async (formData) => {
-    try {
-      if (
-        !formData.deliveryName ||
-        !formData.deliveryNumber ||
-        !formData.streetAddress ||
-        !formData.city ||
-        !formData.state ||
-        !formData.zip
-      ) {
-        toast.error('Please fill in all required fields');
-        return;
-      }
-
-      const response = await fetch(`${API_URL}/addresses/${userId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        await fetchAddresses();
-        setShowAddAddressForm(false);
-        toast.success('Address added successfully');
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.message || 'Failed to add address');
-      }
-    } catch (error) {
-      console.error('Error adding address:', error.message);
-      toast.error('Error adding address');
-    }
-  };
-
+  } catch (error) {
+    console.error('Error adding address:', error.message);
+    toast.error('Network error. Please check your connection.');
+  }
+};
   // FIXED: Updated updateQuantity function with proper database integration
   const updateQuantity = async (productId, newQuantity) => {
     try {
