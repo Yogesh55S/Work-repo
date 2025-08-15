@@ -39,7 +39,7 @@ const AddProductForm = lazy(() => import('./Component/admin/AddProductForm'));
 const ProductView = lazy(() => import('./Component/admin/ProductView'));
 const Orders = lazy(() => import('./Component/admin/Orders'));
 const OrderDetail = lazy(() => import('./Component/admin/OrderDetail'));
-
+const OrderDetailsPage = lazy(() => import('./Component/admin/OrderDetailsPage'));
 // User Panel Components
 const UserPanel = lazy(() => import('./Pages/UserPanel'));
 const PersonalInformation = lazy(() =>
@@ -321,6 +321,7 @@ function App() {
                     element={<Orders userId={user?.userId} />}
                   />
                   <Route path='order/:orderId' element={<OrderDetail />} />{' '}
+                    <Route path="order-details/:orderId" element={<OrderDetailsPage />} /> 
                 </Route>
 
                 {/* Protected User Panel Routes */}
