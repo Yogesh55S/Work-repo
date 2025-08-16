@@ -21,7 +21,6 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
-  // Extract season from collection name
   const extractSeasonFromCollection = (collectionName) => {
     const lower = collectionName.toLowerCase();
     if (lower.includes('monsoon')) return 'Monsoon';
@@ -36,7 +35,7 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
     const fetchSeasonData = async () => {
       try {
         const response = await fetch(`${API_URL}/seasons/active`);
-        if (!response.ok) throw new Error('Failed to fetch active season');
+        if (!response.ok) throw new Error('Failed to fetch season');
         const data = await response.json();
         if (data.success && data.season) {
           setSeasonData(data.season);
@@ -48,7 +47,7 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
     fetchSeasonData();
   }, [API_URL]);
 
-  // Fetch products based on season
+  // ✅ FIXED: Fetch products with proper mapping
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -57,35 +56,49 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
         let apiUrl = `${API_URL}/products`;
         if (season) apiUrl += `?season=${season}`;
         
+        console.log('Fetching products with URL:', apiUrl);
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Failed to fetch products: ${response.statusText}`);
-        const data = await response.json();
         
-        // Map the API response to match Card component props
-        let filteredProducts = data.map(product => ({
-          ...product,
-          // Map database fields to Card component expected props
-          name: product.product_name,
-          productId: product.id,
-          image: product.image,
-          price: product.price
-        }));
-
-        if (!season) {
-          filteredProducts = filteredProducts.filter(product => product.sub_type === collectionName);
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
-        setProducts(filteredProducts);
+        const data = await response.json();
+        console.log('Raw products data:', data);
+
+        // ✅ Map to Card component props
+        let mappedProducts = Array.isArray(data) ? data.map(product => ({
+          name: product.product_name || product.name || 'Unknown Product',
+          price: `₹${product.price || 0}`, // Card expects string with ₹ symbol
+          image: product.image || '/placeholder.jpg',
+          productId: product.id || product._id || Math.random().toString(36),
+          product: product // Full product object
+        })) : [];
+
+        // Apply legacy filtering if no season
+        if (!season) {
+          mappedProducts = mappedProducts.filter(item => 
+            item.product.sub_type === collectionName
+          );
+        }
+
+        console.log('Final mapped products:', mappedProducts);
+        setProducts(mappedProducts);
         setError(null);
+        
       } catch (error) {
-        setError(error.message || 'Unable to fetch products');
-        setProducts([]);
         console.error('Error fetching products:', error);
+        if (error.message.includes('Failed to fetch') || error.message.includes('TypeError')) {
+          setError('Server connection failed. Please restart your backend server.');
+        } else {
+          setError(error.message);
+        }
+        setProducts([]);
       } finally {
         setLoading(false);
       }
     };
-    
+
     if (collectionName || seasonData) {
       fetchProducts();
     }
@@ -97,16 +110,11 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
       setTimeout(() => setShowLoader(false), 500);
     };
     window.addEventListener("load", handlePageLoad);
-    if (document.readyState === "complete") { handlePageLoad(); }
-    if (!loading) {
-      setTimeout(() => setShowLoader(false), 300);
-    }
-    return () => {
-      window.removeEventListener("load", handlePageLoad);
-    };
+    if (document.readyState === "complete") handlePageLoad();
+    if (!loading) setTimeout(() => setShowLoader(false), 300);
+    return () => window.removeEventListener("load", handlePageLoad);
   }, [loading]);
 
-  // Slides calculation
   const calculateSlidesToShow = () => {
     const screenWidth = window.innerWidth;
     if (screenWidth >= 1440) setSlidesToShow(4);
@@ -134,7 +142,7 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
   const isNextDisabled = currentSlide + slidesToShow >= products.length;
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product.productId || product.id}`, { state: { product } });
+    navigate(`/product/${product.productId}`, { state: { product: product.product } });
   };
 
   const displayContent = seasonData
@@ -160,37 +168,21 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
     return `Explore our ${lower} specially curated for the season.`;
   }
 
-  // Error renderer
-  const renderError = () => (
-    <div style={{
-      background: '#ffe6e6',
-      color: '#b00020',
-      padding: '2rem',
-      borderRadius: '8px',
-      textAlign: 'center',
-      margin: '1rem 0'
-    }}>
-      <h3>Unable to load products</h3>
-      <p><strong>{error}</strong></p>
-      {error && error.includes('Failed to fetch') && (
-        <div>
-          <strong>Possible issues:</strong>
-          <ul style={{ textAlign: 'left', display: 'inline-block' }}>
-            <li>Server is not running or unreachable.</li>
-            <li>CORS policy blocks request. Ensure backend allows requests from <code>{window.location.origin}</code>.</li>
-            <li>Network problem.</li>
-          </ul>
-        </div>
-      )}
-    </div>
-  );
-
-  // Show loader
   if (showLoader) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <img src={loadingGif} alt="Loading..." className="w-16 h-16 mb-4" />
         <span className="text-lg">Loading...</span>
+      </div>
+    );
+  }
+
+  // ✅ Better error display
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+        <h3 className="text-lg font-semibold text-red-800 mb-2">Unable to Load {displayContent.name}</h3>
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
@@ -202,15 +194,12 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
         <p className="text-gray-700">{displayContent.description}</p>
       </div>
       
-      {error && renderError()}
-      
       {loading ? (
         <CardSkeleton />
-      ) : !error && products.length === 0 ? (
+      ) : products.length === 0 ? (
         <p className="text-lg text-gray-500">No products available for {displayContent.name} at the moment.</p>
-      ) : !error && (
+      ) : (
         <div className="relative">
-          {/* Navigation buttons */}
           <button
             onClick={() => sliderRef.current?.slickPrev()}
             disabled={isPrevDisabled}
@@ -233,10 +222,13 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
 
           <Slider ref={sliderRef} {...settings}>
             {products.map(product => (
-              <div key={product.productId || product.id} className="px-2">
+              <div key={product.productId} className="px-2">
                 <Card
-                  product={product}
-                  onClick={() => handleProductClick(product)}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image}
+                  productId={product.productId}
+                  product={product.product}
                 />
               </div>
             ))}

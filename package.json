@@ -20,6 +20,7 @@
     "@supabase/supabase-js": "^2.55.0",
     "axios": "^1.7.7",
     "cashfree-pg-sdk-javascript": "^2.0.8",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "emailjs-com": "^3.2.0",
     "framer-motion": "^11.11.17",
