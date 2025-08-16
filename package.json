@@ -17,6 +17,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@react-oauth/google": "^0.12.1",
+    "@supabase/supabase-js": "^2.55.0",
     "axios": "^1.7.7",
     "cashfree-pg-sdk-javascript": "^2.0.8",
     "dotenv": "^16.4.5",

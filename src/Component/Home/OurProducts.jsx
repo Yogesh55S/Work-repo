@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import * as PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import Card from '../Card';
 import CardSkeleton from '../skeletons/Cardskeleton';
 
@@ -15,30 +15,22 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Extract the category from location state (if any)
   const categoryFromState = location.state?.category || 'All';
 
-  // Set the active category when coming from Care (via navigate)
   useEffect(() => {
     if (categoryFromState !== 'All') {
       setActiveCategory(categoryFromState);
     }
   }, [categoryFromState]);
 
-  // Calculate number of cards to show based on screen width and current page
+  // Cards calculation
   const calculateCardsToShow = () => {
     const screenWidth = window.innerWidth;
-    
     if (!showAll) {
-      if (screenWidth >= 1440) {
-        setCardsToShow(4);
-      } else if (screenWidth >= 1024) {
-        setCardsToShow(3);
-      } else if (screenWidth >= 768) {
-        setCardsToShow(4);
-      } else {
-        setCardsToShow(4);
-      }
+      if (screenWidth >= 1440) setCardsToShow(4);
+      else if (screenWidth >= 1024) setCardsToShow(3);
+      else if (screenWidth >= 768) setCardsToShow(4);
+      else setCardsToShow(4);
     } else {
       setCardsToShow(Infinity);
     }
@@ -47,155 +39,157 @@ const OurProducts = ({ showAll, hideViewAllButton }) => {
   useEffect(() => {
     calculateCardsToShow();
     window.addEventListener('resize', calculateCardsToShow);
-    
     return () => {
       window.removeEventListener('resize', calculateCardsToShow);
     };
   }, [showAll]);
 
-  // UPDATED: Fetch products from your Node.js + Supabase API
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
-      
       try {
-        // Build query parameters
         const params = new URLSearchParams();
         if (activeCategory !== 'All') {
           params.append('category', activeCategory);
         }
-        
         const url = `${API_URL}/products${params.toString() ? `?${params.toString()}` : ''}`;
         const response = await fetch(url);
-        
         if (!response.ok) {
           throw new Error(`Failed to fetch products: ${response.statusText}`);
         }
-        
         const data = await response.json();
-        setProducts(data);
+        
+        // Map API response to Card component props
+        const mappedProducts = data.map(product => ({
+          ...product,
+          name: product.product_name,
+          productId: product.id,
+          image: product.image,
+          price: product.price
+        }));
+        
+        setProducts(mappedProducts);
       } catch (err) {
         console.error('Error fetching products:', err);
-        setError(err.message);
+        setError(err.message || 'Unable to fetch products.');
       } finally {
         setLoading(false);
       }
     };
-
     fetchProducts();
-  }, [activeCategory]); // Re-fetch when category changes
+  }, [activeCategory, API_URL]);
 
-  // Filter products based on the active category (backup client-side filtering)
-  const filteredProducts = activeCategory === 'All' 
-    ? products 
+  // Filtering
+  const filteredProducts = activeCategory === 'All'
+    ? products
     : products.filter(
         (product) => product.type?.trim().toLowerCase() === activeCategory.trim().toLowerCase()
       );
 
-  const displayedProducts = showAll 
-    ? filteredProducts 
-    : filteredProducts.slice(0, cardsToShow);
+  const displayedProducts = showAll ? filteredProducts : filteredProducts.slice(0, cardsToShow);
+
+  // Error renderer
+  const renderError = () => (
+    <div style={{ background: '#ffe6e6', color: '#b00020', padding: '2rem', borderRadius: '8px', textAlign: 'center' }}>
+      <h3>Unable to load products</h3>
+      <p>
+        There was a problem while connecting to the product database.
+        <br />
+        <strong>{error}</strong>
+      </p>
+      {error && error.indexOf('Failed to fetch') !== -1 && (
+        <div style={{ marginTop: '1rem' }}>
+          <strong>Possible reasons:</strong>
+          <ul style={{ textAlign: 'left', display: 'inline-block' }}>
+            <li>The server is not running or unreachable.</li>
+            <li>CORS policy is blocking your request. Please ensure the backend allows requests from <code>{window.location.origin}</code>.</li>
+            <li>Network connection problem.</li>
+          </ul>
+          <p>
+            Developers: Open browser Console/Network tab for details.<br />
+            <a href="https://reactjs.org/link/react-devtools" target="_blank" rel="noopener noreferrer">React DevTools</a>
+          </p>
+        </div>
+      )}
+    </div>
+  );
 
   const handleProductClick = (product) => {
-    navigate(`/product/${product._id || product.id}`, { state: { product } });
+    navigate(`/product/${product.productId || product.id}`, { state: { product } });
   };
-
+  
   const handleViewAllClick = () => {
     navigate('/shop');
   };
-
+  
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
   };
-
+  
   const getGridClasses = () => {
-    if (showAll) {
-      return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center';
-    } else {
-      return 'grid gap-4 justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
-    }
+    return showAll
+      ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 justify-items-center'
+      : 'grid gap-4 justify-items-center grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4';
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold mb-4">Our Products</h2>
-        <p className="text-gray-600 mb-6">
-          Nurture your skin naturally with our herbal and homemade skincare essentials
-        </p>
-
-        {/* Category Buttons */}
-        <div className="flex flex-wrap justify-center gap-2 mb-8">
-          {['All', 'Body Care', 'Skin Care', 'Hair Care', 'Soap Bars'].map((category) => (
-            <button
-              key={category}
-              onClick={() => handleCategoryClick(category)}
-              className={`px-4 py-2 rounded-full border transition-colors duration-300 ${
-                activeCategory === category
-                  ? 'bg-amber-800 text-white border-amber-800'
-                  : 'bg-white text-amber-800 border-amber-800 hover:bg-amber-50'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Loading State */}
-      {loading && <CardSkeleton />}
-
-      {/* Error State */}
-      {error && (
-        <div className="text-center py-8">
-          <p className="text-red-600">Error: {error}</p>
-        </div>
-      )}
-
-      {/* Products Grid */}
-      {!loading && !error && (
-        <div className={getGridClasses()}>
-          {displayedProducts.length === 0 ? (
-            <div className="col-span-full text-center py-8">
-              <p className="text-gray-600">No products found for this category.</p>
-            </div>
-          ) : (
-            displayedProducts.map((product) => {
-              return (
-                <Card
-                  key={product._id || product.id}
-                  name={product.productName || product.name}
-                  price={`₹${product.price}`}
-                  image={product.image}
-                  productId={product._id || product.id}
-                  product={product}
-                  onClick={() => handleProductClick(product)}
-                />
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {/* View All Button */}
-      {!showAll && !hideViewAllButton && displayedProducts.length > 0 && (
-        <div className="text-center mt-8">
+    <main>
+      <h2 className="text-2xl font-bold mb-2">Nurture your skin naturally with our herbal and homemade skincare essentials</h2>
+      
+      {/* Category Buttons */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {['All', 'Face Care', 'Body Care', 'Hair Care'].map(category => (
           <button
+            key={category}
+            onClick={() => handleCategoryClick(category)}
+            className={`px-4 py-2 rounded-full ${
+              activeCategory === category
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+      </div>
+      
+      {error && renderError()}
+      
+      {loading ? (
+        <CardSkeleton />
+      ) : !error && displayedProducts.length === 0 ? (
+        <p className="text-lg text-gray-500">No products found for this category.</p>
+      ) : !error && (
+        <section className={getGridClasses()}>
+          {displayedProducts.map(product => (
+            <Card
+              key={product.productId || product.id}
+              product={product}
+              onClick={() => handleProductClick(product)}
+            />
+          ))}
+        </section>
+      )}
+      
+      {!hideViewAllButton && !showAll && (
+        <div className="flex justify-center mt-4">
+          <button
+            className="px-6 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700"
             onClick={handleViewAllClick}
-            className="bg-amber-800 text-white px-6 py-2 rounded-md hover:bg-amber-700 transition-colors duration-300"
           >
             View All Products
           </button>
         </div>
       )}
-    </div>
+    </main>
   );
 };
 
 OurProducts.propTypes = {
   showAll: PropTypes.bool,
-  hideViewAllButton: PropTypes.bool,
+  hideViewAllButton: PropTypes.bool
 };
 
 export default OurProducts;
