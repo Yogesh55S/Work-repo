@@ -1,13 +1,14 @@
 // Navbar.js - Fixed user panel navigation
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { FiShoppingCart, FiUser, FiLogOut } from "react-icons/fi";
+import { FiShoppingCart, FiUser, FiLogOut, FiHeart } from "react-icons/fi";
 import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "./providers/AuthContext";
 import { useCart } from "./providers/CartContext";
 import logo from "../assets/svg/logos/Group24.svg";
 import GuestCartService from "../services/GuestCartService";
+import { useWishlist } from "./providers/WishlistContext";
 
 const Navbar = () => {
 	const { cartCount, updateCartCount } = useCart();
@@ -16,6 +17,7 @@ const Navbar = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const { isLoggedIn, logout, user } = useAuth();
+const { wishlistCount } = useWishlist();
 
 	useEffect(() => {
 		const handleResize = () => {
@@ -100,6 +102,18 @@ const Navbar = () => {
 
 				{/* Icons */}
 				<div className="flex items-center space-x-6 text-xl">
+{/* Wishlist Icon - Always show */}
+<div className="relative">
+  <Link to="/wishlist" className="block">
+    <FiHeart className="h-6 w-6 text-gray-600 hover:text-secondary transition-colors cursor-pointer" />
+  </Link>
+  {wishlistCount > 0 && (
+    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+      {wishlistCount}
+    </span>
+  )}
+</div>
+
 					{/* Cart Icon with Badge */}
 					<Link
 						to="/cart"

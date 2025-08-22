@@ -17,7 +17,7 @@ import Loader from './Component/gifloader';
 import Home from './Pages/Home';
 
 import PrivacyPolicy from './Pages/PrivicyPolicy';
-
+import { WishlistProvider } from './Component/providers/WishlistContext';
 // Lazy load all components
 const WinterCollection = lazy(() => import('./Pages/WinterCollection'));
 const NotFound = lazy(() => import('./Pages/Notfound'));
@@ -33,6 +33,7 @@ const ResetPassword = lazy(() => import('./Pages/ResetPassword'));
 const PaymentStatus = lazy(() => import('./Pages/PaymentStatus'));
 const ProductDetail = lazy(() => import('./Component/ProductDetail'));
 const VerifyResetOTP = lazy(() => import('./Pages/VerifyResetOTP'));
+const Wishlist = lazy(() => import('./Pages/Wishlist'));
 // Admin Panel Components
 const AdminPanel = lazy(() => import('./Pages/AdminPanel'));
 const AddProductForm = lazy(() => import('./Component/admin/AddProductForm'));
@@ -164,6 +165,7 @@ function App() {
       <AuthContext.Provider value={{ user, logout }}>
         <LoadingContext.Provider value={{ isLoading, setIsLoading }}>
           <CartProvider>
+             <WishlistProvider>
             <Router>
               <Navbar />
               {isLoading && (
@@ -238,6 +240,7 @@ function App() {
                     </Suspense>
                   }
                 />
+                <Route path="/wishlist" element={<Wishlist />} />
                 <Route
                   path='/login'
                   element={
@@ -371,6 +374,7 @@ function App() {
                 theme='light'
               />
             </Router>
+            </WishlistProvider>
           </CartProvider>
         </LoadingContext.Provider>
       </AuthContext.Provider>
