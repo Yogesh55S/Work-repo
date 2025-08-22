@@ -5,7 +5,7 @@ import 'react-loading-skeleton/dist/skeleton.css';
 const CardSkeleton = () => {
   // Custom theme colors to match your design
   const skeletonBaseColor = '#efe6dc';
-  const skeletonHighlightColor = '#f5eee6';
+  const skeletonHighlightColor = '#f5eee6'; 
 
   // State to track number of skeletons to show based on screen size
   const [skeletonsToShow, setSkeletonsToShow] = useState(4);

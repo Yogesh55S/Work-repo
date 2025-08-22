@@ -17,7 +17,6 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showLoader, setShowLoader] = useState(true);
-  const [seasonData, setSeasonData] = useState(null);
   const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
@@ -30,29 +29,11 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
     return null;
   };
 
-  // Fetch active season data
-  useEffect(() => {
-    const fetchSeasonData = async () => {
-      try {
-        const response = await fetch(`${API_URL}/seasons/active`);
-        if (!response.ok) throw new Error('Failed to fetch season');
-        const data = await response.json();
-        if (data.success && data.season) {
-          setSeasonData(data.season);
-        }
-      } catch (error) {
-        console.error('Error fetching season data:', error);
-      }
-    };
-    fetchSeasonData();
-  }, [API_URL]);
-
-  // ✅ FIXED: Fetch products with proper mapping
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const season = extractSeasonFromCollection(collectionName) || seasonData?.season_name;
+        const season = extractSeasonFromCollection(collectionName);
         let apiUrl = `${API_URL}/products`;
         if (season) apiUrl += `?season=${season}`;
         
@@ -66,30 +47,34 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
         const data = await response.json();
         console.log('Raw products data:', data);
 
-        // ✅ Map to Card component props
+        // Your backend returns products in the correct format already
+        // Map to Card component props with your Supabase field structure
         let mappedProducts = Array.isArray(data) ? data.map(product => ({
-          name: product.product_name || product.name || 'Unknown Product',
-          price: `₹${product.price || 0}`, // Card expects string with ₹ symbol
+          // Card component expects these exact props
+          name: product.productName || product.name || 'Unknown Product',
+          price: `₹${product.price || 0}`,
           image: product.image || '/placeholder.jpg',
-          productId: product.id || product._id || Math.random().toString(36),
-          product: product // Full product object
+          productId: product._id || product.id,
+          product: product // Full product object for navigation
         })) : [];
 
-        // Apply legacy filtering if no season
+        // Legacy filtering if no season-based filtering
         if (!season) {
           mappedProducts = mappedProducts.filter(item => 
-            item.product.sub_type === collectionName
+            item.product.subType === collectionName || item.product.sub_type === collectionName
           );
         }
 
-        console.log('Final mapped products:', mappedProducts);
+        console.log(`Found ${mappedProducts.length} products for ${season || collectionName}`);
         setProducts(mappedProducts);
         setError(null);
         
       } catch (error) {
         console.error('Error fetching products:', error);
         if (error.message.includes('Failed to fetch') || error.message.includes('TypeError')) {
-          setError('Server connection failed. Please restart your backend server.');
+          setError('Backend server not running. Please start your Node.js server.');
+        } else if (error.message.includes('ERR_CONNECTION_REFUSED')) {
+          setError('Cannot connect to server. Check if backend is running on correct port.');
         } else {
           setError(error.message);
         }
@@ -99,34 +84,54 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
       }
     };
 
-    if (collectionName || seasonData) {
-      fetchProducts();
-    }
-  }, [API_URL, collectionName, seasonData]);
+    fetchProducts();
+  }, [API_URL, collectionName]);
 
-  // Loader management
+  // Handle page loader
   useEffect(() => {
     const handlePageLoad = () => {
-      setTimeout(() => setShowLoader(false), 500);
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 500);
     };
+
     window.addEventListener("load", handlePageLoad);
-    if (document.readyState === "complete") handlePageLoad();
-    if (!loading) setTimeout(() => setShowLoader(false), 300);
-    return () => window.removeEventListener("load", handlePageLoad);
+
+    if (document.readyState === "complete") {
+      handlePageLoad();
+    }
+
+    if (!loading) {
+      setTimeout(() => {
+        setShowLoader(false);
+      }, 300);
+    }
+
+    return () => {
+      window.removeEventListener("load", handlePageLoad);
+    };
   }, [loading]);
 
   const calculateSlidesToShow = () => {
     const screenWidth = window.innerWidth;
-    if (screenWidth >= 1440) setSlidesToShow(4);
-    else if (screenWidth >= 1024) setSlidesToShow(3);
-    else if (screenWidth >= 768) setSlidesToShow(2);
-    else setSlidesToShow(1);
+
+    if (screenWidth >= 1440) {
+      setSlidesToShow(4);
+    } else if (screenWidth >= 1024) {
+      setSlidesToShow(3);
+    } else if (screenWidth >= 768) {
+      setSlidesToShow(2);
+    } else {
+      setSlidesToShow(1);
+    }
   };
 
   useEffect(() => {
     calculateSlidesToShow();
-    window.addEventListener('resize', calculateSlidesToShow);
-    return () => window.removeEventListener('resize', calculateSlidesToShow);
+    window.addEventListener('resize', calculateSlidesToShow); 
+    return () => {
+      window.removeEventListener('resize', calculateSlidesToShow);
+    };
   }, []);
 
   const settings = {
@@ -145,97 +150,137 @@ const Winter = ({ collectionName = "Monsoon Collection" }) => {
     navigate(`/product/${product.productId}`, { state: { product: product.product } });
   };
 
-  const displayContent = seasonData
-    ? {
-        name: seasonData.collection_name || collectionName,
-        description: seasonData.collection_description || getDefaultDescription(collectionName),
-        bannerDesktop: seasonData.banner_image_desktop,
-        bannerMobile: seasonData.banner_image_mobile
-      }
-    : {
-        name: collectionName,
-        description: getDefaultDescription(collectionName),
-        bannerDesktop: null,
-        bannerMobile: null
+  // Get display content based on collection name
+  const getDisplayContent = (collectionName) => {
+    const lower = collectionName.toLowerCase();
+    if (lower.includes('monsoon')) {
+      return {
+        title: "Monsoon Collection",
+        description: "Embrace the season with our Monsoon Collection—made to hydrate, soothe, and protect your skin against humidity, stickiness, and sudden breakouts. Powered by 100% natural, plant-based ingredients."
       };
+    }
+    if (lower.includes('winter')) {
+      return {
+        title: "Winter Collection",
+        description: "Embrace the winter season with our nourishing collection, specially formulated to protect and heal your skin during the cold, dry months. Powered by 100% natural, plant-based ingredients."
+      };
+    }
+    if (lower.includes('summer')) {
+      return {
+        title: "Summer Collection",
+        description: "Beat the heat with our refreshing summer collection, designed to cool and soothe your skin during hot, sunny days. Powered by 100% natural, plant-based ingredients."
+      };
+    }
+    if (lower.includes('spring')) {
+      return {
+        title: "Spring Collection",
+        description: "Rejuvenate with our spring collection, perfect for renewal and fresh beginnings as nature blooms around you. Powered by 100% natural, plant-based ingredients."
+      };
+    }
+    return {
+      title: `${collectionName}`,
+      description: `Explore our ${lower} collection, specially curated for the season. Powered by 100% natural, plant-based ingredients.`
+    };
+  };
 
-  function getDefaultDescription(name) {
-    const lower = name.toLowerCase();
-    if (lower.includes('monsoon')) return "Discover our exclusive monsoon collection, crafted for lush season—formulated to keep your skin fresh, healthy, and protected from humidity and rain.";
-    if (lower.includes('winter')) return "Embrace the winter season with our nourishing collection, specially formulated to protect and heal your skin during the cold, dry months.";
-    if (lower.includes('summer')) return "Beat the heat with our refreshing summer collection, designed to cool and soothe your skin during hot, sunny days.";
-    if (lower.includes('spring')) return "Rejuvenate with our spring collection, perfect for renewal and fresh beginnings as nature blooms around you.";
-    return `Explore our ${lower} specially curated for the season.`;
-  }
+  const displayContent = getDisplayContent(collectionName);
 
+  // Show loader while page is loading
   if (showLoader) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <img src={loadingGif} alt="Loading..." className="w-16 h-16 mb-4" />
-        <span className="text-lg">Loading...</span>
-      </div>
-    );
-  }
-
-  // ✅ Better error display
-  if (error) {
-    return (
-      <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
-        <h3 className="text-lg font-semibold text-red-800 mb-2">Unable to Load {displayContent.name}</h3>
-        <p className="text-red-600">{error}</p>
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <div className="text-center">
+          <img src={loadingGif} alt="Loading..." className="w-32 h-32 mx-auto" />
+          <p className="mt-4 text-gray-700 font-medium">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <section className="winter-collection-section">
-      <div className="mb-4">
-        <h2 className="font-bold text-2xl mb-1">{displayContent.name}</h2>
-        <p className="text-gray-700">{displayContent.description}</p>
-      </div>
-      
-      {loading ? (
-        <CardSkeleton />
-      ) : products.length === 0 ? (
-        <p className="text-lg text-gray-500">No products available for {displayContent.name} at the moment.</p>
-      ) : (
-        <div className="relative">
-          <button
-            onClick={() => sliderRef.current?.slickPrev()}
-            disabled={isPrevDisabled}
-            className={`absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-full ${
-              isPrevDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-            } text-white`}
-          >
-            <FontAwesomeIcon icon={faArrowLeft} />
-          </button>
-          
-          <button
-            onClick={() => sliderRef.current?.slickNext()}
-            disabled={isNextDisabled}
-            className={`absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 rounded-full ${
-              isNextDisabled ? 'bg-gray-300 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-            } text-white`}
-          >
-            <FontAwesomeIcon icon={faArrowRight} />
-          </button>
-
-          <Slider ref={sliderRef} {...settings}>
-            {products.map(product => (
-              <div key={product.productId} className="px-2">
-                <Card
-                  name={product.name}
-                  price={product.price}
-                  image={product.image}
-                  productId={product.productId}
-                  product={product.product}
-                />
-              </div>
-            ))}
-          </Slider>
+    <div
+      id='winter-carousel'
+      className='py-16 px-4 md:px-8 bg-white'
+    >
+      <div className='max-w-7xl mx-auto'>
+        {/* Header Section */}
+        <div className='text-center mb-16'>
+          <h1 className='text-4xl md:text-5xl lg:text-6xl font-serif text-black mb-6 tracking-wide'>
+            {displayContent.title}
+          </h1>
+          <div className='max-w-4xl mx-auto'>
+            <p className='text-base md:text-lg text-gray-700 leading-relaxed px-4'>
+              {displayContent.description}
+            </p>
+          </div>
         </div>
-      )}
-    </section>
+
+        {/* Products Section */}
+        <div className='relative'>
+          {loading ? (
+            <CardSkeleton />
+          ) : error ? (
+            <div className='text-center py-12'>
+              <p className='text-red-600 text-lg'>Error: {error}</p>
+            </div>
+          ) : products.length === 0 ? (
+            <div className='text-center py-12'>
+              <p className='text-xl text-gray-500'>No products available for {displayContent.title} at the moment.</p>
+            </div>
+          ) : (
+            <>
+              {/* Products Carousel */}
+              <div className='relative px-12'>
+                <Slider ref={sliderRef} {...settings}>
+                  {products.map((product) => (
+                    <div
+                      key={product.productId}
+                      onClick={() => handleProductClick(product)}
+                      className='cursor-pointer px-3'
+                    >
+                      <div className='w-full transform transition duration-300 hover:scale-105'>
+                        <Card
+                          name={product.name}
+                          price={product.price}
+                          image={product.image}
+                          product={product.product}
+                          productId={product.productId}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </Slider>
+
+                {/* Navigation Arrows */}
+                <button
+                  onClick={() => sliderRef.current?.slickPrev()}
+                  className={`absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center transition-all duration-300 z-10 ${
+                    isPrevDisabled 
+                      ? 'opacity-30 cursor-not-allowed' 
+                      : 'hover:border-gray-500 hover:bg-gray-50 shadow-lg'
+                  }`}
+                  disabled={isPrevDisabled}
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} className="text-gray-600 text-lg" />
+                </button>
+
+                <button
+                  onClick={() => sliderRef.current?.slickNext()}
+                  className={`absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center transition-all duration-300 z-10 ${
+                    isNextDisabled 
+                      ? 'opacity-30 cursor-not-allowed' 
+                      : 'hover:border-gray-500 hover:bg-gray-50 shadow-lg'
+                  }`}
+                  disabled={isNextDisabled}
+                >
+                  <FontAwesomeIcon icon={faArrowRight} className="text-gray-600 text-lg" />
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
 

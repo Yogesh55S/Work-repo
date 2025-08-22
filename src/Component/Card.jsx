@@ -11,7 +11,7 @@ const Card = ({ name, price, image, productId, product }) => {
   const { updateCartCount } = useCart();
   const { isLoggedIn, user } = useAuth();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const navigate = useNavigate();
+  const navigate = useNavigate(); 
 
   const handleAddToCart = async () => {
     if (isAddingToCart) return; // Prevent multiple clicks
@@ -93,16 +93,20 @@ const Card = ({ name, price, image, productId, product }) => {
       onClick={handleCardClick}
     >
       {/* Cart Icon (Visible on Hover) */}
-      <button
-        onClick={handleAddToCart} // No stopPropagation here
-        disabled={isAddingToCart}
-        className={`absolute top-5 right-3 winter-carousel-button-2 ${
-          isAddingToCart ? 'opacity-75' : 'opacity-0'
-        } group-hover:opacity-100 transition-opacity duration-200 ease-in-out z-50`}
-        aria-label='Add to Cart'
-      >
-        {isAddingToCart ? '...' : <FaShoppingCart />}
-      </button>
+     <button
+ onClick={handleAddToCart}
+ disabled={isAddingToCart}
+ className={`absolute top-4 right-4 w-10 h-10 bg-[#4D602E] rounded-full flex items-center justify-center hover:bg-[#3d4f24] hover:scale-110 transition-all duration-300 shadow-lg ${
+   isAddingToCart ? 'opacity-75' : 'opacity-0'
+ } group-hover:opacity-100 transform rotate-12 group-hover:rotate-0 z-50`}
+ aria-label='Add to Cart'
+>
+ {isAddingToCart ? (
+   <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+ ) : (
+   <FaShoppingCart className="text-white text-sm" />
+ )}
+</button>
 
       {/* Image Container with zoom effect */}
       <div className='relative overflow-hidden group'>
